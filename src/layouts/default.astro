@@ -1,0 +1,38 @@
+---
+import Base from "./base.astro";
+import Navbar from "../components/navbar.astro";
+import Footer from "../components/footer.astro";
+---
+
+<Base>
+    <div class="nav-container">
+        <Navbar />
+    </div>
+    <div class="content-container">
+        <slot />
+    </div>
+    <div class="footer-container">
+        <Footer />
+    </div>
+</Base>
+
+<style>
+    .nav-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+    }
+
+    .content-container {
+        margin-top: 4rem;
+    }
+
+    .footer-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+</style>

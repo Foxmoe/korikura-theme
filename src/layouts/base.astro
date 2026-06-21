@@ -1,0 +1,46 @@
+---
+import { siteConfig, profileConfig } from "../config";
+import "normalize.css";
+import type { THEME_MODE } from "../constants/constants";
+
+export interface Props {
+    title?: string;
+    description?: string;
+    keywords?: string;
+    themeMode?: THEME_MODE;
+}
+
+let { title, description, keywords, themeMode } = Astro.props;
+
+// const isHomePage = isHomePage(Astro.url.pathname, url("/"));
+
+title = title ? title + " - " + siteConfig.title : siteConfig.title;
+description = description || siteConfig.description;
+keywords = keywords || siteConfig.keywords;
+---
+
+<!doctype html>
+<html lang={siteConfig.lang}>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <meta name="description" content={description} />
+        <meta name="keywords" content={keywords} />
+        <meta name="author" content={profileConfig.name} />
+        <meta name="generator" content={Astro.generator} />
+
+        <meta property="og:site_name" content={siteConfig.title} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={siteConfig.url} />
+        <title>{title}</title>
+    </head>
+
+    <body>
+        <div class="container" data-theme={themeMode}>
+            <slot />
+        </div>
+    </body>
+</html>
