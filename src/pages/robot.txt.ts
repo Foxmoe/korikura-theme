@@ -5,12 +5,13 @@ import type { APIRoute } from "astro";
 const robotsTxt = `
 User-agent: *
 Disallow: /_astro/
+Disallow: /console/
+Disallow: /.well-known/
 
 Sitemap: ${new URL("sitemap.xml", import.meta.env.SITE).href}
 
 Crawl-delay: 5
 `.trim();
-
 
 export const GET: APIRoute = () => {
 	return new Response(robotsTxt, {
