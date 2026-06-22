@@ -7,7 +7,8 @@ import sitemap from '@astrojs/sitemap';
 import react from '@astrojs/react';
 import mdx from '@astrojs/mdx';
 import partytown from '@astrojs/partytown';
-
+import svelte from '@astrojs/svelte';
+import NebulaCMS from 'nebula-cms';
 import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
@@ -29,7 +30,9 @@ export default defineConfig({
     priority: 0.7,
     filenameBase: 'sitemap',
     entryLimit: 50000,
-  }), react(), mdx(), partytown()],
+  }), react(), mdx(), partytown(), svelte(), NebulaCMS({
+    basePath: '/console',
+  })],
   vite: {
     plugins: [tailwindcss()],
     resolve: {
