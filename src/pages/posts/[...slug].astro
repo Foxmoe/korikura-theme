@@ -6,8 +6,8 @@ import {
     render,
 } from "astro:content";
 import DefaultLayout from "@/layouts/default.astro";
-
 import { formatDate, formatDateToChinese } from "@/utils/utils";
+
 type Post = CollectionEntry<"posts">;
 
 export async function getStaticPaths() {

@@ -1,3 +1,5 @@
+// copy sitemap-index.xml to sitemap.xml
+
 import fs from 'fs-extra';
 import path from 'path';
 
