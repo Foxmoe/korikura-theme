@@ -39,6 +39,8 @@ title = title ? title + " - " + siteConfig.title : siteConfig.title;
         <meta property="og:description" content={description} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={siteConfig.url} />
+
+        <link rel="sitemap" href="/sitemap.xml" />
         <title>{title}</title>
 
         <ClientRouter />

@@ -1,13 +1,14 @@
 {
-  "name": "",
+  "name": "korikura",
   "type": "module",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "engines": {
     "node": ">=22.12.0"
   },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "postbuild": "node scripts/copy-sitemap.js",
     "preview": "astro preview",
     "astro": "astro",
     "generate-types": "wrangler types"
@@ -21,6 +22,7 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "astro": "^6.4.7",
+    "fs-extra": "^11.3.5",
     "normalize.css": "^8.0.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
