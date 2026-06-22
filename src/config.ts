@@ -4,6 +4,7 @@ export const siteConfig = {
     keywords: "BakaXH,BakaXH日记,BakaXH的博客",
     lang: "zh-CN",
     url: "https://blog.foxmoe.top",
+    entry: "/",
     themeMode: "auto"
 }
 

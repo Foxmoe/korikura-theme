@@ -1,10 +1,20 @@
 ---
 import Base from "./base.astro";
-import Navbar from "../components/navbar.astro";
-import Footer from "../components/footer.astro";
+import Navbar from "@/components/navbar.astro";
+import Footer from "@/components/footer.astro";
+
+import "@/styles/style.css";
+
+export interface Props {
+    title?: string;
+}
+
+let {
+    title
+} = Astro.props;
 ---
 
-<Base>
+<Base title={title}>
     <div class="nav-container">
         <Navbar />
     </div>

@@ -1,0 +1,21 @@
+---
+import DefaultLayout from "@/layouts/default.astro";
+import { getCollection } from "astro:content";
+import { formatDate, formatDateToChinese } from "@/utils/utils";
+const posts = await getCollection("posts");
+---
+
+<DefaultLayout>
+  <h1>文章列表</h1>
+  <p>共计 {posts.length} 篇文章</p>
+  <ul>
+    {
+      posts.map((post) => (
+        <li>
+          <a href={`/posts/${post.id}`}>{post.data.title}</a>-{" "}
+          {formatDateToChinese(post.data.pubDate)}
+        </li>
+      ))
+    }
+  </ul>
+</DefaultLayout>

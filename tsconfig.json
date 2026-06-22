@@ -3,9 +3,25 @@
   "include": [
     ".astro/types.d.ts",
     "**/*",
-    "./worker-configuration.d.ts"
+    "worker-configuration.d.ts"
   ],
   "exclude": [
     "dist"
-  ]
+  ],
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "allowJs": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    },
+    "types": [
+      "astro/client"
+    ],
+    "skipLibCheck": true,
+    "ignoreDeprecations": "6.0"
+  }
 }

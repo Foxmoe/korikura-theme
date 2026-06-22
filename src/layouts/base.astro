@@ -1,7 +1,8 @@
 ---
-import { siteConfig, profileConfig } from "../config";
+import { siteConfig, profileConfig } from "@/config";
 import "normalize.css";
-import type { THEME_MODE } from "../constants/constants";
+import type { THEME_MODE } from "@/constants/constants";
+import { ClientRouter } from "astro:transitions";
 
 export interface Props {
     title?: string;
@@ -10,13 +11,16 @@ export interface Props {
     themeMode?: THEME_MODE;
 }
 
-let { title, description, keywords, themeMode } = Astro.props;
+let {
+    title,
+    description = siteConfig.description,
+    keywords = siteConfig.keywords,
+    themeMode = siteConfig.themeMode,
+} = Astro.props;
 
 // const isHomePage = isHomePage(Astro.url.pathname, url("/"));
 
 title = title ? title + " - " + siteConfig.title : siteConfig.title;
-description = description || siteConfig.description;
-keywords = keywords || siteConfig.keywords;
 ---
 
 <!doctype html>
@@ -36,11 +40,15 @@ keywords = keywords || siteConfig.keywords;
         <meta property="og:type" content="website" />
         <meta property="og:url" content={siteConfig.url} />
         <title>{title}</title>
+
+        <ClientRouter />
     </head>
 
     <body>
+        <slot name="head" />
         <div class="container" data-theme={themeMode}>
             <slot />
         </div>
+        <slot name="footer" />
     </body>
 </html>

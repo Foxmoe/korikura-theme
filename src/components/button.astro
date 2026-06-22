@@ -1,0 +1,49 @@
+---
+
+---
+
+<div class="card">
+    <h2 class="title">Button Test</h2>
+
+    <button class="btn"> Click Me </button>
+    <button
+        class="bg-pink-400 hover:bg-pink-600 text-white px-4 py-2 rounded-xl"
+    >
+        hover test
+    </button>
+</div>
+
+<style lang="scss">
+    .card {
+        padding: 24px;
+        border-radius: 16px;
+
+        // Tailwind 用来对比（如果生效会很明显）
+        background: #542323;
+
+        border: 2px solid #ff7ab6;
+    }
+
+    .title {
+        font-size: 20px;
+        margin-bottom: 12px;
+        color: #ff4f93;
+    }
+
+    .btn {
+        padding: 10px 16px;
+        border-radius: 12px;
+        cursor: pointer;
+
+        // SCSS hover
+        transition: all 0.2s ease;
+
+        background: black;
+        color: white;
+
+        &:hover {
+            transform: scale(1.08);
+            background: #ff4f93;
+        }
+    }
+</style>

@@ -14,11 +14,24 @@
   },
   "dependencies": {
     "@astrojs/cloudflare": "^13.7.0",
+    "@astrojs/mdx": "^6.0.3",
+    "@astrojs/partytown": "^2.1.7",
+    "@astrojs/react": "^5.0.7",
+    "@astrojs/sitemap": "^3.7.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
     "astro": "^6.4.7",
     "normalize.css": "^8.0.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "tailwindcss": "^4.3.1",
     "wrangler": "^4.103.0"
   },
   "overrides": {
     "vite": "^7"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "sass": "^1.101.0"
   }
 }

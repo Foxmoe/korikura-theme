@@ -1,0 +1,40 @@
+---
+import {
+    getCollection,
+    type CollectionEntry,
+    getEntry,
+    render,
+} from "astro:content";
+import DefaultLayout from "@/layouts/default.astro";
+
+import { formatDate, formatDateToChinese } from "@/utils/utils";
+type Post = CollectionEntry<"posts">;
+
+export async function getStaticPaths() {
+    const posts = await getCollection("posts");
+
+    return posts.map((post: Post) => ({
+        params: { slug: post.id },
+        props: { post },
+    }));
+}
+
+const { post } = Astro.props as { post: Post };
+const { Content } = await render(post);
+---
+
+<DefaultLayout title={post.data.title}>
+    <h1>{post.data.title}</h1>
+    <span>tags:</span>
+    <div>
+        {post.data.tags.map((tag) => (
+            <span>{tag}</span>
+            <br />
+        ))}
+    </div>
+    <p>
+        {post.data.description} · {formatDateToChinese(post.data.pubDate)}
+    </p>
+
+    <Content />
+</DefaultLayout>
