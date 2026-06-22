@@ -1,0 +1,38 @@
+---
+// post navigation component
+
+import { getCollection, type CollectionEntry } from "astro:content";
+interface Props {
+    current: CollectionEntry<"posts">;
+}
+
+const { current } = Astro.props;
+
+const posts = (
+    await getCollection("posts", ({ data }) => data.draft !== true)
+).sort(
+    (a, b) =>
+        new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime(),
+);
+
+const idx = posts.findIndex((post) => post.id === current.id);
+const next = idx < posts.length - 1 ? posts[idx + 1] : undefined;
+const prev = idx > 0 ? posts[idx - 1] : undefined;
+---
+
+{
+    (next || prev) && (
+        <nav class="post-nav">
+            {prev && (
+                <a href={`/posts/${prev.id}`} class="post-prev" transition:name={`title-${prev.id}`}>
+                    上一篇 {prev.data.title}
+                </a>
+            )}
+            {next && (
+                <a href={`/posts/${next.id}`} class="post-next" transition:name={`title-${next.id}`}>
+                    {next.data.title} 下一篇
+                </a>
+            )}
+        </nav>
+    )
+}

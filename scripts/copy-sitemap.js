@@ -17,7 +17,7 @@ const source = candidates
   .find(fs.existsSync);
 
 if (!source) {
-  console.log('[korikura] sitemap-index.xml not found.');
+  console.log('[korikura] sitemap-index.xml or sitemap-0.xml not found.');
   process.exit(1);
 }
 
@@ -25,4 +25,4 @@ const target = path.join(path.dirname(source), 'sitemap.xml');
 
 fs.copySync(source, target);
 
-console.log('[korikura] sitemap.xml generated from:', source);
+console.log('[korikura] sitemap.xml copied from:', source);
