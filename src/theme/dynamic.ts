@@ -1,44 +1,18 @@
-// theme/monet.ts
-import {
-  argbFromHex,
-  themeFromSourceColor,
-  SchemeContent,
-  Hct,
-  hexFromArgb,
-} from "@material/material-color-utilities";
+// theme/dynamic.ts
+import { hexFromArgb } from "@material/material-color-utilities";
+import type { ColorScheme } from "./monet";
+import { COLOR_KEYS } from "./monet";
 
-export const COLOR_KEYS = [
-  "--md-sys-color-primary",
-  "--md-sys-color-on-primary",
-  "--md-sys-color-primary-container",
-  "--md-sys-color-on-primary-container",
-  "--md-sys-color-secondary",
-  "--md-sys-color-on-secondary",
-  "--md-sys-color-secondary-container",
-  "--md-sys-color-on-secondary-container",
-  "--md-sys-color-tertiary",
-  "--md-sys-color-on-tertiary",
-  "--md-sys-color-tertiary-container",
-  "--md-sys-color-on-tertiary-container",
-  "--md-sys-color-error",
-  "--md-sys-color-on-error",
-  "--md-sys-color-error-container",
-  "--md-sys-color-on-error-container",
-  "--md-sys-color-background",
-  "--md-sys-color-on-background",
-  "--md-sys-color-surface",
-  "--md-sys-color-on-surface",
-  "--md-sys-color-surface-variant",
-  "--md-sys-color-on-surface-variant",
-  "--md-sys-color-outline",
-  "--md-sys-color-outline-variant",
-  "--md-sys-color-inverse-surface",
-  "--md-sys-color-inverse-on-surface",
-  "--md-sys-color-inverse-primary",
-] as const;
+let dynamicImported: any = null;
 
-export type ColorScheme = Record<(typeof COLOR_KEYS)[number], string>;
+async function loadUtils() {
+  if (!dynamicImported) {
+    dynamicImported = await import("@material/material-color-utilities");
+  }
+  return dynamicImported;
+}
 
+// CSS 变量后缀 → 方案实例属性名（驼峰式）
 const SUFFIX_TO_PROP: Record<string, string> = {
   primary: "primary",
   "on-primary": "onPrimary",
@@ -69,12 +43,16 @@ const SUFFIX_TO_PROP: Record<string, string> = {
   "inverse-primary": "inversePrimary",
 };
 
+/**
+ * 从方案实例中提取 CSS 变量映射表
+ * 直接读取实例属性，避免依赖 toJSON()
+ */
 function schemeToVariables(schemeInstance: any): ColorScheme {
   const vars = {} as Record<string, string>;
   for (const cssVar of COLOR_KEYS) {
     const suffix = cssVar.replace("--md-sys-color-", "");
     const prop = SUFFIX_TO_PROP[suffix];
-    const argb = schemeInstance[prop];
+    const argb = schemeInstance[prop]; // ARGB 数值
     if (typeof argb === "number") {
       vars[cssVar] = hexFromArgb(argb);
     } else {
@@ -84,16 +62,17 @@ function schemeToVariables(schemeInstance: any): ColorScheme {
   return vars as ColorScheme;
 }
 
-// 以下函数目前仅用于可能的手动调用，客户端请使用 dynamic.ts
-export function generateAllSchemes(seedColorHex: string) {
-  const seedArgb = argbFromHex(seedColorHex);
-  const theme = themeFromSourceColor(seedArgb);
+export async function generateDynamicSchemes(seedColorHex: string) {
+  const utils = await loadUtils();
+  const seedArgb = utils.argbFromHex(seedColorHex);
+  const theme = utils.themeFromSourceColor(seedArgb);
 
   const lightScheme = schemeToVariables(theme.schemes.light);
   const darkScheme = schemeToVariables(theme.schemes.dark);
 
-  const hct = Hct.fromInt(seedArgb);
-  const contentLight = new SchemeContent(hct, false, 0);
+  // 阅读模式：SchemeContent 实例
+  const hct = utils.Hct.fromInt(seedArgb);
+  const contentLight = new utils.SchemeContent(hct, false, 0);
   const readScheme = schemeToVariables(contentLight);
 
   return { light: lightScheme, dark: darkScheme, read: readScheme };

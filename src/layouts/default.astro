@@ -1,50 +1,47 @@
 ---
-// default layout
-
 import Base from "./base.astro";
 import Navbar from "@/components/navbar.astro";
 import Footer from "@/components/footer.astro";
-
+import ThemeSwitcher from "@/components/themeswitcher.astro";
 import "@/styles/style.css";
 
 export interface Props {
-    title?: string;
+  title?: string;
 }
 
-let {
-    title
-} = Astro.props;
+const { title } = Astro.props;
 ---
 
 <Base title={title}>
-    <div class="nav-container">
-        <Navbar />
-    </div>
-    <div class="content-container">
-        <slot />
-    </div>
-    <div class="footer-container">
-        <Footer />
-    </div>
+  <div class="nav-container">
+    <Navbar />
+  </div>
+  <div class="content-container">
+        <ThemeSwitcher />
+    <slot />
+  </div>
+  <div class="footer-container">
+    <Footer />
+  </div>
 </Base>
 
 <style>
-    .nav-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 100;
-    }
-
-    .content-container {
-        margin-top: 4rem;
-    }
-
-    .footer-container {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-    }
+  .nav-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+  }
+  .content-container {
+    margin-top: 4rem;
+    padding-bottom: 4rem;
+    min-height: calc(100vh - 4rem - 8rem);
+    display: flex;
+    flex-direction: column;
+  }
+  .footer-container {
+    position: relative;
+    width: 100%;
+  }
 </style>

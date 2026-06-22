@@ -1,9 +1,10 @@
 ---
-// base layout
-
+// layouts/base.astro
 import { siteConfig, profileConfig } from "@/config";
 import "normalize.css";
+import { THEME_DEFAULTS } from "@/constants/constants";
 import type { THEME_MODE } from "@/constants/constants";
+import { DEFAULT_SCHEMES } from "@/theme/default-schemes";
 import { ClientRouter } from "astro:transitions";
 
 export interface Props {
@@ -20,9 +21,9 @@ let {
     themeMode = siteConfig.themeMode,
 } = Astro.props;
 
-// const isHomePage = isHomePage(Astro.url.pathname, url("/"));
-
 title = title ? title + " - " + siteConfig.title : siteConfig.title;
+
+const schemesJSON = JSON.stringify(DEFAULT_SCHEMES);
 ---
 
 <!doctype html>
@@ -44,12 +45,101 @@ title = title ? title + " - " + siteConfig.title : siteConfig.title;
 
         <link rel="sitemap" href="/sitemap.xml" />
         <link rel="icon" href="/favicon.ico" />
-        <link rel="alternate" type="application/rss+xml" title="Rss Feed" href="/rss.xml" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="Rss Feed"
+            href="/rss.xml"
+        />
         <title>{title}</title>
 
         <ClientRouter />
-    </head>
 
+        <!-- 注入默认颜色表 -->
+        <script is:inline define:vars={{ schemesJSON }}>
+            window.__colorSchemes = JSON.parse(schemesJSON);
+        </script>
+
+        <!-- 主题初始化与全局 API -->
+        <script is:inline>
+            (function () {
+                var STORAGE_KEY = "theme-mode";
+                var SEED_KEY = "seed-color";
+
+                function getStoredMode() {
+                    try {
+                        return localStorage.getItem(STORAGE_KEY);
+                    } catch (e) {
+                        return null;
+                    }
+                }
+
+                function getSystemMode() {
+                    if (
+                        window.matchMedia &&
+                        window.matchMedia("(prefers-color-scheme: dark)")
+                            .matches
+                    ) {
+                        return "dark";
+                    }
+                    return "light";
+                }
+
+                function applyTheme(mode, schemes) {
+                    if (!schemes) schemes = window.__colorSchemes;
+                    var scheme = schemes.light;
+                    if (mode === "dark") scheme = schemes.dark;
+                    else if (mode === "read") scheme = schemes.read;
+
+                    var root = document.documentElement;
+                    for (var key in scheme) {
+                        root.style.setProperty(key, scheme[key]);
+                    }
+                    if (document.body) {
+                        document.body.dataset.theme = mode;
+                    }
+                }
+
+                window.__applyTheme = applyTheme;
+
+                var systemQuery = window.matchMedia(
+                    "(prefers-color-scheme: dark)",
+                );
+                function systemListener(e) {
+                    var stored = getStoredMode();
+                    if (!stored || stored === "auto") {
+                        applyTheme(e.matches ? "dark" : "light");
+                    }
+                }
+                systemQuery.addEventListener("change", systemListener);
+
+                var initialMode = getStoredMode() || "auto";
+                if (initialMode === "auto") initialMode = getSystemMode();
+                applyTheme(initialMode);
+            })();
+        </script>
+
+        <style is:inline>
+            body {
+                background-color: var(--md-sys-color-background);
+                color: var(--md-sys-color-on-background);
+                margin: 0;
+                min-height: 100vh;
+                transition:
+                    background-color 0.3s,
+                    color 0.3s;
+            }
+            .container {
+                max-width: 72rem;
+                margin-left: auto;
+                margin-right: auto;
+                padding-left: 1rem;
+                padding-right: 1rem;
+                width: 100%;
+                box-sizing: border-box;
+            }
+        </style>
+    </head>
     <body>
         <slot name="head" />
         <div class="container" data-theme={themeMode}>

@@ -1,40 +1,111 @@
 ---
 // index page
-
 import Default from "@/layouts/default.astro";
-import Button from "@/components/button.astro";
-
 import { getCollection } from "astro:content";
 
 const posts = await getCollection("posts");
-
-console.log(posts);
+const latestPosts = posts
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 8);
 ---
 
 <Default title="首页">
-  <div style="text-align: center; padding: 3rem 0;">
-    <div
-      style="font-size: 3rem; display: inline-block; animation: float 3s ease-in-out infinite;"
-    >
-      =w=
+  <!-- 主视觉区 -->
+  <section class="relative overflow-hidden py-16 md:py-24">
+    <!-- 装饰背景圆 -->
+    <div class="absolute -top-24 -right-24 w-96 h-96 bg-primary-container rounded-full opacity-20 blur-3xl"></div>
+    <div class="absolute -bottom-16 -left-16 w-72 h-72 bg-tertiary-container rounded-full opacity-20 blur-3xl"></div>
+
+    <div class="container mx-auto px-4 text-center relative z-10">
+      <div class="text-6xl md:text-8xl mb-6 animate-bounce-slow inline-block">=w=</div>
+      <h1 class="text-4xl md:text-6xl font-extrabold mb-4">
+        <span class="text-primary">Baka小狐</span>
+        <span class="text-on-surface"> の 日记</span>
+      </h1>
+      <p class="text-xl md:text-2xl text-on-surface-variant mb-2">才不是笨蛋呢！</p>
+      <p class="text-sm text-outline mt-6 animate-pulse">记录日常与奇思妙想</p>
     </div>
-    <h1 style="font-size: 3rem; color: #d4888f; margin: 0.5rem 0;">
-      Baka小狐 の 日记
-    </h1>
-    <p style="color: #b88a8a; font-size: 1.2rem;">才不是笨蛋呢!</p>
-    <p style="color: #c9a8a8; margin-top: 2rem;">✨ 正在建设中 ✨</p>
-  </div>
-  
+  </section>
+
+  <!-- 最新文章 -->
+  <section class="container mx-auto px-4 pb-20">
+    <div class="flex items-center gap-3 mb-8">
+      <div class="h-px flex-1 bg-outline-variant"></div>
+      <h2 class="text-2xl font-bold text-on-surface whitespace-nowrap">最近更新</h2>
+      <div class="h-px flex-1 bg-outline-variant"></div>
+    </div>
+
+    {latestPosts.length === 0 ? (
+      <div class="text-center py-16">
+        <div class="text-5xl mb-4">📭</div>
+        <p class="text-on-surface-variant text-lg">还没有文章，小狐正在努力写...</p>
+      </div>
+    ) : (
+      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {latestPosts.map((post) => (
+          <a
+            href={`/posts/${post.id}`}
+            class="group block bg-surface rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border border-outline-variant"
+          >
+
+              <div class="h-48 bg-primary-container/30 flex items-center justify-center">
+                <span class="text-5xl opacity-30">📄</span>
+              </div>
+            <div class="p-5">
+              <!-- 标签 -->
+              {post.data.tags && post.data.tags.length > 0 && (
+                <div class="flex flex-wrap gap-2 mb-3">
+                  {post.data.tags.slice(0, 2).map((tag: string) => (
+                    <span class="text-xs px-2 py-1 rounded-full bg-secondary-container text-on-secondary-container">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              <h3 class="text-lg font-semibold text-on-surface mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                {post.data.title}
+              </h3>
+
+              <p class="text-sm text-on-surface-variant mb-4 line-clamp-2">
+                {post.data.description || post.body?.substring(0, 80) + '...'}
+              </p>
+
+              <div class="flex items-center text-xs text-outline">
+                <span>{post.data.pubDate.toLocaleDateString('zh-CN')}</span>
+                <span class="mx-2">·</span>
+                <span>{post.data.author || '小狐'}</span>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+
+    {latestPosts.length > 0 && (
+      <div class="text-center mt-12">
+        <a
+          href="/posts"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-on-primary rounded-full font-medium hover:shadow-lg hover:opacity-90 transition-all"
+        >
+          查看所有文章
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    )}
+  </section>
 </Default>
 
 <style is:global>
-  @keyframes float {
-    0%,
-    100% {
+  @keyframes bounce-slow {
+    0%, 100% {
       transform: translateY(0);
     }
     50% {
-      transform: translateY(-8px);
+      transform: translateY(-10px);
     }
+  }
+  .animate-bounce-slow {
+    animation: bounce-slow 3s ease-in-out infinite;
   }
 </style>
