@@ -1,5 +1,4 @@
 ---
-// index page
 import Default from "@/layouts/default.astro";
 import { getCollection } from "astro:content";
 
@@ -10,102 +9,222 @@ const latestPosts = posts
 ---
 
 <Default title="首页">
-  <!-- 主视觉区 -->
-  <section class="relative overflow-hidden py-16 md:py-24">
-    <!-- 装饰背景圆 -->
-    <div class="absolute -top-24 -right-24 w-96 h-96 bg-primary-container rounded-full opacity-20 blur-3xl"></div>
-    <div class="absolute -bottom-16 -left-16 w-72 h-72 bg-tertiary-container rounded-full opacity-20 blur-3xl"></div>
+  <section class="hero-section">
+    <button class="btn-primary">点击</button>
+    <div class="bg-circle-top"></div>
+    <div class="bg-circle-bottom"></div>
 
-    <div class="container mx-auto px-4 text-center relative z-10">
-      <div class="text-6xl md:text-8xl mb-6 animate-bounce-slow inline-block">=w=</div>
-      <h1 class="text-4xl md:text-6xl font-extrabold mb-4">
+    <div class="hero-content">
+      <div class="hero-emoji">=w=</div>
+      <h1 class="hero-title">
         <span class="text-primary">Baka小狐</span>
-        <span class="text-on-surface"> の 日记</span>
+        <span class=""> の 日记</span>
       </h1>
-      <p class="text-xl md:text-2xl text-on-surface-variant mb-2">才不是笨蛋呢！</p>
-      <p class="text-sm text-outline mt-6 animate-pulse">记录日常与奇思妙想</p>
+      <p class="hero-subtitle">才不是笨蛋呢！</p>
+      <p class="hero-desc">记录日常与奇思妙想</p>
     </div>
   </section>
 
-  <!-- 最新文章 -->
-  <section class="container mx-auto px-4 pb-20">
-    <div class="flex items-center gap-3 mb-8">
-      <div class="h-px flex-1 bg-outline-variant"></div>
-      <h2 class="text-2xl font-bold text-on-surface whitespace-nowrap">最近更新</h2>
-      <div class="h-px flex-1 bg-outline-variant"></div>
+  <section class="posts-section">
+    <div class="section-header">
+      <div class="divider-line"></div>
+      <h2 class="section-title">最近更新</h2>
+      <div class="divider-line"></div>
     </div>
 
-    {latestPosts.length === 0 ? (
-      <div class="text-center py-16">
-        <div class="text-5xl mb-4">📭</div>
-        <p class="text-on-surface-variant text-lg">还没有文章，小狐正在努力写...</p>
-      </div>
-    ) : (
-      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {latestPosts.map((post) => (
-          <a
-            href={`/posts/${post.id}`}
-            class="group block bg-surface rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border border-outline-variant"
-          >
-
-              <div class="h-48 bg-primary-container/30 flex items-center justify-center">
-                <span class="text-5xl opacity-30">📄</span>
+    {
+      latestPosts.length === 0 ? (
+        <div class="empty-state">
+          <div class="empty-icon">📭</div>
+          <p class="empty-text">还没有文章，小狐正在努力写...</p>
+        </div>
+      ) : (
+        <div class="post-grid">
+          {latestPosts.map((post) => (
+            <a href={`/posts/${post.id}`} class="post-card">
+              <div class="card-image">
+                <span class="card-image-icon">📄</span>
               </div>
-            <div class="p-5">
-              <!-- 标签 -->
-              {post.data.tags && post.data.tags.length > 0 && (
-                <div class="flex flex-wrap gap-2 mb-3">
-                  {post.data.tags.slice(0, 2).map((tag: string) => (
-                    <span class="text-xs px-2 py-1 rounded-full bg-secondary-container text-on-secondary-container">
-                      {tag}
-                    </span>
-                  ))}
+              <div class="card-content">
+                {post.data.tags && post.data.tags.length > 0 && (
+                  <div class="tag-group">
+                    {post.data.tags.slice(0, 2).map((tag: string) => (
+                      <span class="tag">{tag}</span>
+                    ))}
+                  </div>
+                )}
+
+                <h3 class="post-title">{post.data.title}</h3>
+                <p class="post-description">
+                  {post.data.description || post.body?.substring(0, 80) + "..."}
+                </p>
+
+                <div class="post-meta">
+                  <span>{post.data.pubDate.toLocaleDateString("zh-CN")}</span>
+                  <span class="meta-dot">·</span>
+                  <span>{post.data.author || "小狐"}</span>
                 </div>
-              )}
-
-              <h3 class="text-lg font-semibold text-on-surface mb-2 group-hover:text-primary transition-colors line-clamp-2">
-                {post.data.title}
-              </h3>
-
-              <p class="text-sm text-on-surface-variant mb-4 line-clamp-2">
-                {post.data.description || post.body?.substring(0, 80) + '...'}
-              </p>
-
-              <div class="flex items-center text-xs text-outline">
-                <span>{post.data.pubDate.toLocaleDateString('zh-CN')}</span>
-                <span class="mx-2">·</span>
-                <span>{post.data.author || '小狐'}</span>
               </div>
-            </div>
-          </a>
-        ))}
-      </div>
-    )}
+            </a>
+          ))}
+        </div>
+      )
+    }
 
-    {latestPosts.length > 0 && (
-      <div class="text-center mt-12">
-        <a
-          href="/posts"
-          class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-on-primary rounded-full font-medium hover:shadow-lg hover:opacity-90 transition-all"
-        >
-          查看所有文章
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
-      </div>
-    )}
+    {
+      latestPosts.length > 0 && (
+        <div class="view-all-wrapper">
+          <a href="/posts" class="view-all-btn">
+            查看所有文章
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+      )
+    }
   </section>
 </Default>
 
-<style is:global>
+<style lang="scss">
+  @use "tailwindcss";
+
+  @layer components {
+    .hero-section {
+      @apply relative overflow-hidden py-16 md:py-24;
+    }
+
+    .btn-primary {
+      @apply text-white px-4 py-2 rounded-lg;
+    }
+
+    .bg-circle-top {
+      @apply absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-20 blur-3xl;
+    }
+
+    .bg-circle-bottom {
+      @apply absolute -bottom-16 -left-16 w-72 h-72 rounded-full opacity-20 blur-3xl;
+    }
+
+    .hero-content {
+      @apply container mx-auto px-4 text-center relative z-10;
+    }
+
+    .hero-emoji {
+      @apply text-6xl md:text-8xl mb-6 inline-block;
+      animation: bounce-slow 3s ease-in-out infinite;
+    }
+
+    .hero-title {
+      @apply text-4xl md:text-6xl font-extrabold mb-4;
+    }
+
+    .hero-subtitle {
+      @apply text-xl md:text-2xl mb-2;
+    }
+
+    .hero-desc {
+      @apply text-sm mt-6 animate-pulse;
+    }
+
+    .posts-section {
+      @apply container mx-auto px-4 pb-20;
+    }
+
+    .section-header {
+      @apply flex items-center gap-3 mb-8;
+    }
+
+    .divider-line {
+      @apply h-px flex-1;
+    }
+
+    .section-title {
+      @apply text-2xl font-bold whitespace-nowrap;
+    }
+
+    .empty-state {
+      @apply text-center py-16;
+    }
+
+    .empty-icon {
+      @apply text-5xl mb-4;
+    }
+
+    .empty-text {
+      @apply text-lg;
+    }
+
+    .post-grid {
+      @apply grid gap-6 md:grid-cols-2 lg:grid-cols-3;
+    }
+
+    .post-card {
+      @apply block rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1;
+    }
+
+    .card-image {
+      @apply h-48 flex items-center justify-center;
+    }
+
+    .card-image-icon {
+      @apply text-5xl opacity-30;
+    }
+
+    .card-content {
+      @apply p-5;
+    }
+
+    .tag-group {
+      @apply flex flex-wrap gap-2 mb-3;
+    }
+
+    .tag {
+      @apply text-xs px-2 py-1 rounded-full border;
+    }
+
+    .post-title {
+      @apply text-lg font-semibold mb-2 transition-colors line-clamp-2;
+    }
+
+    .post-description {
+      @apply text-sm mb-4 line-clamp-2;
+    }
+
+    .post-meta {
+      @apply flex items-center text-xs;
+    }
+
+    .meta-dot {
+      @apply mx-2;
+    }
+
+    .view-all-wrapper {
+      @apply text-center mt-12;
+    }
+
+    .view-all-btn {
+      @apply inline-flex items-center gap-2 px-6 py-3 text-white rounded-full font-medium hover:shadow-lg hover:opacity-90 transition-all;
+    }
+  }
+
   @keyframes bounce-slow {
-    0%, 100% {
+    0%,
+    100% {
       transform: translateY(0);
     }
     50% {
       transform: translateY(-10px);
     }
-  }
-  .animate-bounce-slow {
-    animation: bounce-slow 3s ease-in-out infinite;
   }
 </style>

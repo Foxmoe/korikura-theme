@@ -1,0 +1,22 @@
+@use "tailwindcss";
+
+:root {
+  --hue: 210;
+  --primary:      oklch(0.67 0.16 var(--hue));
+  --primary-hover:oklch(0.57 0.20 var(--hue));
+  --bg:           oklch(0.985 0.005 var(--hue));
+  --card-bg:      oklch(1 0 0);
+  --text:         oklch(0.21 0.02 var(--hue));
+  --muted:        oklch(0.51 0.025 var(--hue));
+  --border:       oklch(0.88 0.01 var(--hue));
+}
+
+[data-theme="dark"] {
+  --primary:      oklch(0.77 0.17 var(--hue));
+  --primary-hover:oklch(0.83 0.17 var(--hue));
+  --bg:           oklch(0.155 0.015 var(--hue));
+  --card-bg:      oklch(0.215 0.020 var(--hue));
+  --text:         oklch(0.94 0.01 var(--hue));
+  --muted:        oklch(0.625 0.022 var(--hue));
+  --border:       oklch(0.31 0.024 var(--hue));
+}

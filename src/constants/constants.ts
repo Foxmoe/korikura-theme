@@ -1,4 +1,4 @@
-export type THEME_MODE = "light" | "read" | "dark" | "auto";
+export type THEME_MODE = "light"| "dark" | "auto";
 
 export const THEME_DEFAULTS = {
     mode: "light" as THEME_MODE,

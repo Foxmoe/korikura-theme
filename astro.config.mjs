@@ -1,6 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
-import { siteConfig, profileConfig } from './src/config.js';
+import { siteConfig } from './src/config';
 
 import cloudflare from '@astrojs/cloudflare';
 import sitemap from '@astrojs/sitemap';
@@ -11,7 +11,6 @@ import svelte from '@astrojs/svelte';
 import NebulaCMS from 'nebula-cms';
 import tailwindcss from '@tailwindcss/vite';
 
-// https://astro.build/config
 export default defineConfig({
   site: siteConfig.url,
   base: siteConfig.entry,
@@ -30,7 +29,12 @@ export default defineConfig({
     priority: 0.7,
     filenameBase: 'sitemap',
     entryLimit: 50000,
-  }), react(), mdx(), partytown(), svelte(), NebulaCMS({
+  }),
+  react(),
+  mdx(),
+  partytown(),
+  svelte(),
+  NebulaCMS({
     basePath: '/console',
   })],
   vite: {

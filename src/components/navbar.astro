@@ -9,32 +9,48 @@ const navLinks = [
 ];
 ---
 
-<nav class="fixed top-0 left-0 right-0 z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30">
-  <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-    <!-- Logo / 站点名 -->
-    <a
-      href="/"
-      class="text-xl font-bold tracking-tight text-on-surface hover:text-primary transition-colors duration-200 flex items-center gap-2"
-    >
+<nav class="nav">
+  <div class="nav-container">
+    <a href="/" class="logo">
       <span class="text-2xl">XX</span>
       <span>{siteConfig.title}</span>
     </a>
 
-    <!-- 导航链接 -->
-    <div class="hidden sm:flex items-center gap-1">
-      {navLinks.map((link) => (
-        <a
-          href={link.href}
-          class="relative px-4 py-2 text-sm font-medium text-on-surface-variant hover:text-on-surface rounded-full transition-colors duration-200 hover:bg-surface-variant/50"
-        >
-          {link.label}
-        </a>
-      ))}
+    <div class="nav-links">
+      {
+        navLinks.map((link) => (
+          <a href={link.href} class="nav-link">
+            {link.label}
+          </a>
+        ))
+      }
     </div>
 
-    <!-- 移动端占位（可后续加汉堡菜单） -->
     <div class="sm:hidden">
       <span class="text-on-surface-variant text-sm">菜单</span>
     </div>
   </div>
 </nav>
+
+<style lang="scss">
+  @use "tailwindcss";
+  nav {
+    @apply fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b;
+  }
+
+  .nav-container {
+    @apply max-w-6xl mx-auto px-4 h-16 flex items-center justify-between;
+  }
+
+  .logo {
+    @apply text-xl font-bold tracking-tight transition-colors duration-200 flex items-center gap-2 hover:text-[#ff6ff0];
+  }
+
+  .nav-links {
+    @apply hidden sm:flex items-center gap-1;
+  }
+
+  .nav-link {
+    @apply relative px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200 hover:text-[#ff6ff0];
+  }
+</style>

@@ -2,46 +2,62 @@
 import Base from "./base.astro";
 import Navbar from "@/components/navbar.astro";
 import Footer from "@/components/footer.astro";
-import ThemeSwitcher from "@/components/themeswitcher.astro";
-import "@/styles/style.css";
+import "@/styles/style.scss";
 
-export interface Props {
+interface Props {
   title?: string;
+  description?: string;
+  keywords?: string;
+  showSidebar?: boolean;
 }
-
-const { title } = Astro.props;
+const { title, description, keywords, showSidebar = true } = Astro.props;
 ---
 
-<Base title={title}>
-  <div class="nav-container">
+<Base {title} {description} {keywords}>
+  <div class="container">
     <Navbar />
-  </div>
-  <div class="content-container">
-        <ThemeSwitcher />
-    <slot />
-  </div>
-  <div class="footer-container">
+
+    <main class="main-container">
+      <article class="flex-1 min-w-0">
+        <slot />
+      </article>
+
+      {
+        showSidebar && (
+          <aside class="sidebar-container">
+            <slot name="sidebar" />
+          </aside>
+        )
+      }
+    </main>
+
     <Footer />
   </div>
 </Base>
 
-<style>
+<style lang="scss">
+  @use "tailwindcss";
+  .container {
+    @apply min-h-screen flex flex-col;
+  }
+
+  .main-container {
+    @apply flex-1 container mx-auto px-4 py-8 flex gap-8;
+  }
+
+  .sidebar-container {
+    @apply w-72 hidden xl:block shrink-0;
+  }
+
   .nav-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
+    @apply top-0 left-0 right-0 fixed z-100;
   }
+
   .content-container {
-    margin-top: 4rem;
-    padding-bottom: 4rem;
-    min-height: calc(100vh - 4rem - 8rem);
-    display: flex;
-    flex-direction: column;
+    @apply mt-16 pb-16 min-h-[calc(100vh-4rem-8rem)] flex flex-col;
   }
+
   .footer-container {
-    position: relative;
-    width: 100%;
+    @apply relative w-full;
   }
 </style>
