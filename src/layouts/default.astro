@@ -40,23 +40,18 @@ const { title, description, keywords, showSidebar = true } = Astro.props;
   .container {
     @apply min-h-screen flex flex-col;
   }
-
   .main-container {
     @apply flex-1 container mx-auto px-4 py-8 flex gap-8;
   }
-
   .sidebar-container {
     @apply w-72 hidden xl:block shrink-0;
   }
-
   .nav-container {
     @apply top-0 left-0 right-0 fixed z-100;
   }
-
   .content-container {
     @apply mt-16 pb-16 min-h-[calc(100vh-4rem-8rem)] flex flex-col;
   }
-
   .footer-container {
     @apply relative w-full;
   }
