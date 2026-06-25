@@ -11,7 +11,9 @@ import svelte from '@astrojs/svelte';
 import NebulaCMS from 'nebula-cms';
 import tailwindcss from '@tailwindcss/vite';
 import rehypeSlug from 'rehype-slug';
+import remarkToc from 'remark-toc';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import { unified, rehypeHeadingIds } from '@astrojs/markdown-remark';
 
 export default defineConfig({
   site: siteConfig.url,
@@ -33,17 +35,24 @@ export default defineConfig({
     entryLimit: 50000,
   }),
   react(),
-  mdx({
-    rehypePlugins: [
-      rehypeSlug,
-      rehypeAutolinkHeadings,
-    ]
-  }),
+  mdx(),
   partytown(),
   svelte(),
   NebulaCMS({
     basePath: '/console',
   })],
+  markdown: {
+    processor: unified({
+      remarkPlugins: [[remarkToc, { heading: 'toc', maxDepth: 3 }]],
+      rehypePlugins: [
+        rehypeSlug,
+        rehypeHeadingIds,
+        [rehypeAutolinkHeadings, {
+          behavior: 'wrap'
+        }]
+      ]
+    }),
+  },
   vite: {
     plugins: [tailwindcss()],
     resolve: {
