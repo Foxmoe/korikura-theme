@@ -3,7 +3,7 @@ import Base from "./base.astro";
 import Navbar from "@/components/navbar.astro";
 import Footer from "@/components/footer.astro";
 
-import "@/styles/style.scss";
+import "@/styles/style.css";
 
 interface Props {
   title?: string;
@@ -17,49 +17,46 @@ const { title, description, keywords, showSidebar = true } = Astro.props;
 
 <Base {title} {description} {keywords}>
   <div class="layout">
-
     <header class="header">
       <Navbar />
     </header>
 
     <main class="container">
-      <div class="content">
+      <div class="container-content">
         <slot />
       </div>
-
       {
         showSidebar && (
-          <aside class="sidebar">
+          <div class="sidebar-container">
             <slot name="sidebar" />
-          </aside>
+          </div>
         )
       }
-
     </main>
 
     <Footer />
-
   </div>
 </Base>
 
 <style lang="scss">
-@use "tailwindcss";
-.layout {
-  @apply min-h-screen flex flex-col;
-}
+  @use "tailwindcss";
+  .layout {
+    @apply min-h-screen flex flex-col;
+  }
 
-.container {
-  width: var(--container);
-  margin: 0 auto;
-  @apply flex gap-10 py-8;
-  view-transition-name: main;
-}
+  .container {
+    width: var(--container);
+    margin: 0 auto;
+    @apply flex gap-10 py-8;
+  }
 
-.content {
-  @apply flex-1;
-}
+  .container-content {
+    @apply flex-1;
+    view-transition-name: main;
+  }
 
-.sidebar {
-  @apply w-72 hidden xl:block shrink-0;
-}
+  .sidebar-container {
+    @apply w-72 hidden xl:block shrink-0;
+    background: rgba(0, 0, 0, 0);
+  }
 </style>

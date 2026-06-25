@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+.sidebar {
+    will-change: transform;
+    @apply w-72 shrink-0 hidden xl:block;
+}
+
+.sidebar-inner {
+    @apply top-8 space-y-6;
+}
+
+.card {
+    @apply border border-black/10 dark:border-white/10;
+    @apply p-3 rounded-xl shadow-lg;
+
+    background-color: rgba(255, 255, 255, 0.1);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+}

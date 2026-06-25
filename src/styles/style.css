@@ -1,5 +1,5 @@
-@use "tailwindcss";
 @import "normalize.css";
+@import "tailwindcss";
 
 :root {
   --hue: 210;

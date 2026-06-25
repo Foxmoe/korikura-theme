@@ -7,7 +7,7 @@ const tags = [
 ];
 ---
 
-<div class="tags">
+<div class="card">
   <div class="title">Tags</div>
 
   <div class="cloud">
@@ -25,12 +25,6 @@ const tags = [
 
 <style lang="scss">
   @use "tailwindcss";
-
-  .tags {
-    @apply p-4 rounded-2xl bg-white/40 backdrop-blur-md
-           border border-pink-100/40;
-  }
-
   .title {
     @apply text-sm font-semibold text-pink-500 mb-2;
   }

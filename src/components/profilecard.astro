@@ -1,25 +1,24 @@
 ---
-const name = "Bakahu";
-const desc = "A small sakura blog in cyberspace";
+import { profileConfig } from "@/config";
 ---
 
 <div class="card">
-  <div class="avatar" />
-  <div class="name">{name}</div>
-  <div class="desc">{desc}</div>
+  <div class="avatar">
+    <img
+      src={profileConfig.avatar}
+      alt="Avatar"
+      class="w-full h-full object-cover rounded-full"
+    />
+  </div>
+  <div class="name">{profileConfig.name}</div>
+  <div class="desc">{profileConfig.bio}</div>
 </div>
 
 <style lang="scss">
   @use "tailwindcss";
-
-  .card {
-    @apply p-4 rounded-2xl bg-pink-50/60 backdrop-blur-md
-           border border-pink-200/40 text-center;
-  }
-
   .avatar {
     @apply w-16 h-16 mx-auto rounded-full
-           bg-gradient-to-br from-pink-300 to-purple-300
+           bg-linear-to-br from-pink-300 to-purple-300
            mb-3;
   }
 
