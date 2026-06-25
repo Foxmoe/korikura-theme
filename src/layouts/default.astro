@@ -21,8 +21,8 @@ const { title, description, keywords, showSidebar = true } = Astro.props;
       <Navbar />
     </header>
 
-    <main class="container">
-      <div class="container-content">
+    <main id="main-container">
+      <div class="article-content">
         <slot />
       </div>
       {
@@ -43,15 +43,14 @@ const { title, description, keywords, showSidebar = true } = Astro.props;
   .layout {
     @apply min-h-screen flex flex-col;
   }
-
-  .container {
+  #main-container {
     width: var(--container);
     margin: 0 auto;
     @apply flex gap-10 py-8;
   }
 
-  .container-content {
-    @apply flex-1;
+  .article-content {
+    @apply flex-1 min-w-0;
     view-transition-name: main;
   }
 

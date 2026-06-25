@@ -1,7 +1,6 @@
 ---
 import { siteConfig, profileConfig } from "@/config";
 import type { THEME_MODE } from "@/constants/constants";
-// import { ClientRouter } from "astro:transitions";
 import SpaRouter from "@/components/spaRouter.astro";
 
 export interface Props {
@@ -53,7 +52,11 @@ title = title ? title + " - " + siteConfig.title : siteConfig.title;
     </head>
 
     <body>
-        <SpaRouter />
+        <SpaRouter
+            contentSelector="#main-container"
+            scrollToTop={true}
+            prefetch={true}
+        />
         <slot />
     </body>
 </html>
