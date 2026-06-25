@@ -1,7 +1,5 @@
 ---
-// layouts/base.astro
 import { siteConfig, profileConfig } from "@/config";
-import { THEME_DEFAULTS } from "@/constants/constants";
 import type { THEME_MODE } from "@/constants/constants";
 import { ClientRouter } from "astro:transitions";
 
@@ -28,6 +26,7 @@ title = title ? title + " - " + siteConfig.title : siteConfig.title;
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
         <meta name="description" content={description} />
         <meta name="keywords" content={keywords} />
         <meta name="author" content={profileConfig.name} />
@@ -41,17 +40,19 @@ title = title ? title + " - " + siteConfig.title : siteConfig.title;
 
         <link rel="sitemap" href="/sitemap.xml" />
         <link rel="icon" href="/favicon.ico" />
+
         <link
             rel="alternate"
             type="application/rss+xml"
             title="Rss Feed"
             href="/rss.xml"
         />
-        <title>{title}</title>
 
-        <ClientRouter />
+        <title>{title}</title>
     </head>
+
     <body>
+        <ClientRouter />
         <slot />
     </body>
 </html>

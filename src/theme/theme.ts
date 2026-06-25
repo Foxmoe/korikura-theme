@@ -34,13 +34,3 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e)
     }
   }
 });
-
-// --- 主色选择器（假设有一个滑块 id="hue-slider"）---
-document.getElementById('hue-slider')?.addEventListener('input', (e) => {
-  const hue = e.target.value;
-  document.documentElement.style.setProperty('--hue', hue);
-  localStorage.setItem('theme-hue', hue);
-});
-
-// --- 暴露到全局供按钮调用 ---
-window.setTheme = setTheme;

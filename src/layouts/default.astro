@@ -2,6 +2,7 @@
 import Base from "./base.astro";
 import Navbar from "@/components/navbar.astro";
 import Footer from "@/components/footer.astro";
+
 import "@/styles/style.scss";
 
 interface Props {
@@ -10,49 +11,60 @@ interface Props {
   keywords?: string;
   showSidebar?: boolean;
 }
+
 const { title, description, keywords, showSidebar = true } = Astro.props;
 ---
 
 <Base {title} {description} {keywords}>
-  <div class="container">
-    <Navbar />
+  <div class="layout">
+    <div class="content">
+      <header class="header">
+        <Navbar />
+      </header>
+      <main class="main" transition:name="trans">
+        <article class="article">
+          <slot />
+        </article>
 
-    <main class="main-container">
-      <article class="flex-1 min-w-0">
-        <slot />
-      </article>
+        {
+          showSidebar && (
+            <aside class="sidebar">
+              <slot name="sidebar" />
+            </aside>
+          )
+        }
+      </main>
 
-      {
-        showSidebar && (
-          <aside class="sidebar-container">
-            <slot name="sidebar" />
-          </aside>
-        )
-      }
-    </main>
-
-    <Footer />
+      <Footer />
+    </div>
   </div>
 </Base>
 
 <style lang="scss">
   @use "tailwindcss";
-  .container {
+
+  .layout {
     @apply min-h-screen flex flex-col;
   }
-  .main-container {
-    @apply flex-1 container mx-auto px-4 py-8 flex gap-8;
+
+  .header {
+    @apply relative;
   }
-  .sidebar-container {
+
+  .content {
+    @apply flex-1 flex flex-col;
+  }
+
+  .main {
+    @apply flex-1 max-w-6xl mx-auto w-full px-4 py-8 flex gap-8;
+    view-transition-name: main;
+  }
+
+  .article {
+    @apply flex-1 min-w-0;
+  }
+
+  .sidebar {
     @apply w-72 hidden xl:block shrink-0;
-  }
-  .nav-container {
-    @apply top-0 left-0 right-0 fixed z-100;
-  }
-  .content-container {
-    @apply mt-16 pb-16 min-h-[calc(100vh-4rem-8rem)] flex flex-col;
-  }
-  .footer-container {
-    @apply relative w-full;
   }
 </style>

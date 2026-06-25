@@ -1,7 +1,4 @@
 ---
-// components/navbar.astro
-import { siteConfig } from "@/config";
-
 const navLinks = [
   { href: "/", label: "首页" },
   { href: "/posts", label: "文章" },
@@ -9,44 +6,77 @@ const navLinks = [
 ];
 ---
 
-<nav class="nav">
-  <div class="nav-container">
-    <a href="/" class="logo">
-      <span class="text-2xl">XX</span>
-      <span>{siteConfig.title}</span>
-    </a>
+<nav class="nav-wrapper">
+  <div class="nav-card">
+    <!-- logo -->
+    <a href="/" class="logo">Blog</a>
 
+    <!-- links -->
     <div class="nav-links">
-      {
-        navLinks.map((link) => (
-          <a href={link.href} class="nav-link">
-            {link.label}
-          </a>
-        ))
-      }
+      {navLinks.map((i) => (
+        <a href={i.href} class="nav-link" data-link={i.href}>
+          {i.label}
+        </a>
+      ))}
     </div>
 
-    <div class="sm:hidden">
-      <span class="text-on-surface-variant text-sm">菜单</span>
+    <!-- actions -->
+    <div class="actions">
+      <button class="btn">菜单</button>
     </div>
   </div>
 </nav>
 
+<script is:inline>
+function updateActive() {
+  const path = window.location.pathname;
+
+  document.querySelectorAll(".nav-link").forEach((el) => {
+    const href = el.dataset.link;
+    el.classList.toggle("active", href === path);
+  });
+}
+
+updateActive();
+document.addEventListener("swup:page:view", updateActive);
+</script>
+
 <style lang="scss">
-  @use "tailwindcss";
-  nav {
-    @apply fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b;
-  }
-  .nav-container {
-    @apply max-w-6xl mx-auto px-4 h-16 flex items-center justify-between;
-  }
-  .logo {
-    @apply text-xl font-bold tracking-tight transition-colors duration-200 flex items-center gap-2 hover:text-[#ff6ff0];
-  }
-  .nav-links {
-    @apply hidden sm:flex items-center gap-1;
-  }
-  .nav-link {
-    @apply relative px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200 hover:text-[#ff6ff0];
-  }
+@use "tailwindcss";
+
+.nav-wrapper {
+  @apply fixed top-4 left-0 right-0 z-50 flex justify-center;
+}
+
+.nav-card {
+  @apply flex items-center justify-between;
+  @apply w-[min(1100px,92vw)];
+  @apply px-6 py-3;
+  @apply rounded-2xl;
+  @apply backdrop-blur-xl;
+  @apply bg-white/70 dark:bg-black/40;
+  @apply border border-black/10 dark:border-white/10;
+  @apply shadow-lg;
+}
+
+.logo {
+  @apply font-bold text-lg;
+}
+
+.nav-links {
+  @apply hidden sm:flex gap-2;
+}
+
+.nav-link {
+  @apply px-4 py-2 rounded-full text-sm transition;
+  @apply hover:bg-black/5 dark:hover:bg-white/10;
+}
+
+.nav-link.active {
+  @apply bg-black/10 dark:bg-white/20 font-medium;
+}
+
+.btn {
+  @apply px-3 py-2 border rounded-lg text-sm;
+}
 </style>

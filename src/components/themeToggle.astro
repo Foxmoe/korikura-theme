@@ -1,0 +1,19 @@
+<button id="theme-toggle" class="theme-btn">
+  🌙 / ☀️
+</button>
+
+<script is:inline>
+  const btn = document.getElementById("theme-toggle");
+
+  btn?.addEventListener("click", () => {
+    document.documentElement.classList.toggle("dark");
+  });
+</script>
+
+<style lang="scss">
+  @use "tailwindcss";
+
+  .theme-btn {
+    @apply text-sm px-3 py-2 rounded-md border transition hover:bg-gray-100 dark:hover:bg-zinc-800;
+  }
+</style>
