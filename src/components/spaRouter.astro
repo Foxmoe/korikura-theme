@@ -84,29 +84,26 @@ const {
                 head.appendChild(el.cloneNode(true));
             });
 
-            captureBaseGlobalStyles();
-            removeExtraGlobalStyles();
+            const oldGlobals = head.querySelectorAll(
+                'style:not([data-astro-cid]):not([data-permanent]), link[rel="stylesheet"]:not([data-astro-cid]):not([data-permanent])',
+            );
+            oldGlobals.forEach((el) => el.remove());
 
             const newGlobals = newDoc.head.querySelectorAll(
                 'style:not([data-astro-cid]), link[rel="stylesheet"]:not([data-astro-cid])',
             );
             newGlobals.forEach((newEl) => {
                 const alreadyExists = Array.from(
-                    head.querySelectorAll(
-                        'style:not([data-astro-cid]), link[rel="stylesheet"]:not([data-astro-cid])',
-                    ),
+                    head.querySelectorAll('style, link[rel="stylesheet"]'),
                 ).some((el) => el.isEqualNode(newEl));
-                if (!alreadyExists && baseGlobalStyles) {
-                    const clone = newEl.cloneNode(true);
-                    clone.setAttribute(EXTRA_GLOBAL_ATTR, "");
-                    head.appendChild(clone);
+                if (!alreadyExists) {
+                    head.appendChild(newEl.cloneNode(true));
                 }
             });
 
             const newTitle = newDoc.querySelector("title")?.textContent || "";
             document.title = newTitle;
         }
-
         async function navigate(url, pushState = true) {
             try {
                 const newDoc = await fetchContent(url);

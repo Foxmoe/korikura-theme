@@ -14,14 +14,17 @@ import rehypeSlug from 'rehype-slug';
 import remarkToc from 'remark-toc';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import { unified, rehypeHeadingIds } from '@astrojs/markdown-remark';
+import compressor from 'astro-compressor';
 
 export default defineConfig({
   site: siteConfig.url,
   base: siteConfig.entry,
 
-  trailingSlash: "ignore",
+  trailingSlash: "never",
   compressHTML: true,
-
+  build: {
+    format: 'file'
+  },
   devToolbar: {
     enabled: true
   },
@@ -33,14 +36,9 @@ export default defineConfig({
     priority: 0.7,
     filenameBase: 'sitemap',
     entryLimit: 50000,
-  }),
-  react(),
-  mdx(),
-  partytown(),
-  svelte(),
-  NebulaCMS({
+  }), react(), mdx(), partytown(), svelte(), NebulaCMS({
     basePath: '/console',
-  })],
+  }), compressor({ gzip: true, brotli: true })],
   markdown: {
     processor: unified({
       remarkPlugins: [[remarkToc, { heading: 'toc', maxDepth: 3 }]],
@@ -60,5 +58,8 @@ export default defineConfig({
         '@': '/src',
       },
     },
+    build: {
+      cssCodeSplit: true
+    }
   }
 });

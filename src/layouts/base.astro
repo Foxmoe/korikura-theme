@@ -2,6 +2,7 @@
 import { siteConfig, profileConfig } from "@/config";
 import type { THEME_MODE } from "@/constants/constants";
 import SpaRouter from "@/components/spaRouter.astro";
+import styleUrl from "@/styles/style.css?url";
 
 export interface Props {
     title?: string;
@@ -40,6 +41,8 @@ title = title ? title + " - " + siteConfig.title : siteConfig.title;
 
         <link rel="sitemap" href="/sitemap.xml" />
         <link rel="icon" href="/favicon.ico" />
+
+        <link rel="stylesheet" href={styleUrl} data-permanent />
 
         <link
             rel="alternate"
