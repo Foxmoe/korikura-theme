@@ -10,7 +10,7 @@ export const siteConfig = {
 
 export const profileConfig = {
     name: "BakaXH",
-    avatar: "/assets/avatar.jpg",
+    avatar: "/images/avatar.jpg",
     bio: "记录生活点滴，分享技术心得"
 }
 
