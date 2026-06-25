@@ -2,7 +2,9 @@
 import { siteConfig, profileConfig } from "@/config";
 import type { THEME_MODE } from "@/constants/constants";
 import SpaRouter from "@/components/spaRouter.astro";
+import ProgressBar from "@/components/progressbar.astro";
 import styleUrl from "@/styles/style.css?url";
+import Progressbar from "@/components/progressbar.astro";
 
 export interface Props {
     title?: string;
@@ -55,6 +57,7 @@ title = title ? title + " - " + siteConfig.title : siteConfig.title;
     </head>
 
     <body>
+        <Progressbar />
         <SpaRouter
             contentSelector="#main-container"
             scrollToTop={true}

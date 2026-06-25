@@ -1,0 +1,92 @@
+---
+
+---
+
+<div id="spa-progress-bar" class="progress-bar-hidden"></div>
+
+<style lang="scss" is:global>
+    @use "tailwindcss";
+
+    #spa-progress-bar {
+        @apply fixed top-0 left-0 z-99999 pointer-events-none h-px;
+        /* 纯粹樱花粉，无透明消散 */
+        background: linear-gradient(
+            90deg,
+            #fbcfe8,
+            #f9a8d4 30%,
+            #f472b6 70%,
+            #ec4899
+        );
+        border-radius: 1px;
+        box-shadow:
+            0 0 6px rgba(244, 114, 182, 0.5),
+            0 0 2px rgba(249, 168, 212, 0.3);
+        width: 0;
+        opacity: 0;
+        transition:
+            width 0.3s ease-out,
+            opacity 0.3s ease-out;
+
+        &.progress-bar-hidden {
+            @apply hidden;
+        }
+
+        &.progress-bar-visible {
+            @apply block;
+        }
+
+        &.progress-bar-loading {
+            @apply opacity-100;
+            width: 80%;
+            transition:
+                width 2s cubic-bezier(0.1, 0.7, 0.3, 1),
+                opacity 0s;
+        }
+
+        &.progress-bar-finish {
+            width: 100%;
+            @apply opacity-0;
+            transition:
+                width 0.2s ease-out,
+                opacity 0.3s ease-out 0.2s;
+        }
+    }
+</style>
+
+<script>
+    const bar = document.getElementById("spa-progress-bar") as HTMLElement;
+
+    let timeout: number | NodeJS.Timeout | undefined;
+    let isLoading = false;
+
+    function showLoader() {
+        if (isLoading) return;
+        isLoading = true;
+        clearTimeout(timeout);
+        bar.classList.remove(
+            "progress-bar-finish",
+            "progress-bar-hidden",
+            "progress-bar-loading",
+        );
+        bar.classList.add("progress-bar-visible");
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                bar.classList.add("progress-bar-loading");
+            });
+        });
+    }
+
+    function finishLoader() {
+        isLoading = false;
+        clearTimeout(timeout);
+        bar.classList.remove("progress-bar-loading");
+        bar.classList.add("progress-bar-finish");
+        timeout = setTimeout(() => {
+            bar.classList.remove("progress-bar-finish", "progress-bar-visible");
+            bar.classList.add("progress-bar-hidden");
+        }, 400);
+    }
+
+    window.addEventListener("spa-navigate-start", showLoader);
+    window.addEventListener("spa-navigate-end", finishLoader);
+</script>

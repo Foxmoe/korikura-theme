@@ -3,16 +3,16 @@ export interface Props {
     contentSelector?: string;
     scrollToTop?: boolean;
     prefetch?: boolean;
-    scrollBehavior?: "instant" | "smooth";
     ignoreHash?: boolean;
+    scrollBehavior?: string;
 }
 
 const {
     contentSelector = ".main-container",
     scrollToTop = true,
-    scrollBehavior = "smooth",
     prefetch = true,
     ignoreHash = false,
+    scrollBehavior = "smooth",
 } = Astro.props;
 ---
 
@@ -21,8 +21,8 @@ const {
         contentSelector,
         scrollToTop,
         prefetch,
-        scrollBehavior,
         ignoreHash,
+        scrollBehavior,
     }}
 >
     if (!document.startViewTransition) {
@@ -120,6 +120,11 @@ const {
         }
 
         async function navigate(url, pushState = true) {
+            // 导航开始，通知进度条
+            window.dispatchEvent(
+                new CustomEvent("spa-navigate-start", { detail: { url } }),
+            );
+
             try {
                 const newDoc = await fetchContent(url);
                 const newContent = newDoc.querySelector(contentSelector);
@@ -147,16 +152,22 @@ const {
                 if (scrollToTop && (ignoreHash || !hasHash)) {
                     window.scrollTo({ top: 0, behavior: scrollBehavior });
                 }
+
                 window.dispatchEvent(
                     new CustomEvent("spa-navigate", { detail: { url } }),
+                );
+                window.dispatchEvent(
+                    new CustomEvent("spa-navigate-end", { detail: { url } }),
                 );
             } catch (err) {
                 console.error(
                     "Navigation failed, falling back to hard navigation",
                     err,
                 );
+                window.dispatchEvent(
+                    new CustomEvent("spa-navigate-end", { detail: { url } }),
+                );
                 window.location.href = url;
-                return;
             }
         }
 

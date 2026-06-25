@@ -29,24 +29,33 @@ const navLinks = [
     </div>
   </div>
 </nav>
-
 <script is:inline>
-  let rafId;
-
-  function updateActive() {
-    cancelAnimationFrame(rafId);
-    rafId = requestAnimationFrame(() => {
-      const path = window.location.pathname;
-      document.querySelectorAll(".nav-link").forEach((el) => {
-        const href = el.dataset.link;
-        el.classList.toggle("active", href === path);
-      });
+  const navLinks = document.querySelectorAll(".nav-link");
+  function setActiveByPath(path) {
+    navLinks.forEach((el) => {
+      const href = el.dataset.link;
+      el.classList.toggle("active", href === path);
     });
   }
 
-  updateActive();
+  setActiveByPath(window.location.pathname);
 
-  window.addEventListener('spa-navigate', updateActive);
+  document.addEventListener(
+    "click",
+    (e) => {
+      const link = e.target.closest(".nav-link");
+      if (!link) return;
+      const href = link.dataset.link;
+      if (href && href !== window.location.pathname) {
+        setActiveByPath(href);
+      }
+    },
+    true,
+  );
+
+  window.addEventListener("spa-navigate", () => {
+    setActiveByPath(window.location.pathname);
+  });
 </script>
 
 <style lang="scss">
@@ -96,10 +105,10 @@ const navLinks = [
     @apply hover:bg-black/5 dark:hover:bg-white/10;
 
     transform: translateZ(0);
-  }
 
-  .nav-link.active {
-    @apply bg-black/10 dark:bg-white/20 font-medium;
+    &.active {
+      @apply bg-black/10 dark:bg-white/20 font-medium;
+    }
   }
 
   .btn {
