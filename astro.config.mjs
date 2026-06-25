@@ -23,7 +23,8 @@ export default defineConfig({
   trailingSlash: "never",
   compressHTML: true,
   build: {
-    format: 'file'
+    format: 'file',
+    assets: 'assets',
   },
   devToolbar: {
     enabled: true
