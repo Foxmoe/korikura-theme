@@ -85,10 +85,8 @@ html {
     animation-duration: 0.6s;
   }
 
-  ::view-transition-old(root) {
-    animation: none;
-  }
-
+  ::view-transition-group(*),
+  ::view-transition-old(root),
   ::view-transition-new(root) {
     animation: none;
   }
