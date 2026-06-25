@@ -10,6 +10,8 @@ import partytown from '@astrojs/partytown';
 import svelte from '@astrojs/svelte';
 import NebulaCMS from 'nebula-cms';
 import tailwindcss from '@tailwindcss/vite';
+import rehypeSlug from 'rehype-slug';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
 export default defineConfig({
   site: siteConfig.url,
@@ -31,7 +33,12 @@ export default defineConfig({
     entryLimit: 50000,
   }),
   react(),
-  mdx(),
+  mdx({
+    rehypePlugins: [
+      rehypeSlug,
+      rehypeAutolinkHeadings,
+    ]
+  }),
   partytown(),
   svelte(),
   NebulaCMS({

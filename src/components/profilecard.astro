@@ -1,0 +1,33 @@
+---
+const name = "Bakahu";
+const desc = "A small sakura blog in cyberspace";
+---
+
+<div class="card">
+  <div class="avatar" />
+  <div class="name">{name}</div>
+  <div class="desc">{desc}</div>
+</div>
+
+<style lang="scss">
+  @use "tailwindcss";
+
+  .card {
+    @apply p-4 rounded-2xl bg-pink-50/60 backdrop-blur-md
+           border border-pink-200/40 text-center;
+  }
+
+  .avatar {
+    @apply w-16 h-16 mx-auto rounded-full
+           bg-gradient-to-br from-pink-300 to-purple-300
+           mb-3;
+  }
+
+  .name {
+    @apply font-semibold text-gray-800;
+  }
+
+  .desc {
+    @apply text-xs text-gray-500 mt-1;
+  }
+</style>

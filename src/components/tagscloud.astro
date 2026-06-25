@@ -1,0 +1,47 @@
+---
+const tags = [
+  { name: "Astro", count: 12 },
+  { name: "CSS", count: 8 },
+  { name: "Anime", count: 20 },
+  { name: "Sakura", count: 5 },
+];
+---
+
+<div class="tags">
+  <div class="title">Tags</div>
+
+  <div class="cloud">
+    {tags.map(tag => (
+      <a
+        class="tag"
+        href={`/tags/${tag.name.toLowerCase()}`}
+        style={`font-size: ${0.75 + tag.count * 0.02}rem`}
+      >
+        {tag.name}
+      </a>
+    ))}
+  </div>
+</div>
+
+<style lang="scss">
+  @use "tailwindcss";
+
+  .tags {
+    @apply p-4 rounded-2xl bg-white/40 backdrop-blur-md
+           border border-pink-100/40;
+  }
+
+  .title {
+    @apply text-sm font-semibold text-pink-500 mb-2;
+  }
+
+  .cloud {
+    @apply flex flex-wrap gap-2;
+  }
+
+  .tag {
+    @apply px-2 py-1 rounded-full bg-pink-100/40
+           text-gray-600 hover:bg-pink-200/40
+           transition;
+  }
+</style>

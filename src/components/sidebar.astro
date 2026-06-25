@@ -1,0 +1,46 @@
+---
+import ProfileCard from "./profilecard.astro";
+import RecentPosts from "./recentposts.astro";
+import TagsCloud from "./tagscloud.astro";
+import TableOfContents from "./tableofcontents.astro";
+
+const { headings } = Astro.props;
+---
+
+<aside class="sidebar">
+    <div class="sidebar-inner">
+        <ProfileCard />
+
+        {
+            headings?.length > 0 && (
+                <>
+                    <div class="divider" />
+                    <TableOfContents headings={headings} />
+                </>
+            )
+        }
+        <div class="divider"></div>
+
+        <RecentPosts />
+
+        <div class="divider"></div>
+
+        <TagsCloud />
+    </div>
+</aside>
+
+<style lang="scss">
+    @use "tailwindcss";
+
+    .sidebar {
+        @apply w-72 shrink-0 hidden xl:block;
+    }
+
+    .sidebar-inner {
+        @apply sticky top-8 space-y-6;
+    }
+
+    .divider {
+        @apply h-px bg-pink-200/40 my-4;
+    }
+</style>

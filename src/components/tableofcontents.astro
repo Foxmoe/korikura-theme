@@ -1,0 +1,50 @@
+---
+interface Props {
+  headings: { depth: number; slug: string; text: string }[];
+}
+
+const { headings } = Astro.props;
+
+const items = headings.filter(h => h.depth >= 2 && h.depth <= 3);
+---
+
+<div class="toc">
+  <div class="title">Contents</div>
+
+  <ul>
+    {items.map(h => (
+      <li class={`level-${h.depth}`}>
+        <a href={`#${h.slug}`}>{h.text}</a>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style lang="scss">
+  @use "tailwindcss";
+
+  .toc {
+    @apply p-4 rounded-2xl bg-white/40 backdrop-blur-md
+           border border-pink-100/40;
+  }
+
+  .title {
+    @apply text-sm font-semibold text-pink-500 mb-2;
+  }
+
+  ul {
+    @apply space-y-1;
+  }
+
+  li {
+    @apply text-xs text-gray-600;
+  }
+
+  .level-3 {
+    @apply pl-3 opacity-80;
+  }
+
+  a {
+    @apply hover:text-pink-500 transition;
+  }
+</style>

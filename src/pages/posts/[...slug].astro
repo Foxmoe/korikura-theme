@@ -5,8 +5,9 @@ import {
     getEntry,
     render,
 } from "astro:content";
-import DefaultLayout from "@/layouts/default.astro";
+import Default from "@/layouts/default.astro";
 import PostNav from "@/components/postnav.astro";
+import Sidebar from "@/components/sidebar.astro";
 import { formatDate, formatDateToChinese } from "@/utils/utils";
 
 type Post = CollectionEntry<"posts">;
@@ -21,10 +22,10 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props as { post: Post };
-const { Content } = await render(post);
+const { Content,headings } = await render(post);
 ---
 
-<DefaultLayout title={post.data.title}>
+<Default title={post.data.title}>
     <h1>{post.data.title}</h1>
     <span>tags:</span>
     <div>
@@ -39,4 +40,7 @@ const { Content } = await render(post);
 
     <Content />
     <PostNav current={post} />
-</DefaultLayout>
+      <div slot="sidebar">
+    <Sidebar headings={headings} />
+  </div>
+</Default>
