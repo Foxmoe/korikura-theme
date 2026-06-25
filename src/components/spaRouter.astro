@@ -3,16 +3,28 @@ export interface Props {
     contentSelector?: string;
     scrollToTop?: boolean;
     prefetch?: boolean;
+    scrollBehavior?: "instant" | "smooth";
+    ignoreHash?: boolean;
 }
 
 const {
     contentSelector = ".main-container",
     scrollToTop = true,
-    prefetch = false,
+    scrollBehavior = "smooth",
+    prefetch = true,
+    ignoreHash = false,
 } = Astro.props;
 ---
 
-<script define:vars={{ contentSelector, scrollToTop, prefetch }}>
+<script
+    define:vars={{
+        contentSelector,
+        scrollToTop,
+        prefetch,
+        scrollBehavior,
+        ignoreHash,
+    }}
+>
     if (!document.startViewTransition) {
     } else {
         const DYNAMIC_SCRIPT_ATTR = "data-spa-dynamic-script";
@@ -84,38 +96,39 @@ const {
                 head.appendChild(el.cloneNode(true));
             });
 
-            const oldGlobals = head.querySelectorAll(
-                'style:not([data-astro-cid]):not([data-permanent]), link[rel="stylesheet"]:not([data-astro-cid]):not([data-permanent])',
-            );
-            oldGlobals.forEach((el) => el.remove());
+            captureBaseGlobalStyles();
+            removeExtraGlobalStyles();
 
             const newGlobals = newDoc.head.querySelectorAll(
                 'style:not([data-astro-cid]), link[rel="stylesheet"]:not([data-astro-cid])',
             );
             newGlobals.forEach((newEl) => {
                 const alreadyExists = Array.from(
-                    head.querySelectorAll('style, link[rel="stylesheet"]'),
+                    head.querySelectorAll(
+                        'style:not([data-astro-cid]), link[rel="stylesheet"]:not([data-astro-cid])',
+                    ),
                 ).some((el) => el.isEqualNode(newEl));
-                if (!alreadyExists) {
-                    head.appendChild(newEl.cloneNode(true));
+                if (!alreadyExists && baseGlobalStyles) {
+                    const clone = newEl.cloneNode(true);
+                    clone.setAttribute(EXTRA_GLOBAL_ATTR, "");
+                    head.appendChild(clone);
                 }
             });
 
             const newTitle = newDoc.querySelector("title")?.textContent || "";
             document.title = newTitle;
         }
+
         async function navigate(url, pushState = true) {
             try {
                 const newDoc = await fetchContent(url);
                 const newContent = newDoc.querySelector(contentSelector);
                 if (!newContent) throw new Error("Missing content");
 
-                removeDynamicScripts(); // 清理旧脚本（不影响视图）
+                removeDynamicScripts();
 
                 const transition = document.startViewTransition(() => {
-                    // 1. 先同步头部样式（新样式立即生效）
                     updateHeadStyles(newDoc);
-                    // 2. 再替换内容（此时样式已就绪）
                     const container = getContentContainer();
                     if (container) {
                         container.innerHTML = newContent.innerHTML;
@@ -125,8 +138,14 @@ const {
 
                 await transition.finished;
 
-                if (scrollToTop) {
-                    window.scrollTo({ top: 0, behavior: "instant" });
+                if (pushState) {
+                    window.history.pushState(null, "", url);
+                }
+
+                const targetUrl = new URL(url, location.origin);
+                const hasHash = !!targetUrl.hash;
+                if (scrollToTop && (ignoreHash || !hasHash)) {
+                    window.scrollTo({ top: 0, behavior: scrollBehavior });
                 }
                 window.dispatchEvent(
                     new CustomEvent("spa-navigate", { detail: { url } }),
@@ -139,11 +158,8 @@ const {
                 window.location.href = url;
                 return;
             }
-
-            if (pushState) {
-                window.history.pushState(null, "", url);
-            }
         }
+
         document.addEventListener("click", (e) => {
             const link = e.target?.closest?.("a[href]") || null;
             if (!link) return;

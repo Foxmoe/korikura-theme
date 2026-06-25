@@ -59,6 +59,8 @@ title = title ? title + " - " + siteConfig.title : siteConfig.title;
             contentSelector="#main-container"
             scrollToTop={true}
             prefetch={false}
+            ignoreHash={false}
+            scrollBehavior="smooth"
         />
         <slot />
     </body>
