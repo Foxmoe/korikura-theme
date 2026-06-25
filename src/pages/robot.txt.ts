@@ -4,7 +4,7 @@ import type { APIRoute } from "astro";
 
 const robotsTxt = `
 User-agent: *
-Disallow: /_astro/
+Disallow: /assets/
 Disallow: /console/
 Disallow: /.well-known/
 
