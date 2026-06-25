@@ -85,6 +85,10 @@ html {
     animation-duration: 0.6s;
   }
 
+  ::view-transition {
+    pointer-events: none;
+  }
+
   ::view-transition-group(*),
   ::view-transition-old(root),
   ::view-transition-new(root) {
@@ -92,11 +96,11 @@ html {
   }
 
   ::view-transition-old(main) {
-    animation: page-out 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: page-out 100ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   ::view-transition-new(main) {
-    animation: page-in 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: page-in 100ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   @keyframes page-out {

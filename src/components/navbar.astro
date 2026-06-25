@@ -6,16 +6,22 @@ const navLinks = [
 ];
 ---
 
-<nav class="nav-wrapper">
+<nav
+  class="nav-wrapper"
+  transition:persist="nav"
+  data-astro-transition-persist="nav"
+>
   <div class="nav-card">
     <a href="/" class="logo">Blog</a>
 
     <div class="nav-links">
-      {navLinks.map((i) => (
-        <a href={i.href} class="nav-link" data-link={i.href}>
-          {i.label}
-        </a>
-      ))}
+      {
+        navLinks.map((i) => (
+          <a href={i.href} class="nav-link" data-link={i.href}>
+            {i.label}
+          </a>
+        ))
+      }
     </div>
 
     <div class="actions">
@@ -25,81 +31,80 @@ const navLinks = [
 </nav>
 
 <script is:inline>
-let rafId;
+  let rafId;
 
-function updateActive() {
-  cancelAnimationFrame(rafId);
-
-  rafId = requestAnimationFrame(() => {
-    const path = window.location.pathname;
-
-    document.querySelectorAll(".nav-link").forEach((el) => {
-      const href = el.dataset.link;
-      el.classList.toggle("active", href === path);
+  function updateActive() {
+    cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(() => {
+      const path = window.location.pathname;
+      document.querySelectorAll(".nav-link").forEach((el) => {
+        const href = el.dataset.link;
+        el.classList.toggle("active", href === path);
+      });
     });
-  });
-}
+  }
 
-updateActive();
-document.addEventListener("astro:page-load", updateActive);
+  updateActive();
+
+  window.addEventListener('spa-navigate', updateActive);
 </script>
 
 <style lang="scss">
-@use "tailwindcss";
+  @use "tailwindcss";
 
-:root {
-  --container: min(1100px, 92vw);
-}
+  :root {
+    --container: min(1100px, 92vw);
+  }
 
-.nav-wrapper {
-  @apply fixed top-0 left-0 right-0 z-50 flex justify-center;
-  padding-top: 16px;
-  transform: translateZ(0);
-}
+  .nav-wrapper {
+    @apply fixed top-0 left-0 right-0 z-50 flex justify-center;
+    padding-top: 16px;
+    transform: translateZ(0);
+  }
 
-.nav-card {
-  width: var(--container);
+  .nav-card {
+    width: var(--container);
 
-  @apply flex items-center justify-between;
-  @apply px-6 py-3 rounded-2xl;
-  @apply border border-black/10 dark:border-white/10;
-  @apply shadow-lg;
+    @apply flex items-center justify-between;
+    @apply px-6 py-3 rounded-2xl;
+    @apply border border-black/10 dark:border-white/10;
+    @apply shadow-lg;
 
-  background-color: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
 
-  transform: translateZ(0);
-  will-change: transform;
-}
+    transform: translateZ(0);
+    will-change: transform;
+  }
 
-.dark .nav-card {
-  background-color: rgba(0, 0, 0, 0.45);
-}
+  .dark .nav-card {
+    background-color: rgba(0, 0, 0, 0.45);
+  }
 
-.logo {
-  @apply font-bold text-lg;
-  transform: translateZ(0);
-}
+  .logo {
+    @apply font-bold text-lg;
+    transform: translateZ(0);
+  }
 
-.nav-links {
-  @apply hidden sm:flex gap-2;
-}
+  .nav-links {
+    @apply hidden sm:flex gap-2;
+  }
 
-.nav-link {
-  @apply px-4 py-2 rounded-full text-sm transition;
-  @apply hover:bg-black/5 dark:hover:bg-white/10;
+  .nav-link {
+    @apply px-4 py-2 rounded-full text-sm transition;
+    @apply hover:bg-black/5 dark:hover:bg-white/10;
 
-  transform: translateZ(0);
-}
+    transform: translateZ(0);
+  }
 
-.nav-link.active {
-  @apply bg-black/10 dark:bg-white/20 font-medium;
-}
+  .nav-link.active {
+    @apply bg-black/10 dark:bg-white/20 font-medium;
+  }
 
-.btn {
-  @apply px-3 py-2 border rounded-lg text-sm;
+  .btn {
+    @apply px-3 py-2 border rounded-lg text-sm;
 
-  transform: translateZ(0);
-}
+    transform: translateZ(0);
+  }
 </style>
