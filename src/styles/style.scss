@@ -34,11 +34,13 @@ body {
     Arial,
     "Noto Sans CJK SC",
     sans-serif;
-    font-synthesis: none;
+  font-synthesis: none;
+  background-image: url("/images/wallhaven-qr3j1r.jpg");
+  background-repeat: no-repeat;
 }
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 @layer scrollbar {

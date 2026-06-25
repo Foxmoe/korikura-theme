@@ -1,4 +1,6 @@
 module.exports = {
+  content: ["./src/**/*.{astro,html,js,ts,md,mdx}"],
+  plugins: [require("@tailwindcss/typography")],
   theme: {
     extend: {
       colors: {

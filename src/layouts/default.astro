@@ -17,54 +17,49 @@ const { title, description, keywords, showSidebar = true } = Astro.props;
 
 <Base {title} {description} {keywords}>
   <div class="layout">
-    <div class="content">
-      <header class="header">
-        <Navbar />
-      </header>
-      <main class="main" transition:name="trans">
-        <article class="article">
-          <slot />
-        </article>
 
-        {
-          showSidebar && (
-            <aside class="sidebar">
-              <slot name="sidebar" />
-            </aside>
-          )
-        }
-      </main>
+    <header class="header">
+      <Navbar />
+    </header>
 
-      <Footer />
-    </div>
+    <main class="container">
+      <div class="content">
+        <slot />
+      </div>
+
+      {
+        showSidebar && (
+          <aside class="sidebar">
+            <slot name="sidebar" />
+          </aside>
+        )
+      }
+
+    </main>
+
+    <Footer />
+
   </div>
 </Base>
 
 <style lang="scss">
-  @use "tailwindcss";
+@use "tailwindcss";
+.layout {
+  @apply min-h-screen flex flex-col;
+}
 
-  .layout {
-    @apply min-h-screen flex flex-col;
-  }
+.container {
+  width: var(--container);
+  margin: 0 auto;
+  @apply flex gap-10 py-8;
+  view-transition-name: main;
+}
 
-  .header {
-    @apply relative;
-  }
+.content {
+  @apply flex-1;
+}
 
-  .content {
-    @apply flex-1 flex flex-col;
-  }
-
-  .main {
-    @apply flex-1 max-w-6xl mx-auto w-full px-4 py-8 flex gap-8;
-    view-transition-name: main;
-  }
-
-  .article {
-    @apply flex-1 min-w-0;
-  }
-
-  .sidebar {
-    @apply w-72 hidden xl:block shrink-0;
-  }
+.sidebar {
+  @apply w-72 hidden xl:block shrink-0;
+}
 </style>

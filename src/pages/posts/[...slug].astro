@@ -1,46 +1,114 @@
 ---
 import {
-    getCollection,
-    type CollectionEntry,
-    getEntry,
-    render,
+  getCollection,
+  type CollectionEntry,
+  render,
 } from "astro:content";
+
 import Default from "@/layouts/default.astro";
 import PostNav from "@/components/postnav.astro";
 import Sidebar from "@/components/sidebar.astro";
-import { formatDate, formatDateToChinese } from "@/utils/utils";
+import { formatDateToChinese } from "@/utils/utils";
 
 type Post = CollectionEntry<"posts">;
 
 export async function getStaticPaths() {
-    const posts = await getCollection("posts");
+  const posts = await getCollection("posts");
 
-    return posts.map((post: Post) => ({
-        params: { slug: post.id },
-        props: { post },
-    }));
+  return posts.map((post: Post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
 }
 
 const { post } = Astro.props as { post: Post };
-const { Content,headings } = await render(post);
+const { Content, headings } = await render(post);
 ---
 
 <Default title={post.data.title}>
-    <h1>{post.data.title}</h1>
-    <span>tags:</span>
-    <div>
-        {post.data.tags.map((tag) => (
-            <span>{tag}</span>
-            <br />
-        ))}
+
+  <article class="article">
+
+    <h1 class="title">{post.data.title}</h1>
+
+    <div class="meta">
+      <span>{formatDateToChinese(post.data.pubDate)}</span>
     </div>
-    <p>
-        {post.data.description} · {formatDateToChinese(post.data.pubDate)}
-    </p>
+
+    <div class="tags">
+      {post.data.tags.map((tag) => (
+        <span class="tag">{tag}</span>
+      ))}
+    </div>
+
+    <div class="divider"></div>
 
     <Content />
-    <PostNav current={post} />
-      <div slot="sidebar">
+
+  </article>
+
+  <PostNav current={post} />
+
+  <div slot="sidebar">
     <Sidebar headings={headings} />
   </div>
+
 </Default>
+
+<style lang="scss">
+@use "tailwindcss";
+
+.article {
+  @apply max-w-3xl mx-auto;
+}
+
+/* 标题 */
+.title {
+  @apply text-3xl md:text-4xl font-semibold tracking-tight;
+}
+
+/* meta */
+.meta {
+  @apply mt-2 text-sm text-zinc-500;
+}
+
+/* tags */
+.tags {
+  @apply mt-3 flex flex-wrap gap-2;
+}
+
+.tag {
+  @apply text-xs px-2 py-1 rounded-md
+         bg-zinc-100 dark:bg-zinc-800
+         text-zinc-600 dark:text-zinc-300;
+}
+
+/* 分割线 */
+.divider {
+  @apply my-6 h-px bg-zinc-200 dark:bg-zinc-800;
+}
+
+.article :global(p) {
+  @apply leading-7 text-[15px] text-zinc-800 dark:text-zinc-200;
+}
+
+.article :global(h2) {
+  @apply mt-10 mb-4 text-xl font-semibold;
+}
+
+.article :global(h3) {
+  @apply mt-6 mb-2 text-lg font-semibold;
+}
+
+.article :global(img) {
+  @apply rounded-xl mx-auto;
+}
+
+.article :global(pre) {
+  @apply rounded-xl overflow-x-auto;
+}
+
+.article :global(code) {
+  @apply text-sm;
+}
+</style>
