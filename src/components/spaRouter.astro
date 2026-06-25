@@ -120,7 +120,6 @@ const {
         }
 
         async function navigate(url, pushState = true) {
-            // 导航开始，通知进度条
             window.dispatchEvent(
                 new CustomEvent("spa-navigate-start", { detail: { url } }),
             );
