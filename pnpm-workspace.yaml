@@ -3,5 +3,8 @@ allowBuilds:
   esbuild: false
   sharp: false
   workerd: false
+minimumReleaseAgeExclude:
+  - astro-tailwind-autoref@1.0.0
+  - astro-tailwind-autoref@1.0.2
 packages:
   - "*"

@@ -12,7 +12,7 @@ import NebulaCMS from 'nebula-cms';
 import tailwindcss from '@tailwindcss/vite';
 import rehypeSlug from 'rehype-slug';
 import remarkToc from 'remark-toc';
-import addTailwindcssReference from './src/plugins/addTailwindcssReference.cjs';
+import addTailwindcssReference from 'astro-tailwind-autoref';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import { unified, rehypeHeadingIds } from '@astrojs/markdown-remark';
 import compressor from 'astro-compressor';
