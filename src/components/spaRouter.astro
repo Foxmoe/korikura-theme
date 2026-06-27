@@ -125,6 +125,8 @@ const {
             );
 
             const container = getContentContainer();
+            const targetUrl = new URL(url, location.origin);
+            const hasHash = !!targetUrl.hash;
             if (!container) {
                 console.error("Content container not found");
                 return;
@@ -142,6 +144,9 @@ const {
 
                 const newDocPromise = fetchContent(url);
                 await leaveTransition.finished;
+                if (scrollToTop && (ignoreHash || !hasHash)) {
+                    window.scrollTo({ top: 0, behavior: scrollBehavior });
+                }
 
                 disableNewStyle.remove();
 
@@ -161,12 +166,6 @@ const {
 
                 if (pushState) {
                     window.history.pushState(null, "", url);
-                }
-
-                const targetUrl = new URL(url, location.origin);
-                const hasHash = !!targetUrl.hash;
-                if (scrollToTop && (ignoreHash || !hasHash)) {
-                    window.scrollTo({ top: 0, behavior: scrollBehavior });
                 }
 
                 window.dispatchEvent(
