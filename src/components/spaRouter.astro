@@ -124,23 +124,40 @@ const {
                 new CustomEvent("spa-navigate-start", { detail: { url } }),
             );
 
+            const container = getContentContainer();
+            if (!container) {
+                console.error("Content container not found");
+                return;
+            }
+
             try {
-                const newDoc = await fetchContent(url);
+                const disableNewStyle = document.createElement("style");
+                disableNewStyle.textContent =
+                    "::view-transition-new(main) { animation: none !important; }";
+                document.head.appendChild(disableNewStyle);
+
+                const leaveTransition = document.startViewTransition(() => {
+                    container.innerHTML = "";
+                });
+
+                const newDocPromise = fetchContent(url);
+                await leaveTransition.finished;
+
+                disableNewStyle.remove();
+
+                const newDoc = await newDocPromise;
                 const newContent = newDoc.querySelector(contentSelector);
                 if (!newContent) throw new Error("Missing content");
 
                 removeDynamicScripts();
+                updateHeadStyles(newDoc);
 
-                const transition = document.startViewTransition(() => {
-                    updateHeadStyles(newDoc);
-                    const container = getContentContainer();
-                    if (container) {
-                        container.innerHTML = newContent.innerHTML;
-                        executeScripts(container);
-                    }
+                const enterTransition = document.startViewTransition(() => {
+                    container.innerHTML = newContent.innerHTML;
+                    executeScripts(container);
                 });
 
-                await transition.finished;
+                await enterTransition.finished;
 
                 if (pushState) {
                     window.history.pushState(null, "", url);
