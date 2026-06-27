@@ -6,5 +6,6 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - astro-tailwind-autoref@1.0.0
   - astro-tailwind-autoref@1.0.2
+  - astro-tailwind-autoref@1.0.5
 packages:
   - "*"

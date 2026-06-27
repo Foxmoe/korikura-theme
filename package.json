@@ -33,7 +33,7 @@
     "astro-embed": "^0.13.0",
     "astro-font": "^1.1.0",
     "astro-pagefind": "^2.0.0",
-    "astro-tailwind-autoref": "1.0.2",
+    "astro-tailwind-autoref": "1.0.5",
     "fs-extra": "^11.3.5",
     "nebula-cms": "^0.1.7",
     "normalize.css": "^8.0.1",
