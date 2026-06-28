@@ -1,18 +1,17 @@
 ---
-// post navigation component
-
 import { getCollection, type CollectionEntry } from "astro:content";
+
 interface Props {
-    current: CollectionEntry<"posts">;
+  current: CollectionEntry<"posts">;
 }
 
 const { current } = Astro.props;
 
 const posts = (
-    await getCollection("posts", ({ data }) => data.draft !== true)
+  await getCollection("posts", ({ data }) => data.draft !== true)
 ).sort(
-    (a, b) =>
-        new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime(),
+  (a, b) =>
+    new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime(),
 );
 
 const idx = posts.findIndex((post) => post.id === current.id);
@@ -21,18 +20,78 @@ const prev = idx > 0 ? posts[idx - 1] : undefined;
 ---
 
 {
-    (next || prev) && (
-        <nav class="post-nav">
-            {prev && (
-                <a href={`/posts/${prev.id}`} class="post-prev" transition:name={`title-${prev.id}`}>
-                    上一篇 {prev.data.title}
-                </a>
-            )}
-            {next && (
-                <a href={`/posts/${next.id}`} class="post-next" transition:name={`title-${next.id}`}>
-                    {next.data.title} 下一篇
-                </a>
-            )}
-        </nav>
-    )
+  (next || prev) && (
+    <nav
+      class="post-nav"
+      transition:name="post-navigation"
+      transition:animate="fade"
+    >
+      {prev && (
+        <a href={`/posts/${prev.id}`} class="post-prev">
+          上一篇 {prev.data.title}
+        </a>
+      )}
+      {next && (
+        <a href={`/posts/${next.id}`} class="post-next">
+          {next.data.title} 下一篇
+        </a>
+      )}
+    </nav>
+  )
 }
+
+<style lang="scss">
+  .post-nav {
+    @apply flex flex-col sm:flex-row justify-between gap-4 mt-12 pt-8 
+           border-t border-gray-100 dark:border-gray-800;
+  }
+
+  .post-prev,
+  .post-next {
+    @apply relative flex-1 flex items-center gap-3 px-5 py-4 rounded-2xl
+           bg-white dark:bg-gray-800/50 backdrop-blur
+           border border-gray-100 dark:border-gray-700/50
+           text-sm font-medium text-gray-600 dark:text-gray-300
+           transition-all duration-300 ease-out
+           hover:bg-white dark:hover:bg-gray-800
+           hover:border-gray-200 dark:hover:border-gray-600
+           hover:shadow-lg hover:shadow-gray-200/50 dark:hover:shadow-gray-900/50
+           hover:-translate-y-0.5
+           hover:text-gray-900 dark:hover:text-white;
+  }
+
+  .post-prev {
+    @apply text-left;
+  }
+
+  .post-next {
+    @apply text-right justify-end;
+  }
+
+  .post-prev::before {
+    content: "←";
+    @apply text-lg text-purple-400 dark:text-purple-300 
+           transition-transform duration-300 ease-out;
+  }
+
+  .post-prev:hover::before {
+    @apply -translate-x-1;
+  }
+
+  .post-next::after {
+    content: "→";
+    @apply text-lg text-purple-400 dark:text-purple-300 
+           transition-transform duration-300 ease-out;
+  }
+
+  .post-next:hover::after {
+    @apply translate-x-1;
+  }
+
+  @media (max-width: 640px) {
+    .post-prev,
+    .post-next {
+      @apply text-sm;
+    }
+  }
+</style>
