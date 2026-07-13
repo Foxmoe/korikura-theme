@@ -1,0 +1,89 @@
+---
+import Icon from "./icon.astro";
+---
+
+<button
+  id="theme-toggle"
+  class="icon-btn"
+  type="button"
+  title="切换主题"
+  aria-label="切换主题"
+>
+  <span class="theme-icon" data-mode="light"><Icon name="sun" size={18} /></span>
+  <span class="theme-icon" data-mode="dark"><Icon name="moon" size={18} /></span>
+  <span class="theme-icon" data-mode="auto"><Icon name="auto" size={18} /></span>
+</button>
+
+<style lang="scss" is:global>
+  .icon-btn {
+    @apply flex items-center justify-center w-9 h-9 rounded
+           border border-[var(--border)] text-[var(--text)]
+           bg-[var(--card-bg)]/50 transition active:scale-95
+           hover:text-[var(--primary)] hover:border-[var(--primary)];
+  }
+  .theme-icon {
+    @apply hidden;
+  }
+  /* 根据 html 上的 data-mode 决定显示哪个图标 */
+  html[data-mode="light"] .theme-icon[data-mode="light"],
+  html[data-mode="dark"] .theme-icon[data-mode="dark"],
+  html[data-mode="auto"] .theme-icon[data-mode="auto"] {
+    @apply block;
+  }
+</style>
+
+<script>
+  function applyTheme(mode: "light" | "dark" | "auto") {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const dark = mode === "dark" || (mode === "auto" && mq.matches);
+    document.documentElement.classList.toggle("dark", dark);
+    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+    document.documentElement.setAttribute("data-mode", mode);
+    localStorage.setItem("theme-mode", mode);
+  }
+
+  const btn = document.getElementById("theme-toggle");
+  const order: ("light" | "dark" | "auto")[] = ["dark", "light", "auto"];
+
+  // 初始化：读取已保存模式（无闪烁脚本可能在更早时设置过 data-mode）
+  if (!document.documentElement.getAttribute("data-mode")) {
+    const saved = (localStorage.getItem("theme-mode") as "light" | "dark" | "auto") || "auto";
+    applyTheme(saved);
+  }
+
+  btn?.addEventListener("click", (e: MouseEvent) => {
+    const current =
+      (document.documentElement.getAttribute("data-mode") as "light" | "dark" | "auto") || "auto";
+    const next = order[(order.indexOf(current) + 1) % order.length];
+
+    // 全局圆圈涟漪：从点击位置扩散
+    const rect = (btn as HTMLButtonElement).getBoundingClientRect();
+    const x = e.clientX || rect.left + rect.width / 2;
+    const y = e.clientY || rect.top + rect.height / 2;
+    const ripple = document.createElement("span");
+    ripple.className = "theme-ripple";
+    ripple.style.left = x + "px";
+    ripple.style.top = y + "px";
+    document.body.appendChild(ripple);
+    ripple.addEventListener("animationend", () => ripple.remove());
+
+    applyTheme(next);
+  });
+
+  // 跟随系统变化（仅 auto 模式）
+  window
+    .matchMedia("(prefers-color-scheme: dark)")
+    .addEventListener("change", () => {
+      const mode = document.documentElement.getAttribute("data-mode");
+      if (mode === "auto") applyTheme("auto");
+    });
+
+  // SPA 导航后保持主题
+  window.addEventListener("spa-navigate", () => {
+    const mode = (document.documentElement.getAttribute("data-mode") as
+      | "light"
+      | "dark"
+      | "auto") || "auto";
+    applyTheme(mode);
+  });
+</script>

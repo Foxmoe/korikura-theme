@@ -1,0 +1,246 @@
+---
+export interface Props {
+    contentSelector?: string;
+    heroSelector?: string;
+    scrollToTop?: boolean;
+    prefetch?: boolean;
+    ignoreHash?: boolean;
+    scrollBehavior?: string;
+}
+
+const {
+    contentSelector = ".main-container",
+    heroSelector = "#hero-slot",
+    scrollToTop = true,
+    prefetch = true,
+    ignoreHash = false,
+    scrollBehavior = "smooth",
+} = Astro.props;
+---
+
+<script
+    define:vars={{
+        contentSelector,
+        heroSelector,
+        scrollToTop,
+        prefetch,
+        ignoreHash,
+        scrollBehavior,
+    }}
+>
+    if (!document.startViewTransition) {
+    } else {
+        const DYNAMIC_SCRIPT_ATTR = "data-spa-dynamic-script";
+        const EXTRA_GLOBAL_ATTR = "data-spa-global-extra";
+
+        let baseGlobalStyles = null;
+
+        function captureBaseGlobalStyles() {
+            if (baseGlobalStyles) return;
+            const head = document.head;
+            const globals = head.querySelectorAll(
+                'style:not([data-astro-cid]), link[rel="stylesheet"]:not([data-astro-cid])',
+            );
+            baseGlobalStyles = new Set(globals);
+        }
+
+        function getContentContainer() {
+            return document.querySelector(contentSelector);
+        }
+
+        function getHeroContainer() {
+            return document.querySelector(heroSelector);
+        }
+
+        function removeExtraGlobalStyles() {
+            document
+                .querySelectorAll(
+                    `style[${EXTRA_GLOBAL_ATTR}], link[rel="stylesheet"][${EXTRA_GLOBAL_ATTR}]`,
+                )
+                .forEach((el) => el.remove());
+        }
+
+        function removeDynamicScripts() {
+            document
+                .querySelectorAll(`script[${DYNAMIC_SCRIPT_ATTR}]`)
+                .forEach((el) => el.remove());
+        }
+
+        function executeScripts(container) {
+            const scripts = container.querySelectorAll("script");
+            scripts.forEach((oldScript) => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach((attr) => {
+                    newScript.setAttribute(attr.name, attr.value);
+                });
+                newScript.setAttribute(DYNAMIC_SCRIPT_ATTR, "");
+                newScript.textContent = oldScript.textContent;
+                oldScript.replaceWith(newScript);
+            });
+        }
+
+        async function fetchContent(url) {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`Failed to fetch ${url}`);
+            const html = await res.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, "text/html");
+            return doc;
+        }
+
+        function updateHeadStyles(newDoc) {
+            const head = document.head;
+
+            const oldScoped = head.querySelectorAll(
+                'style[data-astro-cid], link[rel="stylesheet"][data-astro-cid]',
+            );
+            oldScoped.forEach((el) => el.remove());
+
+            const newScoped = newDoc.head.querySelectorAll(
+                'style[data-astro-cid], link[rel="stylesheet"][data-astro-cid]',
+            );
+            newScoped.forEach((el) => {
+                head.appendChild(el.cloneNode(true));
+            });
+
+            captureBaseGlobalStyles();
+            removeExtraGlobalStyles();
+
+            const newGlobals = newDoc.head.querySelectorAll(
+                'style:not([data-astro-cid]), link[rel="stylesheet"]:not([data-astro-cid])',
+            );
+            newGlobals.forEach((newEl) => {
+                const alreadyExists = Array.from(
+                    head.querySelectorAll(
+                        'style:not([data-astro-cid]), link[rel="stylesheet"]:not([data-astro-cid])',
+                    ),
+                ).some((el) => el.isEqualNode(newEl));
+                if (!alreadyExists && baseGlobalStyles) {
+                    const clone = newEl.cloneNode(true);
+                    clone.setAttribute(EXTRA_GLOBAL_ATTR, "");
+                    head.appendChild(clone);
+                }
+            });
+
+            const newTitle = newDoc.querySelector("title")?.textContent || "";
+            document.title = newTitle;
+        }
+
+        async function navigate(url, pushState = true) {
+            window.dispatchEvent(
+                new CustomEvent("spa-navigate-start", { detail: { url } }),
+            );
+
+            const container = getContentContainer();
+            const targetUrl = new URL(url, location.origin);
+            const hasHash = !!targetUrl.hash;
+            if (!container) {
+                console.error("Content container not found");
+                return;
+            }
+
+            try {
+                const disableNewStyle = document.createElement("style");
+                disableNewStyle.textContent =
+                    "::view-transition-new(main) { animation: none !important; }";
+                document.head.appendChild(disableNewStyle);
+
+                const leaveTransition = document.startViewTransition(() => {
+                    container.innerHTML = "";
+                });
+
+                const newDocPromise = fetchContent(url);
+                await leaveTransition.finished;
+                if (scrollToTop && (ignoreHash || !hasHash)) {
+                    window.scrollTo({ top: 0, behavior: scrollBehavior });
+                }
+
+                disableNewStyle.remove();
+
+                const newDoc = await newDocPromise;
+                const newContent = newDoc.querySelector(contentSelector);
+                if (!newContent) throw new Error("Missing content");
+
+                const newHero = newDoc.querySelector(heroSelector);
+                const heroContainer = getHeroContainer();
+
+                removeDynamicScripts();
+                updateHeadStyles(newDoc);
+
+                const enterTransition = document.startViewTransition(() => {
+                    container.innerHTML = newContent.innerHTML;
+                    if (heroContainer) {
+                        heroContainer.innerHTML =
+                            (newHero && newHero.innerHTML) || "";
+                    }
+                    executeScripts(container);
+                });
+
+                await enterTransition.finished;
+
+                if (pushState) {
+                    window.history.pushState(null, "", url);
+                }
+
+                window.dispatchEvent(
+                    new CustomEvent("spa-navigate", { detail: { url } }),
+                );
+                window.dispatchEvent(
+                    new CustomEvent("spa-navigate-end", { detail: { url } }),
+                );
+            } catch (err) {
+                console.error(
+                    "Navigation failed, falling back to hard navigation",
+                    err,
+                );
+                window.dispatchEvent(
+                    new CustomEvent("spa-navigate-end", { detail: { url } }),
+                );
+                window.location.href = url;
+            }
+        }
+
+        document.addEventListener("click", (e) => {
+            const link = e.target?.closest?.("a[href]") || null;
+            if (!link) return;
+            const url = new URL(link.href, location.origin);
+            if (url.origin !== location.origin) return;
+            if (link.hasAttribute("download") || link.target === "_blank")
+                return;
+
+            // 同页锚点（目录/TOC 等）：直接平滑滚动，避免整页拉取导致的闪烁
+            if (url.pathname === location.pathname && url.hash.length > 1) {
+                const target = document.getElementById(
+                    decodeURIComponent(url.hash.slice(1)),
+                );
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: "smooth", block: "start" });
+                    history.replaceState(null, "", url.hash);
+                }
+                return;
+            }
+
+            e.preventDefault();
+            navigate(url.href);
+        });
+
+        window.addEventListener("popstate", () => {
+            navigate(location.href, false);
+        });
+
+        if (prefetch) {
+            document.addEventListener(
+                "mouseover",
+                (e) => {
+                    const link = e.target?.closest?.("a[href]") || null;
+                    if (!link) return;
+                    const url = new URL(link.href, location.origin);
+                    if (url.origin !== location.origin) return;
+                    fetch(url.href, { priority: "low" }).catch(() => {});
+                },
+                { passive: true },
+            );
+        }
+    }
+</script>
