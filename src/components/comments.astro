@@ -1,113 +1,55 @@
 ---
-import { siteConfig } from "@/config";
+// 评论区组件，使用 @waline/client，后端为独立部署的 Waline Worker。
+import { siteConfig } from "../config";
 
-const env = siteConfig.comments?.twikooEnv || "";
-const src =
-  siteConfig.comments?.twikooSrc ||
-  "https://cdn.jsdelivr.net/npm/twikoo@1.6.41/dist/twikoo.nocss.js";
-const twikooCss = "/twikoo.css";
+const walineServer = siteConfig.comments?.walineServer ?? "https://waline.foxmoe.top";
 ---
 
-<section class="twikoo-comments" aria-label="评论">
+<section class="comments" aria-label="评论">
   <h2 class="comments-title">评论</h2>
-  <div id="tcomment"></div>
-
-  {
-    !env && (
-      <p class="comments-hint">
-        评论功能需在 <code>src/config.ts</code> 的{" "}
-        <code>comments.twikooEnv</code> 中填入 Twikoo 环境 ID 后启用。
-      </p>
-    )
-  }
+  <div id="waline"></div>
 </section>
 
-{
-  env && (
-  <script define:vars={{ env, src, twikooCss }}>
-    (function () {
-      function loadTwikooCSS() {
-        if (document.getElementById("__twikoo-css")) return;
-        var link = document.createElement("link");
-        link.id = "__twikoo-css";
-        link.rel = "stylesheet";
-        link.href = twikooCss;
-        // 先用 print 媒体加载（不阻塞渲染），加载完成再切换为 all
-        link.media = "print";
-        link.onload = function () { link.media = "all"; };
-        document.head.appendChild(link);
-      }
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/@waline/client@v3/dist/waline.css"
+/>
+<script is:inline src="https://unpkg.com/@waline/client@v3/dist/waline.umd.js"></script>
 
-      function initTwikoo() {
-        const el = document.getElementById("tcomment");
-        if (
-          window.twikoo &&
-          window.twikoo.init &&
-          el &&
-          el.childElementCount === 0
-        ) {
-          window.twikoo.init({ envId: env, el: "#tcomment" });
+<script is:inline define:vars={{ walineServer }}>
+  (function () {
+    let walineInstance = null;
+
+    function initWaline() {
+      // Waline 脚本可能尚未加载完成，稍后重试
+      if (typeof Waline === "undefined") {
+        return setTimeout(initWaline, 50);
+      }
+      // 销毁旧实例，避免 SPA 切换时重复渲染
+      if (walineInstance) {
+        try {
+          walineInstance.destroy();
+        } catch (e) {
+          /* 忽略已脱离 DOM 的实例销毁错误 */
         }
+        walineInstance = null;
       }
+      const el = document.querySelector("#waline");
+      if (!el) return;
+      el.innerHTML = "";
+      walineInstance = Waline.init({
+        el: "#waline",
+        serverURL: walineServer,
+        lang: "zh-CN",
+        // 评论数统计等可按需开启
+        visitor: false,
+      });
+    }
 
-      function waitTwikoo(cb, tries) {
-        tries = tries || 0;
-        if (window.twikoo && window.twikoo.init) return cb();
-        if (tries > 60) return;
-        setTimeout(function () {
-          waitTwikoo(cb, tries + 1);
-        }, 100);
-      }
+    // 首次加载
+    initWaline();
 
-      function loadTwikoo(cb) {
-        if (window.twikoo && window.twikoo.init) return cb();
-        if (document.querySelector('script[src="' + src + '"]')) {
-          return waitTwikoo(cb);
-        }
-        if (window.__twikooLoading) return waitTwikoo(cb);
-        window.__twikooLoading = true;
-        var s = document.createElement("script");
-        s.src = src;
-        s.setAttribute("data-twikoo", "");
-        s.onload = function () {
-          window.__twikooLoading = false;
-          cb();
-        };
-        s.onerror = function () {
-          window.__twikooLoading = false;
-        };
-        document.head.appendChild(s);
-      }
-
-      function ensure() {
-        const el = document.getElementById("tcomment");
-        if (!el) return; // 当前页无评论容器
-
-        // 评论区通常在首屏之外：临近视口时才以非阻塞方式加载样式，降低首屏加载量
-        var section = el.closest(".twikoo-comments") || el;
-        if ("IntersectionObserver" in window) {
-          var io = new IntersectionObserver(
-            function (entries) {
-              entries.forEach(function (e) {
-                if (e.isIntersecting) {
-                  loadTwikooCSS();
-                  io.disconnect();
-                }
-              });
-            },
-            { rootMargin: "400px" }
-          );
-          io.observe(section);
-        } else {
-          loadTwikooCSS();
-        }
-
-        if (window.twikoo && window.twikoo.init) return initTwikoo();
-        loadTwikoo(initTwikoo);
-      }
-
-      ensure();
-    })();
-  </script>
-  )
-}
+    // SPA 页面切换后重跑
+    window.addEventListener("spa-navigate", () => setTimeout(initWaline, 60));
+  })();
+</script>

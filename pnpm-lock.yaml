@@ -128,9 +128,6 @@ importers:
       tocbot:
         specifier: ^4.36.8
         version: 4.36.8
-      twikoo:
-        specifier: ^1.6.41
-        version: 1.7.14
       wrangler:
         specifier: ^4.103.0
         version: 4.105.0
@@ -4844,9 +4841,6 @@ packages:
 
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
-
-  twikoo@1.7.14:
-    resolution: {integrity: sha512-hv21UXnj5IPzBCUMS2V1PMUD+uxCcw3pf4DzAvmkDYoakAlWxtPkgNePQRXZZTtCFnrqfaZeJYICZiiP1kUEQQ==}
 
   typed-array-buffer@1.0.3:
     resolution: {integrity: sha512-nAYYwfY3qnzX30IkA6AQZjVbtK6duGontcQm1WSG1MD94YLqK0515GNApXkoxKOWMusVssAHWLh9SeaoefYFGw==}
@@ -11086,8 +11080,6 @@ snapshots:
   trough@2.2.0: {}
 
   tslib@2.8.1: {}
-
-  twikoo@1.7.14: {}
 
   typed-array-buffer@1.0.3:
     dependencies:

@@ -40,7 +40,7 @@ function toPlainText(md: string): string {
       onerror="this.style.display='none'"
     />
     <div class="hero-overlay">
-      <div class="hero-text">
+      <div class="hero-text reveal">
         <h1 class="hero-title">{siteConfig.title}</h1>
         <p class="hero-sub">{siteConfig.description}</p>
       </div>
@@ -48,7 +48,7 @@ function toPlainText(md: string): string {
   </div>
 
   <!-- 顶部：左轮播卡片 + 右最新动态 -->
-  <section class="posts-section home-top">
+  <section class="posts-section home-top reveal">
     <div class="home-top-grid">
       <HomeCarousel />
 
@@ -119,8 +119,8 @@ function toPlainText(md: string): string {
         </div>
       ) : (
         <div class="post-grid" id="post-grid">
-          {latestPosts.map((post) => (
-            <PostCard post={post} />
+          {latestPosts.map((post, i) => (
+            <PostCard post={post} delay={(i % 8) * 70} />
           ))}
         </div>
       )
@@ -135,15 +135,29 @@ function toPlainText(md: string): string {
 <style lang="scss">
   .hero-banner {
     @apply relative w-full overflow-hidden;
-    aspect-ratio: 21 / 7;
     margin-top: calc(-1 * (var(--nav-h) + 8px));
-    border-bottom: 1px solid var(--border);
+    /* 小屏用最小高度，避免 21:7 比例把 banner 压得过矮、文字被挤到屏幕外 */
+    min-height: 46vh;
+    @media (min-width: 768px) {
+      aspect-ratio: 21 / 7;
+      min-height: 0;
+    }
   }
   .hero-banner-img {
     @apply w-full h-full object-cover;
   }
+  /* 底部取色渐变：用 hero 主色淡出到页面背景，使 banner 与下方内容的分界柔和模糊 */
+  .hero-banner::after {
+    content: "";
+    @apply absolute inset-x-0 bottom-0 h-2/5 pointer-events-none z-0;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      color-mix(in oklab, var(--hero-tint) 32%, var(--bg))
+    );
+  }
   .hero-overlay {
-    @apply absolute inset-0 flex items-end;
+    @apply absolute inset-0 flex items-end z-[1];
     background: linear-gradient(
       to top,
       rgba(0, 0, 0, 0.55) 0%,

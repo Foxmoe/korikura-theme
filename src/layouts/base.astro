@@ -9,6 +9,7 @@ import RestoreStyle from "@/components/restore-style.astro";
 import CodeEnhancer from "@/components/code-enhancer.astro";
 import Lightbox from "@/components/lightbox.astro";
 import Tooltip from "@/components/tooltip.astro";
+import Animations from "@/components/animations.astro";
 import "katex/dist/katex.min.css";
 import styleUrl from "@/styles/style.css?url";
 
@@ -118,5 +119,6 @@ const fullTitle = title ? title + " - " + siteConfig.title : siteConfig.title;
 
         <BackToTop />
         <Tooltip />
+        <Animations />
     </body>
 </html>

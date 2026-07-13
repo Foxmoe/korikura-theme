@@ -61,13 +61,12 @@ export const siteConfig = {
         url: "https://creativecommons.org/licenses/by-nc-sa/4.0/",
     },
 
-    /* 评论系统 */
+    /* 评论系统（Waline） */
     comments: {
-        // 部署在 Cloudflare Pages Functions 的 Twikoo 函数地址，例如 https://your-domain/twikoo
-        twikooEnv: "https://blog.foxmoe.top/twikoo",
-        twikooSrc:
-            "https://cdn.jsdelivr.net/npm/twikoo@1.6.41/dist/twikoo.nocss.js",
+        // Waline 后端地址，即你的独立 Worker 域名
+        walineServer: "https://waline.foxmoe.top",
     },
+
 }
 
 export const profileConfig = {

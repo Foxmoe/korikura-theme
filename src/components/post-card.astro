@@ -7,8 +7,9 @@ import Icon from "./icon.astro";
 interface Props {
   post: Post;
   horizontal?: boolean;
+  delay?: number;
 }
-const { post, horizontal = false } = Astro.props;
+const { post, horizontal = false, delay = 0 } = Astro.props;
 const data = post.data;
 const cover = data.cover || siteConfig.defaultCover;
 const reading = getReadingTime(post.body || "", siteConfig.readingSpeed);
@@ -16,9 +17,10 @@ const reading = getReadingTime(post.body || "", siteConfig.readingSpeed);
 
 <a
   href={`/posts/${post.id}`}
-  class={`post-card${horizontal ? " horizontal" : ""}`}
+  class={`post-card reveal${horizontal ? " horizontal" : ""}`}
   data-tags={data.tags.join(",")}
   data-category={data.categories.join(",")}
+  style={`--reveal-delay:${delay}ms`}
 >
   <div class="card-cover">
     <img src={cover} alt={data.coverAlt || data.title} loading="lazy" class="cover-img" />
@@ -66,13 +68,15 @@ const reading = getReadingTime(post.body || "", siteConfig.readingSpeed);
 
 <style lang="scss">
   .post-card {
-    @apply block h-full rounded-md overflow-hidden no-underline
+    @apply block h-full rounded-xl overflow-hidden no-underline
            border border-(--border)
            bg-(--card-bg)
-           transition-all duration-300;
+           transition-all duration-300 will-change-transform;
     box-shadow: 0 4px 18px -14px rgba(0, 0, 0, 0.28);
     &:hover {
-      @apply -translate-y-1 shadow-lg;
+      @apply -translate-y-1.5;
+      border-color: color-mix(in oklab, var(--primary) 45%, var(--border));
+      box-shadow: 0 20px 40px -18px color-mix(in oklab, var(--primary) 45%, rgba(0, 0, 0, 0.45));
     }
   }
   

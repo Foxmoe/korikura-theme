@@ -1,0 +1,66 @@
+---
+// 全局动效：取色背景渐变 + 滚动揭示动画。
+// 抽成独立组件，确保脚本被 Astro 正常打包（布局文件内联 <script> 在本项目未被打包）。
+---
+
+<script>
+  // 取色：从 hero 图片采样主色，写入 --hero-tint，用于背景渐变与底部柔化
+  function initHeroTint() {
+    const img = document.querySelector<HTMLImageElement>(
+      ".hero-banner-img, .article-hero-img",
+    );
+    if (!img) return;
+    const sample = (image: HTMLImageElement) => {
+      try {
+        const c = document.createElement("canvas");
+        c.width = 24;
+        c.height = 24;
+        const ctx = c.getContext("2d");
+        if (!ctx) return;
+        ctx.drawImage(image, 0, 0, 24, 24);
+        const data = ctx.getImageData(0, 0, 24, 24).data;
+        let r = 0,
+          g = 0,
+          b = 0,
+          n = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          r += data[i];
+          g += data[i + 1];
+          b += data[i + 2];
+          n++;
+        }
+        const tint = `rgb(${Math.round(r / n)}, ${Math.round(g / n)}, ${Math.round(b / n)})`;
+        document.documentElement.style.setProperty("--hero-tint", tint);
+      } catch (e) {
+        /* 跨域图片可能污染 canvas，忽略即可，沿用默认 --bg */
+      }
+    };
+    if (img.complete && img.naturalWidth) sample(img);
+    else img.addEventListener("load", () => sample(img), { once: true });
+  }
+
+  // 滚动揭示：进入视口时添加 .in 触发淡入上移动画
+  function initReveal() {
+    const els = document.querySelectorAll<HTMLElement>(".reveal:not(.in)");
+    if (!els.length) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((en) => {
+          if (en.isIntersecting) {
+            en.target.classList.add("in");
+            io.unobserve(en.target);
+          }
+        });
+      },
+      { rootMargin: "0px 0px -8% 0px", threshold: 0.05 },
+    );
+    els.forEach((el) => io.observe(el));
+  }
+
+  initHeroTint();
+  initReveal();
+  window.addEventListener("spa-navigate", () => {
+    initHeroTint();
+    initReveal();
+  });
+</script>

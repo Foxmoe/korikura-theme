@@ -54,7 +54,6 @@
     "svelte": "^5.56.4",
     "tailwindcss": "^4.3.1",
     "tocbot": "^4.36.8",
-    "twikoo": "^1.6.41",
     "wrangler": "^4.103.0"
   },
   "overrides": {

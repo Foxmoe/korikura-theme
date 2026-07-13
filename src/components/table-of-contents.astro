@@ -5,69 +5,135 @@ interface TocItem {
   depth: number;
   slug: string;
   text: string;
-  subheadings?: TocItem[];
+  subheadings: TocItem[];
 }
 
-const { headings = [] } = Astro.props as { headings?: TocItem[] };
+const { headings = [] } = Astro.props as { headings?: any[] };
 
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+// 把 Astro render() 返回的扁平 headings 转成嵌套树（参考 Axi-Theme 的 generateToc，做了容错）
+function generateToc(items: any[]): TocItem[] {
+  const body = items.filter((h) => h.depth > 1);
+  const toc: TocItem[] = [];
+  body.forEach((h) => {
+    const heading: TocItem = { ...h, subheadings: [] };
+    if (heading.depth === 2 || toc.length === 0) {
+      toc.push(heading);
+      return;
+    }
+    const gap = heading.depth - toc[toc.length - 1].depth;
+    let target = toc[toc.length - 1];
+    for (let i = 1; i < gap; i++) {
+      const subs = target.subheadings;
+      if (!subs.length) break;
+      target = subs[subs.length - 1];
+    }
+    target.subheadings.push(heading);
+  });
+  return toc;
 }
 
-function renderList(items: TocItem[]): string {
-  return items
-    .map((h) => {
-      const children =
-        h.subheadings && h.subheadings.length
-          ? `<ol class="toc-list">${renderList(h.subheadings)}</ol>`
-          : "";
-      return `<li class="toc-list-item"><a class="toc-link node-name--H${h.depth}" href="#${h.slug}" data-target="${escapeHtml(h.slug)}">${escapeHtml(h.text)}</a>${children}</li>`;
-    })
-    .join("");
-}
+const toc = generateToc(headings);
 ---
 
-<div class="card toc" id="toc" style={headings.length ? "" : "display:none"}>
+<div class="card toc" id="toc" style={toc.length ? "" : "display:none"}>
   <div class="toc-head">
     <Icon name="hash" size={15} />
     <span>目录</span>
+    <span class="toc-progress-track" title="阅读进度">
+      <span class="toc-progress-bar" id="toc-progress"></span>
+    </span>
   </div>
   <nav class="toc-body" id="toc-body">
-    <ol class="toc-list" set:html={renderList(headings)}></ol>
+    <ol class="toc-list">
+      {
+        toc.map((item) => (
+          <li class="toc-item">
+            <a
+              class={`toc-link node-name--H${item.depth}`}
+              href={`#${item.slug}`}
+              data-target={item.slug}
+            >{item.text}</a>
+            {
+              item.subheadings && item.subheadings.length > 0 && (
+                <ol class="toc-list">
+                  {item.subheadings.map((sub) => (
+                    <li class="toc-item">
+                      <a
+                        class={`toc-link node-name--H${sub.depth}`}
+                        href={`#${sub.slug}`}
+                        data-target={sub.slug}
+                      >{sub.text}</a>
+                    </li>
+                  ))}
+                </ol>
+              )
+            }
+          </li>
+        ))
+      }
+    </ol>
   </nav>
 </div>
 
 <style lang="scss">
   .toc-head {
-    @apply flex items-center gap-1.5 text-sm font-semibold mb-2 text-(--primary);
+    @apply flex items-center gap-1.5 text-sm font-semibold mb-3 text-(--primary);
+  }
+  .toc-progress-track {
+    @apply ml-auto w-16 h-1 rounded-full overflow-hidden bg-(--border)/60;
+  }
+  .toc-progress-bar {
+    @apply block h-full w-0 rounded-full bg-(--primary);
+    transition: width 0.15s linear;
   }
   .toc-body {
-    @apply text-sm;
+    @apply text-sm relative;
   }
+  /* 竖向轨道 */
   .toc-body .toc-list {
-    @apply list-none m-0 p-0;
+    @apply list-none m-0 p-0 relative;
   }
-  /* 嵌套层级缩进 */
+  .toc-body .toc-list::before {
+    content: "";
+    @apply absolute top-1.5 bottom-1.5 left-[5px] w-[2px] rounded-full bg-(--border);
+  }
+  /* 嵌套层级缩进，并保留自己的轨道以体现层级 */
   .toc-body .toc-list .toc-list {
-    @apply ml-1 pl-3 border-l border-(--border);
+    @apply ml-3.5 mt-0.5;
+  }
+  .toc-body .toc-list .toc-list::before {
+    @apply left-[3px];
   }
   .toc-body .toc-link {
-    @apply block py-1 pl-3 -ml-px border-l-2 border-transparent
-           text-(--muted) no-underline rounded-r transition cursor-pointer
+    @apply relative block py-1 pl-[20px] -ml-px text-(--muted) no-underline
+           rounded-md transition-colors duration-200 cursor-pointer
            hover:text-(--primary) hover:bg-(--primary)/5;
   }
-  .toc-body .toc-link.is-active {
-    @apply text-(--primary) border-(--primary) font-medium bg-(--primary)/8;
+  /* 轨道上的圆点 */
+  .toc-body .toc-link::after {
+    content: "";
+    @apply absolute left-[2px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full
+           bg-(--border) transition-all duration-200;
+    border: 2px solid var(--bg);
+    z-index: 1;
   }
   .toc-body .toc-link.node-name--H2 {
     @apply text-[0.9rem];
   }
   .toc-body .toc-link.node-name--H3 {
     @apply text-[0.85rem];
+  }
+  .toc-body .toc-link.node-name--H4 {
+    @apply text-[0.8rem];
+  }
+  /* 当前阅读位置高亮 */
+  .toc-body .toc-link.is-active {
+    @apply text-(--primary) font-semibold bg-(--primary)/9;
+  }
+  .toc-body .toc-link.is-active::after {
+    @apply bg-(--primary) scale-125;
+    border-color: color-mix(in oklab, var(--primary) 35%, var(--bg));
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--primary) 20%, transparent);
   }
   /* 有子项的父标题可点击折叠 */
   .toc-body .is-collapsed > .toc-list {
@@ -78,6 +144,7 @@ function renderList(items: TocItem[]): string {
 <script>
   function initToc() {
     const tocBody = document.getElementById("toc-body");
+    const progress = document.getElementById("toc-progress");
     const content = document.querySelector("#main-container .prose");
     if (!tocBody) return;
 
@@ -103,27 +170,46 @@ function renderList(items: TocItem[]): string {
       }
     });
 
-    // 当前阅读位置高亮
     const headingEls = content
       ? Array.from(content.querySelectorAll<HTMLElement>("h1, h2, h3, h4"))
       : [];
     if (!headingEls.length) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((en) => {
-          if (en.isIntersecting) {
-            const id = (en.target as HTMLElement).id;
-            links.forEach((l) => l.classList.remove("is-active"));
-            if (map[id]) map[id].classList.add("is-active");
-          }
-        });
-      },
-      { rootMargin: "0px 0px -75% 0px", threshold: 0 },
-    );
-    headingEls.forEach((h) => observer.observe(h));
+    // 当前阅读位置：取最后一个“顶部已越过阈值线”的标题，双向滚动都正确
+    let activeId: string | null = null;
+    const THRESHOLD = 130; // 顶栏下方一点的判定线
+
+    const onScroll = () => {
+      let current: string | null = null;
+      for (const h of headingEls) {
+        if (h.getBoundingClientRect().top - THRESHOLD <= 0) current = h.id;
+        else break;
+      }
+      if (!current) current = headingEls[0].id;
+
+      if (current !== activeId) {
+        activeId = current;
+        links.forEach((l) => l.classList.remove("is-active"));
+        if (map[current]) map[current].classList.add("is-active");
+      }
+
+      // 阅读进度条
+      if (progress && content) {
+        const rect = content.getBoundingClientRect();
+        const total = rect.height - window.innerHeight;
+        const scrolled = Math.min(Math.max(-rect.top, 0), Math.max(total, 1));
+        const pct = total > 0 ? (scrolled / total) * 100 : 0;
+        progress.style.width = pct + "%";
+      }
+    };
+
+    // 防止 SPA 多次导航后叠加监听器
+    const key = "__tocScrollHandler" as keyof Window;
+    if (window[key]) window.removeEventListener("scroll", window[key] as any);
+    (window as any)[key] = onScroll;
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
   }
 
-  // SpaRouter 在 SPA 导航后会重跑容器内的脚本，直接执行即可（无需监听事件）
   initToc();
 </script>
