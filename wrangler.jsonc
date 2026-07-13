@@ -3,7 +3,7 @@
 	"compatibility_date": "2026-06-21",
 	"compatibility_flags": ["global_fetch_strictly_public","nodejs_compat"],
 	"name": "korikura",
-	"main": "@astrojs/cloudflare/entrypoints/server",
+	"main": "./worker.js",
 	"assets": {
 		"directory": "./dist",
 		"binding": "ASSETS"

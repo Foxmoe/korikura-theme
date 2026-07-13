@@ -63,6 +63,9 @@ const totalWords = await getTotalWords();
             <img
               style="width:85px;height:25px;"
               src="https://www.busuanzi.cc/static/images/bsz-tongji.png"
+              loading="lazy"
+              decoding="async"
+              alt="不蒜子统计"
             />
           </a>
           
@@ -156,7 +159,8 @@ const totalWords = await getTotalWords();
 
 <script define:vars={{ sinceValue: sinceRaw }}>
   const el = document.getElementById("site-runtime");
-  if (el) {
+  if (el && !el.dataset.runtimeStarted) {
+    el.dataset.runtimeStarted = "1";
     const start =
       typeof sinceValue === "number"
         ? new Date(sinceValue, 0, 1).getTime()
@@ -167,7 +171,8 @@ const totalWords = await getTotalWords();
       const hours = Math.floor((s % 86400) / 3600);
       const mins = Math.floor((s % 3600) / 60);
       const secs = s % 60;
-      el.textContent = `${days}天${hours}小时${mins}分钟${secs}秒`;
+      const text = `${days}天${hours}小时${mins}分钟${secs}秒`;
+      if (el.textContent !== text) el.textContent = text;
     };
     tick();
     setInterval(tick, 1000);

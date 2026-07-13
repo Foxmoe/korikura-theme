@@ -91,6 +91,15 @@ html {
   scrollbar-gutter: stable;
 }
 
+::selection {
+  background: #ffb7c5;
+  color: #4a2030;
+}
+::-moz-selection {
+  background: #ffb7c5;
+  color: #4a2030;
+}
+
 @layer scrollbar {
   ::-webkit-scrollbar {
     width: 10px;

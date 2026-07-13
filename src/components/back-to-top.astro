@@ -53,8 +53,18 @@ import Icon from "./icon.astro";
     ring.style.strokeDasharray = String(C);
     ring.style.strokeDashoffset = String(C * (1 - p));
     btn.classList.toggle("show", window.scrollY > 400);
+
+    // 滚到底部时让按钮停在 footer 顶部之上，不与 footer 叠加
+    const footer = document.querySelector(".site-footer");
+    if (footer) {
+      const fr = footer.getBoundingClientRect();
+      const gap = 20; // 与 footer 顶部的间距(px)
+      const offset = Math.max(20, window.innerHeight - fr.top + gap);
+      btn.style.bottom = offset + "px";
+    }
   }
   window.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("resize", update);
   window.addEventListener("spa-navigate", update);
   btn?.addEventListener("click", () =>
     window.scrollTo({ top: 0, behavior: "smooth" })

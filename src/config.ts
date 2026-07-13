@@ -32,7 +32,7 @@ export const siteConfig = {
     /* 友链 */
     friendLinks: [
         { name: "Astro", url: "https://astro.build", avatar: "https://astro.build/favicon.svg", desc: "The web framework for content-driven websites" },
-        { name: "示例友链", url: "https://example.com", avatar: "", desc: "在这里替换为你的友链伙伴 ~" },
+        { name: "胡巴的博客", url: "https://hlydwz.com", avatar: "", desc: "胡巴的博客是一个自建的全栈个人博客系统，使用 Astro + React + PocketBase 构建，自 2025 年运行至今。" },
     ],
 
     /* 工具 */
