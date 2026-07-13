@@ -49,16 +49,19 @@ const src =
 
         function loadTwikoo(cb) {
           if (window.twikoo && window.twikoo.init) return cb();
-          if (window.__twikooLoading) return waitTwikoo(cb);
+          var existing = document.querySelector("script[data-twikoo]");
+          if (existing || window.__twikooLoading) return waitTwikoo(cb);
           window.__twikooLoading = true;
           const s = document.createElement("script");
           s.src = src;
+          s.setAttribute("data-twikoo", "");
           s.onload = function () {
             window.__twikooLoading = false;
             cb();
           };
           s.onerror = function () {
             window.__twikooLoading = false;
+            s.remove();
           };
           document.head.appendChild(s);
         }
@@ -70,7 +73,6 @@ const src =
           loadTwikoo(initTwikoo);
         }
 
-        // SpaRouter 在 SPA 导航后会重跑本脚本；window 不重载，twikoo 只加载一次
         ensure();
       })();
     </script>
