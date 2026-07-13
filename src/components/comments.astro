@@ -49,30 +49,29 @@ const src =
 
         function loadTwikoo(cb) {
           if (window.twikoo && window.twikoo.init) return cb();
-          // 单例加载：整个会话只插入一次 twikoo 脚本，避免重复执行
-          // 压缩脚本导致 "Identifier 'e' has already been declared"
-          if (!window.__twikooPromise) {
-            window.__twikooPromise = new Promise(function (resolve, reject) {
-              if (document.querySelector('script[data-twikoo]')) {
-                return resolve();
-              }
-              const s = document.createElement("script");
-              s.src = src;
-              s.setAttribute("data-twikoo", "");
-              s.onload = resolve;
-              s.onerror = function () {
-                s.remove();
-                reject();
-              };
-              document.head.appendChild(s);
-            }).catch(function () {
-              window.__twikooPromise = null;
-            });
+          // 以 DOM 中是否已存在该 src 的脚本为唯一权威去重依据，
+          // 不依赖易失的 Promise 状态，可扛住 SPA 重跑 / 加载出错 / 状态丢失等所有情况。
+          // 重复插入同一压缩脚本会在全局作用域重复声明顶层变量，报
+          // "Identifier 'e' has already been declared"。
+          if (document.querySelector('script[src="' + src + '"]')) {
+            return waitTwikoo(cb);
           }
-          window.__twikooPromise.then(function () {
-            if (window.twikoo && window.twikoo.init) cb();
-            else waitTwikoo(cb);
-          });
+          if (window.__twikooLoading) return waitTwikoo(cb);
+          window.__twikooLoading = true;
+          var s = document.createElement("script");
+          s.src = src;
+          s.setAttribute("data-twikoo", "");
+          s.onload = function () {
+            window.__twikooLoading = false;
+            cb();
+          };
+          s.onerror = function () {
+            // 注意：出错时不要移除节点，也不要重置为可重复插入。
+            // 否则下一次调用会因 DOM 中无该节点而再次插入，导致重复执行报错。
+            // 保留节点，后续调用会经上面的 DOM 去重直接走 waitTwikoo。
+            window.__twikooLoading = false;
+          };
+          document.head.appendChild(s);
         }
 
         function ensure() {
