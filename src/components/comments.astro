@@ -49,21 +49,30 @@ const src =
 
         function loadTwikoo(cb) {
           if (window.twikoo && window.twikoo.init) return cb();
-          var existing = document.querySelector("script[data-twikoo]");
-          if (existing || window.__twikooLoading) return waitTwikoo(cb);
-          window.__twikooLoading = true;
-          const s = document.createElement("script");
-          s.src = src;
-          s.setAttribute("data-twikoo", "");
-          s.onload = function () {
-            window.__twikooLoading = false;
-            cb();
-          };
-          s.onerror = function () {
-            window.__twikooLoading = false;
-            s.remove();
-          };
-          document.head.appendChild(s);
+          // 单例加载：整个会话只插入一次 twikoo 脚本，避免重复执行
+          // 压缩脚本导致 "Identifier 'e' has already been declared"
+          if (!window.__twikooPromise) {
+            window.__twikooPromise = new Promise(function (resolve, reject) {
+              if (document.querySelector('script[data-twikoo]')) {
+                return resolve();
+              }
+              const s = document.createElement("script");
+              s.src = src;
+              s.setAttribute("data-twikoo", "");
+              s.onload = resolve;
+              s.onerror = function () {
+                s.remove();
+                reject();
+              };
+              document.head.appendChild(s);
+            }).catch(function () {
+              window.__twikooPromise = null;
+            });
+          }
+          window.__twikooPromise.then(function () {
+            if (window.twikoo && window.twikoo.init) cb();
+            else waitTwikoo(cb);
+          });
         }
 
         function ensure() {
