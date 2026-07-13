@@ -136,9 +136,9 @@ const handle =
 <script define:vars={{ detailUrl: `/dynamics/${id}` }}>
   const root = document.querySelector(".dynamic-detail");
   if (root) {
-    const like = root.querySelector<HTMLButtonElement>(".act-like");
+    const like = root.querySelector(".act-like");
     like?.addEventListener("click", () => like.classList.toggle("active"));
-    const repost = root.querySelector<HTMLButtonElement>(".act-repost");
+    const repost = root.querySelector(".act-repost");
     repost?.addEventListener("click", async () => {
       try {
         await navigator.clipboard.writeText(location.origin + detailUrl);

@@ -49,16 +49,16 @@ const src =
 
         function loadTwikoo(cb) {
           if (window.twikoo && window.twikoo.init) return cb();
-          if ((window as any).__twikooLoading) return waitTwikoo(cb);
-          (window as any).__twikooLoading = true;
+          if (window.__twikooLoading) return waitTwikoo(cb);
+          window.__twikooLoading = true;
           const s = document.createElement("script");
           s.src = src;
           s.onload = function () {
-            (window as any).__twikooLoading = false;
+            window.__twikooLoading = false;
             cb();
           };
           s.onerror = function () {
-            (window as any).__twikooLoading = false;
+            window.__twikooLoading = false;
           };
           document.head.appendChild(s);
         }
