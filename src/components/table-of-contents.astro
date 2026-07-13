@@ -1,6 +1,34 @@
 ---
 import Icon from "./icon.astro";
-const { headings = [] } = Astro.props;
+
+interface TocItem {
+  depth: number;
+  slug: string;
+  text: string;
+  subheadings?: TocItem[];
+}
+
+const { headings = [] } = Astro.props as { headings?: TocItem[] };
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function renderList(items: TocItem[]): string {
+  return items
+    .map((h) => {
+      const children =
+        h.subheadings && h.subheadings.length
+          ? `<ol class="toc-list">${renderList(h.subheadings)}</ol>`
+          : "";
+      return `<li class="toc-list-item"><a class="toc-link node-name--H${h.depth}" href="#${h.slug}" data-target="${escapeHtml(h.slug)}">${escapeHtml(h.text)}</a>${children}</li>`;
+    })
+    .join("");
+}
 ---
 
 <div class="card toc" id="toc" style={headings.length ? "" : "display:none"}>
@@ -8,7 +36,9 @@ const { headings = [] } = Astro.props;
     <Icon name="hash" size={15} />
     <span>目录</span>
   </div>
-  <nav class="toc-body" id="toc-body"></nav>
+  <nav class="toc-body" id="toc-body">
+    <ol class="toc-list" set:html={renderList(headings)}></ol>
+  </nav>
 </div>
 
 <style lang="scss">
@@ -21,69 +51,79 @@ const { headings = [] } = Astro.props;
   .toc-body .toc-list {
     @apply list-none m-0 p-0;
   }
+  /* 嵌套层级缩进 */
   .toc-body .toc-list .toc-list {
     @apply ml-1 pl-3 border-l border-(--border);
   }
   .toc-body .toc-link {
     @apply block py-1 pl-3 -ml-px border-l-2 border-transparent
-           text-(--muted) no-underline rounded-r transition
+           text-(--muted) no-underline rounded-r transition cursor-pointer
            hover:text-(--primary) hover:bg-(--primary)/5;
   }
   .toc-body .toc-link.is-active {
     @apply text-(--primary) border-(--primary) font-medium bg-(--primary)/8;
   }
-  .toc-body .toc-link.node-name--H1 {
-    @apply font-semibold;
-  }
   .toc-body .toc-link.node-name--H2 {
-    @apply text-[0.9rem] opacity-95;
+    @apply text-[0.9rem];
   }
   .toc-body .toc-link.node-name--H3 {
-    @apply text-[0.85rem] opacity-90;
+    @apply text-[0.85rem];
   }
+  /* 有子项的父标题可点击折叠 */
   .toc-body .is-collapsed > .toc-list {
     @apply hidden;
   }
 </style>
 
 <script>
-  import * as tocbot from "tocbot";
-
   function initToc() {
-    const root = document.getElementById("toc");
-    const body = document.getElementById("toc-body");
-    if (!root || !body) return;
+    const tocBody = document.getElementById("toc-body");
+    const content = document.querySelector("#main-container .prose");
+    if (!tocBody) return;
 
-    const headings = document.querySelectorAll(
-      "#main-container .prose :is(h1, h2, h3)",
+    const links = Array.from(
+      tocBody.querySelectorAll<HTMLAnchorElement>(".toc-link"),
     );
-    if (!headings.length) {
-      root.style.display = "none";
-      return;
-    }
-    root.style.display = "";
-
-    try {
-      tocbot.destroy?.();
-    } catch {
-      /* 未初始化时 destroy 可能抛错，忽略 */
-    }
-    body.innerHTML = "";
-    tocbot.init({
-      tocSelector: "#toc-body",
-      contentSelector: "#main-container .prose",
-      headingSelector: "h1, h2, h3",
-      hasInnerContainers: true,
-      scrollSmooth: true,
-      scrollSmoothDuration: 420,
-      headingsOffset: 84,
-      scrollSmoothOffset: -84,
-      activeLinkClass: "is-active",
-      collapseDepth: 6,
-      orderedList: false,
+    const map: Record<string, HTMLAnchorElement> = {};
+    links.forEach((l) => {
+      const id = l.dataset.target;
+      if (id) map[id] = l;
     });
+
+    // 点击有子项的父标题：仅折叠/展开，不跳转
+    tocBody.addEventListener("click", (e) => {
+      const a = (e.target as HTMLElement)?.closest?.(".toc-link") as
+        | HTMLAnchorElement
+        | null;
+      if (!a) return;
+      const li = a.parentElement;
+      if (li && li.querySelector(":scope > .toc-list")) {
+        e.preventDefault();
+        li.classList.toggle("is-collapsed");
+      }
+    });
+
+    // 当前阅读位置高亮
+    const headingEls = content
+      ? Array.from(content.querySelectorAll<HTMLElement>("h1, h2, h3, h4"))
+      : [];
+    if (!headingEls.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((en) => {
+          if (en.isIntersecting) {
+            const id = (en.target as HTMLElement).id;
+            links.forEach((l) => l.classList.remove("is-active"));
+            if (map[id]) map[id].classList.add("is-active");
+          }
+        });
+      },
+      { rootMargin: "0px 0px -75% 0px", threshold: 0 },
+    );
+    headingEls.forEach((h) => observer.observe(h));
   }
 
+  // SpaRouter 在 SPA 导航后会重跑容器内的脚本，直接执行即可（无需监听事件）
   initToc();
-  window.addEventListener("spa-navigate", () => setTimeout(initToc, 80));
 </script>

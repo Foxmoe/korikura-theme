@@ -4,9 +4,14 @@ import Sidebar from "@/components/sidebar.astro";
 import PostCard from "@/components/post-card.astro";
 import HomeCarousel from "@/components/home-carousel.astro";
 import Icon from "@/components/icon.astro";
-import { getPublishedPosts, getCategoryCounts, getDynamics } from "@/utils/posts";
+import {
+  getPublishedPosts,
+  getCategoryCounts,
+  getDynamics,
+} from "@/utils/posts";
 import { profileConfig } from "@/config";
 import { formatRelativeTime } from "@/utils/utils";
+import { siteConfig } from "@/config";
 
 const posts = await getPublishedPosts();
 const latestPosts = posts.slice(0, 8);
@@ -36,8 +41,8 @@ function toPlainText(md: string): string {
     />
     <div class="hero-overlay">
       <div class="hero-text">
-        <h1 class="hero-title">{profileConfig.name} 的日记</h1>
-        <p class="hero-sub">记录生活点滴，分享技术心得 ~(￣▽￣)~</p>
+        <h1 class="hero-title">{siteConfig.title}</h1>
+        <p class="hero-sub">{siteConfig.description}</p>
       </div>
     </div>
   </div>
@@ -69,9 +74,13 @@ function toPlainText(md: string): string {
                   <div class="mini-body">
                     <div class="mini-head">
                       <span class="mini-name">{profileConfig.name}</span>
-                      <span class="mini-time">· {formatRelativeTime(d.data.date)}</span>
+                      <span class="mini-time">
+                        · {formatRelativeTime(d.data.date)}
+                      </span>
                     </div>
-                    <p class="mini-text">{d.data.title || toPlainText(d.body)}</p>
+                    <p class="mini-text">
+                      {d.data?.title || toPlainText(d.body ?? "")}
+                    </p>
                   </div>
                 </a>
               </li>
@@ -85,7 +94,9 @@ function toPlainText(md: string): string {
   <section class="posts-section">
     <div class="section-header cat-header">
       <div class="cat-filter" id="cat-filter">
-        <button type="button" class="filter-chip active" data-cat="">全部文章</button>
+        <button type="button" class="filter-chip active" data-cat=""
+          >全部文章</button
+        >
         {
           cats.map((c) => (
             <button type="button" class="filter-chip" data-cat={c}>
@@ -179,11 +190,10 @@ function toPlainText(md: string): string {
     @apply text-lg text-(--muted);
   }
 
-  
   .home-top-grid {
     @apply grid gap-6 lg:grid-cols-2 items-stretch;
   }
-  
+
   .home-top {
     @apply pt-3 pb-2;
   }
@@ -197,7 +207,6 @@ function toPlainText(md: string): string {
     @apply mb-3;
   }
 
-  
   .cat-header {
     @apply flex-wrap gap-3;
   }
@@ -216,12 +225,10 @@ function toPlainText(md: string): string {
     }
   }
 
-  
   .post-grid {
     @apply grid gap-5 sm:grid-cols-2 items-stretch;
   }
 
-  
   .mini-feed {
     @apply list-none p-0 m-0 flex flex-col gap-2;
   }
@@ -254,7 +261,9 @@ function toPlainText(md: string): string {
     const filter = document.getElementById("cat-filter");
     const grid = document.getElementById("post-grid");
     if (!filter || !grid) return;
-    const chips = Array.from(filter.querySelectorAll<HTMLButtonElement>(".filter-chip"));
+    const chips = Array.from(
+      filter.querySelectorAll<HTMLButtonElement>(".filter-chip"),
+    );
     const cards = Array.from(grid.querySelectorAll<HTMLElement>(".post-card"));
     chips.forEach((chip) => {
       chip.addEventListener("click", () => {

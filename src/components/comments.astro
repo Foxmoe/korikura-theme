@@ -12,38 +12,67 @@ const src =
   <div id="tcomment"></div>
 
   {
-    env ? (
-      <script is:inline src={src} />
-    ) : (
+    !env && (
       <p class="comments-hint">
         评论功能需在 <code>src/config.ts</code> 的{" "}
         <code>comments.twikooEnv</code> 中填入 Twikoo 环境 ID 后启用。
       </p>
     )
   }
-
-  {
-    env && (
-      <script define:vars={{ env }}>
-        (function () {
-          function init() {
-            if (window.twikoo && window.twikoo.init) {
-              const el = document.getElementById("tcomment");
-              // 仅当容器为空时初始化，避免重复挂载
-              if (el && el.childElementCount === 0) {
-                window.twikoo.init({ envId: env, el: "#tcomment" });
-              }
-            }
-          }
-          // Twikoo 脚本可能异步加载，轮询等待其就绪（兼容首屏与 SPA 切换）
-          function wait(tries = 0) {
-            if (window.twikoo && window.twikoo.init) return init();
-            if (tries > 60) return;
-            setTimeout(() => wait(tries + 1), 100);
-          }
-          wait();
-        })();
-      </script>
-    )
-  }
 </section>
+
+{
+  env && (
+    <script define:vars={{ env, src }}>
+      (function () {
+        // 仅当全局 twikoo 不存在时才动态加载一次脚本，避免 SPA 重复加载报 "Identifier 'e' has already been declared"
+        function initTwikoo() {
+          const el = document.getElementById("tcomment");
+          if (
+            window.twikoo &&
+            window.twikoo.init &&
+            el &&
+            el.childElementCount === 0
+          ) {
+            window.twikoo.init({ envId: env, el: "#tcomment" });
+          }
+        }
+
+        function waitTwikoo(cb, tries) {
+          tries = tries || 0;
+          if (window.twikoo && window.twikoo.init) return cb();
+          if (tries > 60) return;
+          setTimeout(function () {
+            waitTwikoo(cb, tries + 1);
+          }, 100);
+        }
+
+        function loadTwikoo(cb) {
+          if (window.twikoo && window.twikoo.init) return cb();
+          if ((window as any).__twikooLoading) return waitTwikoo(cb);
+          (window as any).__twikooLoading = true;
+          const s = document.createElement("script");
+          s.src = src;
+          s.onload = function () {
+            (window as any).__twikooLoading = false;
+            cb();
+          };
+          s.onerror = function () {
+            (window as any).__twikooLoading = false;
+          };
+          document.head.appendChild(s);
+        }
+
+        function ensure() {
+          const el = document.getElementById("tcomment");
+          if (!el) return; // 当前页无评论容器
+          if (window.twikoo && window.twikoo.init) return initTwikoo();
+          loadTwikoo(initTwikoo);
+        }
+
+        // SpaRouter 在 SPA 导航后会重跑本脚本；window 不重载，twikoo 只加载一次
+        ensure();
+      })();
+    </script>
+  )
+}

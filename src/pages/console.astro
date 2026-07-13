@@ -1,7 +1,6 @@
 ---
 // nebula-cms client page
-
-import NebulaCMS from "nebula-cms/client";
+import NebulaCMS from "@/utils/nebula-cms";
 ---
 
 <html lang="en">
@@ -12,6 +11,6 @@ import NebulaCMS from "nebula-cms/client";
     <meta name="robots" content="noindex" />
   </head>
   <body>
-    
+    <NebulaCMS client:load />
   </body>
 </html>
