@@ -66,7 +66,7 @@ export const siteConfig = {
         // 部署在 Cloudflare Pages Functions 的 Twikoo 函数地址，例如 https://your-domain/twikoo
         twikooEnv: "https://blog.foxmoe.top/twikoo",
         twikooSrc:
-            "https://cdn.jsdelivr.net/npm/twikoo@1.6.41/dist/twikoo.all.min.js",
+            "https://cdn.jsdelivr.net/npm/twikoo@1.6.41/dist/twikoo.nocss.js",
     },
 }
 
