@@ -81,25 +81,25 @@ const handle =
     @apply flex items-center justify-between mb-4;
   }
   .detail-date {
-    @apply text-xs text-[var(--muted)];
+    @apply text-xs text-(--muted);
   }
   .detail-card {
-    @apply rounded-xl border border-[var(--border)] bg-[var(--card-bg)]/60 p-5;
+    @apply rounded-xl border border-(--border) bg-(--card-bg)/60 p-5;
   }
   .detail-head {
     @apply flex items-center gap-3 mb-3;
   }
   .detail-avatar {
-    @apply w-12 h-12 rounded-full object-cover shrink-0 border border-[var(--border)];
+    @apply w-12 h-12 rounded-full object-cover shrink-0 border border-(--border);
   }
   .detail-name {
-    @apply font-semibold text-[var(--text)];
+    @apply font-semibold text-(--text);
   }
   .detail-sub {
-    @apply flex items-center gap-1.5 text-xs text-[var(--muted)];
+    @apply flex items-center gap-1.5 text-xs text-(--muted);
   }
   .dynamic-body {
-    @apply text-[var(--text)] leading-relaxed;
+    @apply text-(--text) leading-relaxed;
     > :first-child {
       @apply mt-0;
     }
@@ -107,29 +107,29 @@ const handle =
       @apply mb-0;
     }
     a {
-      @apply text-[var(--primary)] no-underline;
+      @apply text-(--primary) no-underline;
     }
     code {
-      @apply text-[0.85em] px-1 py-0.5 rounded bg-[var(--primary)]/10;
+      @apply text-[0.85em] px-1 py-0.5 rounded bg-(--primary)/10;
     }
   }
   .detail-actions {
-    @apply mt-5 pt-4 border-t border-[var(--border)] flex items-center gap-6
-           text-[var(--muted)];
+    @apply mt-5 pt-4 border-t border-(--border) flex items-center gap-6
+           text-(--muted);
   }
   .detail-act {
     @apply inline-flex items-center gap-1.5 text-sm no-underline cursor-pointer
-           bg-transparent border-0 p-0 text-[var(--muted)] transition;
+           bg-transparent border-0 p-0 text-(--muted) transition;
     &:hover {
-      @apply text-[var(--primary)];
+      @apply text-(--primary);
     }
     &.act-like.active {
       @apply text-pink-500;
     }
   }
   .detail-back {
-    @apply inline-flex items-center gap-1.5 text-sm text-[var(--muted)]
-           no-underline transition hover:text-[var(--primary)];
+    @apply inline-flex items-center gap-1.5 text-sm text-(--muted)
+           no-underline transition hover:text-(--primary);
   }
 </style>
 

@@ -27,7 +27,7 @@ const { name = siteConfig.license.name, url = siteConfig.license.url, author = p
 
 <style lang="scss">
   .license {
-    @apply relative my-5 p-5 rounded-xl overflow-hidden border border-[var(--border)];
+    @apply relative my-5 p-5 rounded-xl overflow-hidden border border-(--border);
     background: color-mix(in oklab, var(--primary) 5%, var(--card-bg));
     box-shadow: 0 10px 30px -22px color-mix(in oklab, var(--primary) 60%, transparent);
   }
@@ -42,15 +42,15 @@ const { name = siteConfig.license.name, url = siteConfig.license.url, author = p
     @apply relative z-10;
   }
   .license-title {
-    @apply flex items-center gap-2 text-base font-bold text-[var(--text)] mb-2;
+    @apply flex items-center gap-2 text-base font-bold text-(--text) mb-2;
   }
   .license-text {
-    @apply text-sm text-[var(--muted)] leading-relaxed m-0;
+    @apply text-sm text-(--muted) leading-relaxed m-0;
     a {
-      @apply text-[var(--primary)] no-underline font-medium hover:underline;
+      @apply text-(--primary) no-underline font-medium hover:underline;
     }
     strong {
-      @apply text-[var(--text)];
+      @apply text-(--text);
     }
   }
 </style>

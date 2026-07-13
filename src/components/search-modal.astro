@@ -41,57 +41,57 @@ import Icon from "./icon.astro";
   .search-panel {
     @apply absolute left-1/2 top-[12%] -translate-x-1/2 w-[min(640px,92vw)]
            max-h-[76vh] flex flex-col rounded-lg overflow-hidden
-           border border-[var(--border)] bg-[var(--card-bg)] shadow-2xl
+           border border-(--border) bg-(--card-bg) shadow-2xl
            scale-95 translate-y-2 opacity-0 transition-all duration-200;
   }
   .search-modal.open .search-panel {
     @apply scale-100 translate-y-0 opacity-100;
   }
   .search-input-wrap {
-    @apply flex items-center gap-2 px-4 py-3 border-b border-[var(--border)];
+    @apply flex items-center gap-2 px-4 py-3 border-b border-(--border);
   }
   .search-input-icon {
-    @apply text-[var(--muted)] shrink-0;
+    @apply text-(--muted) shrink-0;
   }
   .search-input {
-    @apply flex-1 bg-transparent outline-none text-[var(--text)] text-sm min-w-0;
+    @apply flex-1 bg-transparent outline-none text-(--text) text-sm min-w-0;
     &::placeholder {
-      @apply text-[var(--muted)];
+      @apply text-(--muted);
     }
   }
   .search-close {
     @apply flex items-center justify-center w-8 h-8 rounded-md shrink-0
-           text-[var(--muted)] transition
-           hover:text-[var(--primary)] hover:bg-[var(--primary)]/10
+           text-(--muted) transition
+           hover:text-(--primary) hover:bg-(--primary)/10
            active:scale-95;
   }
   .search-results {
     @apply overflow-y-auto p-2 space-y-1.5;
   }
   .search-empty {
-    @apply p-8 text-center text-sm text-[var(--muted)];
+    @apply p-8 text-center text-sm text-(--muted);
   }
   .result-item {
     @apply flex flex-col gap-0.5 px-3.5 py-2.5 rounded-md no-underline
            border border-transparent transition active:scale-[0.99];
     &:hover {
-      @apply border-[var(--border)] bg-[var(--primary)]/5;
+      @apply border-(--border) bg-(--primary)/5;
     }
     .r-title {
-      @apply text-sm font-semibold text-[var(--text)];
+      @apply text-sm font-semibold text-(--text);
     }
     .r-meta {
-      @apply text-xs text-[var(--muted)] flex items-center gap-2;
+      @apply text-xs text-(--muted) flex items-center gap-2;
     }
     .r-desc {
-      @apply text-xs text-[var(--muted)] mt-0.5 line-clamp-1;
+      @apply text-xs text-(--muted) mt-0.5 line-clamp-1;
     }
     mark {
-      @apply bg-[var(--primary)]/25 text-[var(--primary)] rounded px-0.5 font-medium;
+      @apply bg-(--primary)/25 text-(--primary) rounded px-0.5 font-medium;
     }
   }
   .result-empty {
-    @apply p-8 text-center text-sm text-[var(--muted)];
+    @apply p-8 text-center text-sm text-(--muted);
   }
 </style>
 

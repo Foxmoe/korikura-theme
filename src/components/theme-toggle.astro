@@ -17,9 +17,9 @@ import Icon from "./icon.astro";
 <style lang="scss" is:global>
   .icon-btn {
     @apply flex items-center justify-center w-9 h-9 rounded
-           border border-[var(--border)] text-[var(--text)]
-           bg-[var(--card-bg)]/50 transition active:scale-95
-           hover:text-[var(--primary)];
+           border border-(--border) text-(--text)
+           bg-(--card-bg)/50 transition active:scale-95
+           hover:text-(--primary);
   }
   .theme-icon {
     @apply hidden;

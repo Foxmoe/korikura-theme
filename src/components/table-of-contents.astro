@@ -13,7 +13,7 @@ const { headings = [] } = Astro.props;
 
 <style lang="scss">
   .toc-head {
-    @apply flex items-center gap-1.5 text-sm font-semibold mb-2 text-[var(--primary)];
+    @apply flex items-center gap-1.5 text-sm font-semibold mb-2 text-(--primary);
   }
   .toc-body {
     @apply text-sm;
@@ -22,15 +22,15 @@ const { headings = [] } = Astro.props;
     @apply list-none m-0 p-0;
   }
   .toc-body .toc-list .toc-list {
-    @apply ml-1 pl-3 border-l border-[var(--border)];
+    @apply ml-1 pl-3 border-l border-(--border);
   }
   .toc-body .toc-link {
     @apply block py-1 pl-3 -ml-px border-l-2 border-transparent
-           text-[var(--muted)] no-underline rounded-r transition
-           hover:text-[var(--primary)] hover:bg-[var(--primary)]/5;
+           text-(--muted) no-underline rounded-r transition
+           hover:text-(--primary) hover:bg-(--primary)/5;
   }
   .toc-body .toc-link.is-active {
-    @apply text-[var(--primary)] border-[var(--primary)] font-medium bg-[var(--primary)]/8;
+    @apply text-(--primary) border-(--primary) font-medium bg-(--primary)/8;
   }
   .toc-body .toc-link.node-name--H1 {
     @apply font-semibold;

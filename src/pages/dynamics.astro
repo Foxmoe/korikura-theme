@@ -117,10 +117,10 @@ const months = [...monthMap.entries()]
   .page-head {
     @apply mb-5;
     h1 {
-      @apply text-2xl font-bold text-[var(--text)];
+      @apply text-2xl font-bold text-(--text);
     }
     p {
-      @apply text-sm text-[var(--muted)] mt-1;
+      @apply text-sm text-(--muted) mt-1;
     }
   }
 
@@ -136,56 +136,56 @@ const months = [...monthMap.entries()]
   }
   .tl-node {
     @apply relative flex flex-col items-center gap-2 pt-1 px-1
-           bg-transparent border-0 cursor-pointer text-[var(--muted)]
+           bg-transparent border-0 cursor-pointer text-(--muted)
            transition shrink-0;
     &:hover {
-      @apply text-[var(--primary)];
+      @apply text-(--primary);
     }
     &.active {
-      @apply text-[var(--primary)];
+      @apply text-(--primary);
       .tl-label {
-        @apply text-[var(--primary)];
+        @apply text-(--primary);
       }
       .tl-count {
-        @apply bg-[var(--primary)]/15 text-[var(--primary)];
+        @apply bg-(--primary)/15 text-(--primary);
       }
     }
   }
   .tl-dot {
-    @apply relative z-10 w-3.5 h-3.5 rounded-full bg-[var(--card-bg)]
-           border-2 border-[var(--border)] transition-all duration-200;
+    @apply relative z-10 w-3.5 h-3.5 rounded-full bg-(--card-bg)
+           border-2 border-(--border) transition-all duration-200;
   }
   .tl-node:hover .tl-dot {
-    @apply border-[var(--primary)];
+    @apply border-(--primary);
   }
   .tl-node.active .tl-dot {
-    @apply bg-[var(--primary)] border-[var(--primary)] scale-125;
+    @apply bg-(--primary) border-(--primary) scale-125;
     box-shadow: 0 0 0 5px color-mix(in oklab, var(--primary) 18%, transparent);
   }
   .tl-label {
     @apply text-xs whitespace-nowrap font-medium;
   }
   .tl-count {
-    @apply text-[10px] px-1.5 rounded-full bg-[var(--border)] text-[var(--muted)];
+    @apply text-[10px] px-1.5 rounded-full bg-(--border) text-(--muted);
   }
 
   .feed {
-    @apply rounded-xl border border-[var(--border)] bg-[var(--card-bg)]/50 overflow-hidden;
+    @apply rounded-xl border border-(--border) bg-(--card-bg)/50 overflow-hidden;
   }
   .feed-item {
-    @apply flex flex-col gap-1 px-4 py-4 border-b border-[var(--border)] transition-colors;
+    @apply flex flex-col gap-1 px-4 py-4 border-b border-(--border) transition-colors;
     &:hover {
-      @apply bg-[var(--primary)]/4;
+      @apply bg-(--primary)/4;
     }
     &.feed-hidden {
       @apply hidden;
     }
   }
   .feed-link {
-    @apply flex gap-3 no-underline text-[var(--text)] rounded-lg;
+    @apply flex gap-3 no-underline text-(--text) rounded-lg;
   }
   .feed-avatar {
-    @apply w-11 h-11 rounded-full object-cover shrink-0 border border-[var(--border)];
+    @apply w-11 h-11 rounded-full object-cover shrink-0 border border-(--border);
   }
   .feed-main {
     @apply flex-1 min-w-0;
@@ -194,17 +194,17 @@ const months = [...monthMap.entries()]
     @apply flex items-center gap-1.5 text-sm flex-wrap;
   }
   .feed-name {
-    @apply font-semibold text-[var(--text)];
+    @apply font-semibold text-(--text);
   }
   .feed-handle,
   .feed-time {
-    @apply text-[var(--muted)];
+    @apply text-(--muted);
   }
   .feed-dot {
-    @apply text-[var(--muted)];
+    @apply text-(--muted);
   }
   .feed-body {
-    @apply text-sm text-[var(--text)] mt-1 leading-relaxed;
+    @apply text-sm text-(--text) mt-1 leading-relaxed;
     > :first-child {
       @apply mt-0;
     }
@@ -212,20 +212,20 @@ const months = [...monthMap.entries()]
       @apply mb-0;
     }
     a {
-      @apply text-[var(--primary)] no-underline;
+      @apply text-(--primary) no-underline;
     }
     code {
-      @apply text-[0.85em] px-1 py-0.5 rounded bg-[var(--primary)]/10;
+      @apply text-[0.85em] px-1 py-0.5 rounded bg-(--primary)/10;
     }
   }
   .feed-actions {
-    @apply flex items-center gap-6 mt-1 ml-14 text-[var(--muted)];
+    @apply flex items-center gap-6 mt-1 ml-14 text-(--muted);
   }
   .feed-act {
     @apply flex items-center gap-1.5 text-xs transition cursor-pointer bg-transparent border-0 p-0
-           text-[var(--muted)] no-underline;
+           text-(--muted) no-underline;
     &:hover {
-      @apply text-[var(--primary)];
+      @apply text-(--primary);
     }
     &.act-like.active {
       @apply text-pink-500;
@@ -257,7 +257,7 @@ const months = [...monthMap.entries()]
     transform: translateX(-50%) translateY(0);
   }
   .feed-end {
-    @apply text-center text-xs text-[var(--muted)] py-4 hidden;
+    @apply text-center text-xs text-(--muted) py-4 hidden;
     &.show {
       @apply block;
     }

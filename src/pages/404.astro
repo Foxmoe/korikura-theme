@@ -24,14 +24,14 @@ import Icon from "@/components/icon.astro";
     @apply min-h-[calc(100vh-var(--nav-h)-12rem)] flex flex-col items-center justify-center text-center px-4;
   }
   .nf-code {
-    @apply text-7xl md:text-8xl font-black text-[var(--primary)] opacity-90;
+    @apply text-7xl md:text-8xl font-black text-(--primary) opacity-90;
     text-shadow: 0 0 30px color-mix(in oklab, var(--primary) 40%, transparent);
   }
   .nf-title {
-    @apply text-xl md:text-2xl font-bold mt-4 text-[var(--text)];
+    @apply text-xl md:text-2xl font-bold mt-4 text-(--text);
   }
   .nf-text {
-    @apply text-sm text-[var(--muted)] mt-2 max-w-md;
+    @apply text-sm text-(--muted) mt-2 max-w-md;
   }
   .nf-actions {
     @apply flex items-center gap-3 mt-8;
@@ -40,11 +40,11 @@ import Icon from "@/components/icon.astro";
     @apply inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-sm font-medium
            no-underline transition;
     &.primary {
-      @apply bg-[var(--primary)] text-white hover:opacity-90 hover:shadow-lg;
+      @apply bg-(--primary) text-white hover:opacity-90 hover:shadow-lg;
     }
     &.ghost {
-      @apply border border-[var(--border)] text-[var(--text)]
-             hover:border-[var(--primary)] hover:text-[var(--primary)];
+      @apply border border-(--border) text-(--text)
+             hover:border-(--primary) hover:text-(--primary);
     }
   }
 </style>

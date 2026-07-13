@@ -56,26 +56,26 @@ function size(count: number) {
     @apply mb-8;
   }
   .tax-title {
-    @apply text-3xl font-bold flex items-center gap-2 text-[var(--text)];
+    @apply text-3xl font-bold flex items-center gap-2 text-(--text);
   }
   .tax-sub {
-    @apply text-sm text-[var(--muted)] mt-1;
+    @apply text-sm text-(--muted) mt-1;
   }
   .tax-empty {
-    @apply text-[var(--muted)];
+    @apply text-(--muted);
   }
   .cloud {
     @apply flex flex-wrap gap-3;
   }
   .cloud-tag {
     @apply inline-flex items-start px-3 py-1.5 rounded-full no-underline
-           bg-[var(--primary)]/8 text-[var(--text)]
-           border border-[var(--border)] transition;
+           bg-(--primary)/8 text-(--text)
+           border border-(--border) transition;
     &:hover {
-      @apply bg-[var(--primary)]/18 text-[var(--primary)] -translate-y-0.5;
+      @apply bg-(--primary)/18 text-(--primary) -translate-y-0.5;
     }
     sup {
-      @apply text-xs ml-0.5 text-[var(--muted)];
+      @apply text-xs ml-0.5 text-(--muted);
     }
   }
 </style>

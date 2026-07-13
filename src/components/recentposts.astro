@@ -41,12 +41,12 @@ const posts = (await getPublishedPosts()).slice(0, 5);
 
 <style lang="scss">
   .card-title {
-    @apply flex items-center gap-1.5 text-sm font-semibold mb-3 text-[var(--primary)];
+    @apply flex items-center gap-1.5 text-sm font-semibold mb-3 text-(--primary);
   }
   .recent-more {
-    @apply ml-auto text-xs text-[var(--muted)] no-underline inline-flex items-center gap-0.5 transition;
+    @apply ml-auto text-xs text-(--muted) no-underline inline-flex items-center gap-0.5 transition;
     &:hover {
-      @apply text-[var(--primary)];
+      @apply text-(--primary);
     }
   }
   .recent-list {
@@ -54,10 +54,10 @@ const posts = (await getPublishedPosts()).slice(0, 5);
   }
   .recent-item {
     @apply flex items-center gap-2.5 px-2 py-2 rounded-lg no-underline
-           text-[var(--text)] transition hover:bg-[var(--primary)]/8;
+           text-(--text) transition hover:bg-(--primary)/8;
   }
   .recent-dot {
-    @apply w-1.5 h-1.5 rounded-full bg-[var(--primary)]/60 shrink-0;
+    @apply w-1.5 h-1.5 rounded-full bg-(--primary)/60 shrink-0;
   }
   .recent-text {
     @apply flex flex-col min-w-0;
@@ -66,9 +66,9 @@ const posts = (await getPublishedPosts()).slice(0, 5);
     @apply text-sm truncate;
   }
   .recent-date {
-    @apply text-xs text-[var(--muted)];
+    @apply text-xs text-(--muted);
   }
   .recent-cat {
-    @apply text-[var(--primary)]/80;
+    @apply text-(--primary)/80;
   }
 </style>

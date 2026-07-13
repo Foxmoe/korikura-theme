@@ -47,29 +47,29 @@ const cats = await getCategoryCounts();
     @apply mb-8;
   }
   .tax-title {
-    @apply text-3xl font-bold flex items-center gap-2 text-[var(--text)];
+    @apply text-3xl font-bold flex items-center gap-2 text-(--text);
   }
   .tax-sub {
-    @apply text-sm text-[var(--muted)] mt-1;
+    @apply text-sm text-(--muted) mt-1;
   }
   .tax-empty {
-    @apply text-[var(--muted)];
+    @apply text-(--muted);
   }
   .cat-list {
     @apply flex flex-col gap-2;
   }
   .cat-item {
     @apply flex items-center gap-2 px-4 py-3 rounded-lg no-underline
-           border border-[var(--border)] bg-[var(--card-bg)]/50
-           text-[var(--text)] transition;
+           border border-(--border) bg-(--card-bg)/50
+           text-(--text) transition;
     &:hover {
-      @apply border-[var(--primary)] text-[var(--primary)];
+      @apply border-(--primary) text-(--primary);
     }
   }
   .cat-name {
     @apply flex-1 font-medium;
   }
   .cat-count {
-    @apply text-xs px-2 py-0.5 rounded-full bg-[var(--primary)]/10 text-[var(--primary)];
+    @apply text-xs px-2 py-0.5 rounded-full bg-(--primary)/10 text-(--primary);
   }
 </style>

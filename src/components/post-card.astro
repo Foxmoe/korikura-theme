@@ -67,8 +67,8 @@ const reading = getReadingTime(post.body || "", siteConfig.readingSpeed);
 <style lang="scss">
   .post-card {
     @apply block h-full rounded-md overflow-hidden no-underline
-           border border-[var(--border)]
-           bg-[var(--card-bg)]
+           border border-(--border)
+           bg-(--card-bg)
            transition-all duration-300;
     box-shadow: 0 4px 18px -14px rgba(0, 0, 0, 0.28);
     &:hover {
@@ -103,13 +103,13 @@ const reading = getReadingTime(post.body || "", siteConfig.readingSpeed);
     @apply absolute inset-0 flex items-center justify-center p-4;
     background: color-mix(in oklab, var(--primary) 12%, var(--card-bg));
     span {
-      @apply text-[var(--text)]/80 font-semibold text-center text-sm;
+      @apply text-(--text)/80 font-semibold text-center text-sm;
     }
   }
   .featured-badge {
     @apply absolute top-2 right-2 inline-flex items-center gap-1
            text-[11px] px-2 py-0.5 rounded-full
-           bg-[var(--primary)] text-white shadow z-10;
+           bg-(--primary) text-white shadow z-10;
   }
   .category-badge {
     @apply absolute top-2 left-2 inline-flex items-center gap-1
@@ -122,20 +122,20 @@ const reading = getReadingTime(post.body || "", siteConfig.readingSpeed);
   }
   .tag {
     @apply text-xs px-2 py-0.5 rounded-full
-           bg-[var(--primary)]/10 text-[var(--primary)];
+           bg-(--primary)/10 text-(--primary);
   }
   .card-title {
-    @apply text-lg font-semibold text-[var(--text)] mb-1.5 line-clamp-2
+    @apply text-lg font-semibold text-(--text) mb-1.5 line-clamp-2
            transition-colors;
     .post-card:hover & {
-      @apply text-[var(--primary)];
+      @apply text-(--primary);
     }
   }
   .card-desc {
-    @apply text-sm text-[var(--muted)] line-clamp-2 mb-3;
+    @apply text-sm text-(--muted) line-clamp-2 mb-3;
   }
   .card-meta {
-    @apply flex items-center justify-between gap-2 text-xs text-[var(--muted)];
+    @apply flex items-center justify-between gap-2 text-xs text-(--muted);
   }
   .meta-left {
     @apply flex items-center gap-1.5 min-w-0 truncate;

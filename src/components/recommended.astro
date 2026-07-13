@@ -79,12 +79,12 @@ const list: Post[] = related.slice(0, 3);
 
 <style lang="scss">
   .recommend {
-    @apply mt-12 pt-8 border-t border-[var(--border)];
+    @apply mt-12 pt-8 border-t border-(--border);
   }
   .recommend-title {
-    @apply flex items-center gap-1.5 text-lg font-bold text-[var(--text)] mb-4;
+    @apply flex items-center gap-1.5 text-lg font-bold text-(--text) mb-4;
     :global(svg) {
-      @apply text-[var(--primary)];
+      @apply text-(--primary);
     }
   }
   .recommend-grid {
@@ -92,7 +92,7 @@ const list: Post[] = related.slice(0, 3);
   }
   .rec-card {
     @apply relative block aspect-[4/3] rounded-lg overflow-hidden no-underline
-           border border-[var(--border)] transition;
+           border border-(--border) transition;
     box-shadow: 0 4px 18px -14px rgba(0, 0, 0, 0.3);
     &:hover {
       @apply -translate-y-0.5;

@@ -23,15 +23,15 @@ import Icon from "@/components/icon.astro";
     @apply max-w-2xl mx-auto px-1 py-16 text-center;
   }
   .sp-title {
-    @apply text-3xl font-bold flex items-center justify-center gap-2 text-[var(--text)];
+    @apply text-3xl font-bold flex items-center justify-center gap-2 text-(--text);
   }
   .sp-sub {
-    @apply text-sm text-[var(--muted)] mt-2 mb-6;
+    @apply text-sm text-(--muted) mt-2 mb-6;
   }
   .sp-open {
     @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-full
-           border border-[var(--border)] text-[var(--text)] bg-[var(--card-bg)]/60
-           transition hover:border-[var(--primary)] hover:text-[var(--primary)];
+           border border-(--border) text-(--text) bg-(--card-bg)/60
+           transition hover:border-(--primary) hover:text-(--primary);
   }
 </style>
 

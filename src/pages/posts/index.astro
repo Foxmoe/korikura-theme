@@ -62,14 +62,14 @@ const posts = all.slice(0, pageSize);
     @apply flex items-center justify-between mb-6;
   }
   .section-title {
-    @apply text-xl font-bold text-[var(--text)] relative pl-3;
+    @apply text-xl font-bold text-(--text) relative pl-3;
     &::before {
       content: "";
-      @apply absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-full bg-[var(--primary)];
+      @apply absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-full bg-(--primary);
     }
   }
   .section-more {
-    @apply text-sm text-[var(--muted)];
+    @apply text-sm text-(--muted);
   }
   .post-list {
     @apply flex flex-col gap-4;

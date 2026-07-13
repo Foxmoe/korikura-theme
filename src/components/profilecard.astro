@@ -32,19 +32,19 @@ import Icon from "./icon.astro";
     @apply w-20 h-20 mx-auto rounded-full mb-3 p-0.5;
     background: color-mix(in oklab, var(--primary) 22%, var(--card-bg));
     img {
-      @apply border-2 border-[var(--card-bg)];
+      @apply border-2 border-(--card-bg);
     }
   }
   .name {
-    @apply font-semibold text-[var(--text)];
+    @apply font-semibold text-(--text);
   }
   .desc {
-    @apply text-xs text-[var(--muted)] mt-1 leading-relaxed;
+    @apply text-xs text-(--muted) mt-1 leading-relaxed;
   }
   .socials {
-    @apply flex items-center justify-center gap-3 mt-3 text-[var(--muted)];
+    @apply flex items-center justify-center gap-3 mt-3 text-(--muted);
     a {
-      @apply transition hover:text-[var(--primary)] hover:-translate-y-0.5;
+      @apply transition hover:text-(--primary) hover:-translate-y-0.5;
     }
   }
 </style>

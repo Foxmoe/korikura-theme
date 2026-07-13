@@ -44,18 +44,18 @@ const posts = (await getRandomPosts(5)).filter((p) => !p.data.draft);
 
 <style lang="scss">
   .card-title {
-    @apply flex items-center gap-1.5 text-sm font-semibold mb-3 text-[var(--primary)];
+    @apply flex items-center gap-1.5 text-sm font-semibold mb-3 text-(--primary);
   }
   .guess-list {
     @apply list-none p-0 m-0 space-y-1;
   }
   .guess-item {
     @apply flex items-center gap-2.5 px-2 py-2 rounded-lg no-underline
-           text-[var(--text)] transition hover:bg-[var(--primary)]/8;
+           text-(--text) transition hover:bg-(--primary)/8;
   }
   .guess-cover {
     @apply w-12 h-12 rounded-md object-cover shrink-0
-           border border-[var(--border)] bg-[var(--card-bg)];
+           border border-(--border) bg-(--card-bg);
   }
   .guess-meta {
     @apply flex flex-col min-w-0;
@@ -64,9 +64,9 @@ const posts = (await getRandomPosts(5)).filter((p) => !p.data.draft);
     @apply text-sm truncate;
   }
   .guess-date {
-    @apply text-xs text-[var(--muted)];
+    @apply text-xs text-(--muted);
   }
   .guess-cat {
-    @apply text-[var(--primary)]/80;
+    @apply text-(--primary)/80;
   }
 </style>

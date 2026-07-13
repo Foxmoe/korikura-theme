@@ -51,16 +51,16 @@ const { tag, posts } = Astro.props;
     @apply max-w-5xl mx-auto px-1 py-4;
   }
   .crumb {
-    @apply flex items-center gap-1 text-xs text-[var(--muted)] mb-3;
+    @apply flex items-center gap-1 text-xs text-(--muted) mb-3;
     a {
-      @apply no-underline hover:text-[var(--primary)];
+      @apply no-underline hover:text-(--primary);
     }
   }
   .tax-title {
-    @apply text-3xl font-bold flex items-center gap-2 text-[var(--text)];
+    @apply text-3xl font-bold flex items-center gap-2 text-(--text);
   }
   .tax-sub {
-    @apply text-sm text-[var(--muted)] mt-1 mb-6;
+    @apply text-sm text-(--muted) mt-1 mb-6;
   }
   .post-grid {
     @apply grid gap-6 sm:grid-cols-2 lg:grid-cols-3;

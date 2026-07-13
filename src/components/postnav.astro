@@ -47,10 +47,10 @@ const prev = idx > 0 ? posts[idx - 1] : undefined;
   .post-prev,
   .post-next {
     @apply relative flex-1 flex items-center gap-3 px-5 py-4 rounded-lg
-           bg-[var(--card-bg)] border border-[var(--border)]
-           text-sm font-medium text-[var(--muted)]
+           bg-(--card-bg) border border-(--border)
+           text-sm font-medium text-(--muted)
            transition-all duration-300 ease-out active:scale-[0.99]
-           hover:border-[var(--primary)] hover:text-[var(--primary)]
+           hover:border-(--primary) hover:text-(--primary)
            hover:-translate-y-0.5 hover:shadow-lg;
   }
 
@@ -64,7 +64,7 @@ const prev = idx > 0 ? posts[idx - 1] : undefined;
 
   .post-prev::before {
     content: "←";
-    @apply text-lg text-[var(--primary)] transition-transform duration-300 ease-out;
+    @apply text-lg text-(--primary) transition-transform duration-300 ease-out;
   }
 
   .post-prev:hover::before {
@@ -73,7 +73,7 @@ const prev = idx > 0 ? posts[idx - 1] : undefined;
 
   .post-next::after {
     content: "→";
-    @apply text-lg text-[var(--primary)] transition-transform duration-300 ease-out;
+    @apply text-lg text-(--primary) transition-transform duration-300 ease-out;
   }
 
   .post-next:hover::after {

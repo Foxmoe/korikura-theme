@@ -39,22 +39,22 @@ function size(count: number) {
 
 <style lang="scss">
   .card-title {
-    @apply flex items-center gap-1.5 text-sm font-semibold mb-3 text-[var(--primary)];
+    @apply flex items-center gap-1.5 text-sm font-semibold mb-3 text-(--primary);
   }
   .card-more {
-    @apply ml-auto text-xs font-normal text-[var(--muted)] no-underline hover:text-[var(--primary)];
+    @apply ml-auto text-xs font-normal text-(--muted) no-underline hover:text-(--primary);
   }
   .cloud {
     @apply flex flex-wrap gap-2;
   }
   .cloud-tag {
     @apply inline-flex items-start px-2.5 py-1 rounded-full no-underline
-           bg-[var(--primary)]/8 text-[var(--text)] transition;
+           bg-(--primary)/8 text-(--text) transition;
     &:hover {
-      @apply bg-[var(--primary)]/15 text-[var(--primary)] -translate-y-0.5;
+      @apply bg-(--primary)/15 text-(--primary) -translate-y-0.5;
     }
   }
   .cloud-count {
-    @apply text-[10px] ml-0.5 text-[var(--muted)];
+    @apply text-[10px] ml-0.5 text-(--muted);
   }
 </style>

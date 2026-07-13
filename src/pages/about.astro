@@ -70,35 +70,35 @@ const stats = [
   }
   .about-avatar {
     @apply w-24 h-24 rounded-full mx-auto mb-4 object-cover
-           border-4 border-[var(--card-bg)] shadow-lg;
+           border-4 border-(--card-bg) shadow-lg;
   }
   .about-name {
-    @apply text-2xl font-bold text-[var(--text)];
+    @apply text-2xl font-bold text-(--text);
   }
   .about-bio {
-    @apply text-sm text-[var(--muted)] mt-1;
+    @apply text-sm text-(--muted) mt-1;
   }
   .about-socials {
-    @apply flex items-center justify-center gap-4 mt-4 text-[var(--muted)];
+    @apply flex items-center justify-center gap-4 mt-4 text-(--muted);
     a {
-      @apply transition hover:text-[var(--primary)] hover:-translate-y-0.5;
+      @apply transition hover:text-(--primary) hover:-translate-y-0.5;
     }
   }
   .about-card {
-    @apply rounded-xl border border-[var(--border)] p-6 mt-4
-           bg-[var(--card-bg)]/50;
+    @apply rounded-xl border border-(--border) p-6 mt-4
+           bg-(--card-bg)/50;
   }
   .about-stats {
     @apply grid grid-cols-3 gap-3 mt-4;
   }
   .stat {
-    @apply rounded-lg border border-[var(--border)] p-4 text-center
-           bg-[var(--card-bg)]/50;
+    @apply rounded-lg border border-(--border) p-4 text-center
+           bg-(--card-bg)/50;
     .stat-value {
-      @apply text-sm font-semibold text-[var(--text)];
+      @apply text-sm font-semibold text-(--text);
     }
     .stat-label {
-      @apply text-xs text-[var(--muted)] mt-1;
+      @apply text-xs text-(--muted) mt-1;
     }
   }
 </style>

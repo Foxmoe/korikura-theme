@@ -156,13 +156,13 @@ button,
 }
 
 .astro-code {
-  @apply rounded-md p-4 overflow-x-auto text-sm my-0 border border-[var(--border)];
+  @apply rounded-md p-4 overflow-x-auto text-sm my-0 border border-(--border);
   position: relative;
   background-color: color-mix(in oklab, var(--card-bg) 92%, transparent) !important;
 }
 
 .code-block {
-  @apply relative my-5 rounded-md border border-[var(--border)] overflow-hidden;
+  @apply relative my-5 rounded-md border border-(--border) overflow-hidden;
   background-color: color-mix(in oklab, var(--card-bg) 92%, transparent);
 }
 .code-block .code-tools {
@@ -175,14 +175,14 @@ button,
   @apply opacity-100 translate-y-0 pointer-events-auto;
 }
 .code-block .code-lang {
-  @apply text-xs font-medium text-[var(--muted)] tracking-wide
-         px-2 py-0.5 rounded bg-[var(--card-bg)]/80
-         border border-[var(--border)] backdrop-blur-sm;
+  @apply text-xs font-medium text-(--muted) tracking-wide
+         px-2 py-0.5 rounded bg-(--card-bg)/80
+         border border-(--border) backdrop-blur-sm;
 }
 .code-block .copy-btn {
-  @apply rounded px-2 py-0.5 text-xs text-[var(--muted)] border border-[var(--border)]
-         bg-[var(--card-bg)] transition hover:text-[var(--primary)]
-         hover:border-[var(--primary)] active:scale-95;
+  @apply rounded px-2 py-0.5 text-xs text-(--muted) border border-(--border)
+         bg-(--card-bg) transition hover:text-(--primary)
+         hover:border-(--primary) active:scale-95;
   cursor: pointer;
 }
 .code-block .astro-code {
@@ -191,21 +191,21 @@ button,
 }
 
 .code-group {
-  @apply my-5 rounded-md border border-[var(--border)] overflow-hidden;
+  @apply my-5 rounded-md border border-(--border) overflow-hidden;
   background-color: color-mix(in oklab, var(--card-bg) 92%, transparent);
 }
 .code-group .code-tabs {
   @apply flex flex-wrap items-center gap-1 px-2 py-1.5
-         border-b border-[var(--border)] bg-[var(--card-bg)]/60;
+         border-b border-(--border) bg-(--card-bg)/60;
 }
 .code-group .code-tab {
   @apply px-3 py-1 rounded text-xs font-medium no-underline cursor-pointer
-         text-[var(--muted)] border border-transparent transition active:scale-95;
+         text-(--muted) border border-transparent transition active:scale-95;
   &:hover {
-    @apply text-[var(--primary)] bg-[var(--primary)]/8;
+    @apply text-(--primary) bg-(--primary)/8;
   }
   &.active {
-    @apply text-[var(--primary)] bg-[var(--primary)]/12 border-[var(--primary)]/30;
+    @apply text-(--primary) bg-(--primary)/12 border-(--primary)/30;
   }
 }
 .code-group .code-pane {
@@ -303,7 +303,7 @@ button,
   @apply grid-cols-1 gap-0 max-w-[260px];
 }
 .moments-img {
-  @apply relative aspect-square overflow-hidden rounded-md bg-[var(--card-bg)];
+  @apply relative aspect-square overflow-hidden rounded-md bg-(--card-bg);
 }
 .moments-img img {
   @apply absolute inset-0 w-full h-full object-cover cursor-zoom-in transition-transform duration-300;
@@ -503,9 +503,9 @@ html.theme-transition * {
 .code-block .code-toggle {
   @apply absolute bottom-2 left-1/2 -translate-x-1/2 z-20
          px-3 py-1 rounded-full text-xs font-medium cursor-pointer
-         bg-[var(--card-bg)]/95 border border-[var(--border)]
-         text-[var(--muted)] backdrop-blur-sm transition
-         hover:text-[var(--primary)] hover:border-[var(--primary)];
+         bg-(--card-bg)/95 border border-(--border)
+         text-(--muted) backdrop-blur-sm transition
+         hover:text-(--primary) hover:border-(--primary);
   box-shadow: 0 2px 12px -4px rgba(0, 0, 0, 0.35);
 }
 .code-block.is-collapsed .astro-code {
@@ -544,38 +544,38 @@ html.theme-transition * {
 .page { @apply max-w-3xl mx-auto py-4; }
 .page-head { @apply mb-6; }
 .page-head h1 { @apply text-2xl font-bold; }
-.page-head p { @apply text-sm text-[var(--muted)] mt-1; }
+.page-head p { @apply text-sm text-(--muted) mt-1; }
 .link-grid { @apply grid gap-3 sm:grid-cols-2; }
-.link-card { @apply flex items-center gap-3 p-3 rounded-lg border border-[var(--border)] no-underline bg-[var(--card-bg)]/50 transition hover:-translate-y-0.5; }
-.link-avatar { @apply w-10 h-10 rounded-full object-cover border border-[var(--border)]; }
+.link-card { @apply flex items-center gap-3 p-3 rounded-lg border border-(--border) no-underline bg-(--card-bg)/50 transition hover:-translate-y-0.5; }
+.link-avatar { @apply w-10 h-10 rounded-full object-cover border border-(--border); }
 .link-meta { @apply min-w-0 flex-1; }
-.link-name { @apply text-sm font-semibold text-[var(--text)]; }
-.link-desc { @apply text-xs text-[var(--muted)] truncate; }
-.link-go { @apply text-[var(--muted)] shrink-0 self-center; }
+.link-name { @apply text-sm font-semibold text-(--text); }
+.link-desc { @apply text-xs text-(--muted) truncate; }
+.link-go { @apply text-(--muted) shrink-0 self-center; }
 .tool-grid { @apply grid gap-3 sm:grid-cols-2 lg:grid-cols-3; }
-.tool-card { @apply flex flex-col gap-1 p-4 rounded-lg border border-[var(--border)] no-underline bg-[var(--card-bg)]/50 transition hover:-translate-y-0.5; }
-.tool-icon { @apply text-[var(--primary)]; }
-.tool-name { @apply text-sm font-semibold text-[var(--text)]; }
-.tool-desc { @apply text-xs text-[var(--muted)]; }
+.tool-card { @apply flex flex-col gap-1 p-4 rounded-lg border border-(--border) no-underline bg-(--card-bg)/50 transition hover:-translate-y-0.5; }
+.tool-icon { @apply text-(--primary); }
+.tool-name { @apply text-sm font-semibold text-(--text); }
+.tool-desc { @apply text-xs text-(--muted); }
 .timeline { @apply list-none p-0 m-0; }
-.tl-item { @apply relative pl-6 pb-5 border-l-2 border-[var(--border)]; }
+.tl-item { @apply relative pl-6 pb-5 border-l-2 border-(--border); }
 .tl-item:last-child { @apply border-l-transparent pb-0; }
-.tl-dot { @apply absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-[var(--primary)]; }
-.tl-card { @apply rounded-lg border border-[var(--border)] p-3 bg-[var(--card-bg)]/50; }
-.tl-date { @apply text-xs text-[var(--muted)]; }
-.tl-content { @apply text-sm text-[var(--text)] mt-1 leading-relaxed; }
+.tl-dot { @apply absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-(--primary); }
+.tl-card { @apply rounded-lg border border-(--border) p-3 bg-(--card-bg)/50; }
+.tl-date { @apply text-xs text-(--muted); }
+.tl-content { @apply text-sm text-(--text) mt-1 leading-relaxed; }
 
 .twikoo-comments {
-  @apply mt-10 pt-8 border-t border-[var(--border)];
+  @apply mt-10 pt-8 border-t border-(--border);
 }
 .twikoo-comments .comments-title {
-  @apply text-lg font-bold text-[var(--text)] mb-4;
+  @apply text-lg font-bold text-(--text) mb-4;
 }
 .twikoo-comments .comments-hint {
-  @apply text-sm text-[var(--muted)] bg-[var(--card-bg)]/60 border border-[var(--border)]
+  @apply text-sm text-(--muted) bg-(--card-bg)/60 border border-(--border)
          rounded-md p-4 m-0;
   code {
-    @apply text-[var(--primary)] px-1 rounded bg-[var(--primary)]/10;
+    @apply text-(--primary) px-1 rounded bg-(--primary)/10;
   }
 }
 .twikoo,
@@ -585,7 +585,7 @@ html.theme-transition * {
 }
 .twikoo .tk-input,
 .twikoo .tk-textarea {
-  @apply bg-[var(--card-bg)] border rounded-md;
+  @apply bg-(--card-bg) border rounded-md;
   border-color: var(--border);
 }
 .twikoo .tk-input:focus,

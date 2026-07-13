@@ -59,28 +59,28 @@ function pageItems(): (number | "...")[] {
 
 <style lang="scss">
   .pagination {
-    @apply flex flex-wrap justify-center items-center gap-3 mt-12 pt-8 border-t border-[var(--border)];
+    @apply flex flex-wrap justify-center items-center gap-3 mt-12 pt-8 border-t border-(--border);
   }
   .page-btn {
     @apply px-4 py-2 rounded-lg text-sm font-medium
-           text-[var(--text)] border border-[var(--border)]
-           bg-[var(--card-bg)]/60 transition hover:border-[var(--primary)] hover:text-[var(--primary)];
+           text-(--text) border border-(--border)
+           bg-(--card-bg)/60 transition hover:border-(--primary) hover:text-(--primary);
   }
   .page-numbers {
     @apply flex items-center gap-1.5;
   }
   .page-number {
     @apply w-9 h-9 flex items-center justify-center rounded-lg text-sm
-           font-medium text-[var(--muted)] no-underline
+           font-medium text-(--muted) no-underline
            border border-transparent transition;
     &:hover {
-      @apply bg-[var(--primary)]/10 text-[var(--primary)];
+      @apply bg-(--primary)/10 text-(--primary);
     }
     &.active {
-      @apply bg-[var(--primary)] text-white border-[var(--primary)];
+      @apply bg-(--primary) text-white border-(--primary);
     }
   }
   .page-ellipsis {
-    @apply px-1 text-[var(--muted)];
+    @apply px-1 text-(--muted);
   }
 </style>

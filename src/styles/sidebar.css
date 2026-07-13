@@ -12,7 +12,7 @@
 }
 
 .card {
-    @apply border border-[var(--border)] p-4 rounded-lg;
+    @apply border border-(--border) p-4 rounded-lg;
     background-color: color-mix(in oklab, var(--card-bg) 92%, transparent);
     box-shadow: 0 4px 24px -12px rgba(0, 0, 0, 0.15);
 }

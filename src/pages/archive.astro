@@ -62,10 +62,10 @@ const total = groups.reduce((n, g) => n + g.posts.length, 0);
     @apply mb-8;
   }
   .arc-title {
-    @apply text-3xl font-bold flex items-center gap-2 text-[var(--text)];
+    @apply text-3xl font-bold flex items-center gap-2 text-(--text);
   }
   .arc-sub {
-    @apply text-sm text-[var(--muted)] mt-1;
+    @apply text-sm text-(--muted) mt-1;
   }
   .arc-year {
     @apply mb-8;
@@ -73,29 +73,29 @@ const total = groups.reduce((n, g) => n + g.posts.length, 0);
   .year-label {
     @apply flex items-baseline gap-3 mb-3 sticky top-[calc(var(--nav-h)+12px)] z-10;
     .year-num {
-      @apply text-2xl font-bold text-[var(--primary)];
+      @apply text-2xl font-bold text-(--primary);
     }
     .year-count {
-      @apply text-xs text-[var(--muted)];
+      @apply text-xs text-(--muted);
     }
   }
   .arc-list {
-    @apply list-none p-0 m-0 border-l-2 border-[var(--border)] ml-1;
+    @apply list-none p-0 m-0 border-l-2 border-(--border) ml-1;
   }
   .arc-item {
     @apply relative flex items-center gap-3 pl-5 py-2 ml-1;
     .arc-date {
-      @apply text-xs text-[var(--muted)] tabular-nums w-16 shrink-0;
+      @apply text-xs text-(--muted) tabular-nums w-16 shrink-0;
     }
     .arc-dot {
-      @apply absolute -left-[5px] w-2.5 h-2.5 rounded-full bg-[var(--primary)]/60
-             ring-2 ring-[var(--bg)];
+      @apply absolute -left-[5px] w-2.5 h-2.5 rounded-full bg-(--primary)/60
+             ring-2 ring-(--bg);
     }
     .arc-link {
-      @apply text-sm text-[var(--text)] no-underline transition hover:text-[var(--primary)];
+      @apply text-sm text-(--text) no-underline transition hover:text-(--primary);
     }
     .arc-tag {
-      @apply text-xs text-[var(--muted)] ml-auto;
+      @apply text-xs text-(--muted) ml-auto;
     }
   }
 </style>

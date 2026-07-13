@@ -100,7 +100,7 @@ const isPost = Boolean(postTitle);
   }
 
   .logo {
-    @apply font-bold text-base flex items-center gap-2 no-underline text-[var(--text)] shrink-0;
+    @apply font-bold text-base flex items-center gap-2 no-underline text-(--text) shrink-0;
     .logo-img {
       @apply h-7 w-7 rounded-md object-contain;
     }
@@ -121,10 +121,10 @@ const isPost = Boolean(postTitle);
            opacity-0 invisible pointer-events-none transition-opacity duration-300;
   }
   .nav-post-title {
-    @apply block truncate text-sm font-semibold text-[var(--text)];
+    @apply block truncate text-sm font-semibold text-(--text);
   }
   .nav-back-top {
-    @apply hidden items-center gap-1 text-sm font-medium no-underline text-[var(--primary)];
+    @apply hidden items-center gap-1 text-sm font-medium no-underline text-(--primary);
   }
   
   .nav-wrapper.has-post[data-nav="down"] .nav-extra {
@@ -161,10 +161,10 @@ const isPost = Boolean(postTitle);
   .nav-link {
     @apply relative inline-flex items-center shrink-0 px-3.5 py-1.5 rounded-full
            text-sm no-underline transition active:scale-95 overflow-hidden;
-    @apply text-[var(--text)];
+    @apply text-(--text);
     &::before {
       content: "";
-      @apply absolute inset-0 rounded-full bg-[var(--primary)]/10;
+      @apply absolute inset-0 rounded-full bg-(--primary)/10;
       transform: scale(0);
       transform-origin: center;
       transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -174,20 +174,20 @@ const isPost = Boolean(postTitle);
       @apply relative z-10;
     }
     &:hover {
-      @apply text-[var(--primary)];
+      @apply text-(--primary);
     }
     &:hover::before {
       transform: scale(1);
     }
     &.active {
-      @apply text-[var(--primary)];
+      @apply text-(--primary);
     }
     &.active::before {
-      @apply bg-[var(--primary)]/15;
+      @apply bg-(--primary)/15;
       transform: scale(1);
     }
     &:active::before {
-      @apply bg-[var(--primary)]/20;
+      @apply bg-(--primary)/20;
     }
   }
 
@@ -197,9 +197,9 @@ const isPost = Boolean(postTitle);
 
   .icon-btn {
     @apply flex items-center justify-center w-9 h-9 rounded
-           border border-[var(--border)] text-[var(--text)]
-           bg-[var(--card-bg)]/50 transition active:scale-95
-           hover:text-[var(--primary)];
+           border border-(--border) text-(--text)
+           bg-(--card-bg)/50 transition active:scale-95
+           hover:text-(--primary);
   }
 
   .mobile-menu {
@@ -207,7 +207,7 @@ const isPost = Boolean(postTitle);
     top: calc(100% + 8px);
     right: 12px;
     width: 220px;
-    @apply rounded-md border border-[var(--border)] p-2
+    @apply rounded-md border border-(--border) p-2
            flex flex-col gap-1 overflow-hidden
            opacity-0 invisible -translate-y-2 transition-all duration-200;
     background-color: color-mix(in oklab, var(--card-bg) 96%, transparent);
@@ -220,10 +220,10 @@ const isPost = Boolean(postTitle);
   }
 
   .mobile-link {
-    @apply px-4 py-2.5 rounded-md text-sm no-underline text-[var(--text)]
-           hover:bg-[var(--primary)]/10 active:scale-[0.98] transition;
+    @apply px-4 py-2.5 rounded-md text-sm no-underline text-(--text)
+           hover:bg-(--primary)/10 active:scale-[0.98] transition;
     &.active {
-      @apply bg-[var(--primary)]/15 text-[var(--primary)];
+      @apply bg-(--primary)/15 text-(--primary);
     }
   }
 </style>

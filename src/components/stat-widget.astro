@@ -1,7 +1,5 @@
 ---
-import Icon from "./icon.astro";
 ---
-
 <div class="card count-widget" id="enter-count">
   <div class="count-content">
     <div class="enter-count-title-wrapper">
@@ -29,7 +27,7 @@ import Icon from "./icon.astro";
     opacity: 0.85;
   }
   .enter-count-digits {
-    @apply w-full flex items-center justify-end gap-0.5 min-h-[24px];
+    @apply w-full flex items-center justify-end gap-0.5 min-h-6;
   }
 </style>
 
@@ -43,7 +41,6 @@ import Icon from "./icon.astro";
 </style>
 
 <script>
-  let observer;
   function renderEnterCount() {
     const box = document.getElementById("enter-count-digits");
     const src = document.getElementById("busuanzi_value_site_pv");
@@ -59,15 +56,16 @@ import Icon from "./icon.astro";
       )
       .join("");
   }
-  function bind() {
-    const src = document.getElementById("busuanzi_value_site_pv");
-    if (!src) return;
-    if (observer) observer.disconnect();
-    observer = new MutationObserver(renderEnterCount);
-    observer.observe(src, { childList: true, characterData: true, subtree: true });
+
+  function init() {
     renderEnterCount();
+    setTimeout(renderEnterCount, 1200);
   }
 
-  bind();
-  window.addEventListener("spa-navigate", () => setTimeout(bind, 400));
+  if (document.readyState === "loading") {
+    window.addEventListener("load", init);
+  } else {
+    init();
+  }
+  document.addEventListener("astro:page-load", init);
 </script>
