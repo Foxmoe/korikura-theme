@@ -1,0 +1,46 @@
+---
+---
+
+<script>
+  function wrapBody(body: HTMLElement) {
+    if (body.dataset.moments === "done") return;
+    try {
+      const imgs = Array.from(body.querySelectorAll("img"));
+      if (imgs.length < 1) {
+        body.dataset.moments = "done";
+        return;
+      }
+      const grid = document.createElement("div");
+      grid.className =
+        "moments-grid" +
+        (imgs.length === 1 ? " single" : imgs.length === 4 ? " cols-2" : "");
+      imgs.forEach((im) => {
+        const cell = document.createElement("div");
+        cell.className = "moments-img";
+        im.replaceWith(cell);
+        cell.appendChild(im);
+        grid.appendChild(cell);
+      });
+      body.appendChild(grid);
+      body.querySelectorAll("p").forEach((p) => {
+        if (!p.textContent?.trim() && !p.querySelector("img, a")) p.remove();
+      });
+    } finally {
+      body.dataset.moments = "done";
+    }
+  }
+
+  function buildMoments() {
+    document
+      .querySelectorAll(".feed-body, .dynamic-body")
+      .forEach((b) => wrapBody(b as HTMLElement));
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", buildMoments, { once: true });
+  } else {
+    buildMoments();
+  }
+  window.addEventListener("load", buildMoments);
+  window.addEventListener("spa-navigate", () => setTimeout(buildMoments, 60));
+</script>

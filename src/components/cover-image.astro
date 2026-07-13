@@ -1,0 +1,41 @@
+---
+import { siteConfig } from "@/config";
+
+interface Props {
+  src?: string;
+  alt?: string;
+  title?: string;
+  class?: string;
+}
+const { src, alt, title = "", class: cls = "" } = Astro.props;
+const cover = src || siteConfig.defaultCover;
+---
+
+<figure class={`cover ${cls}`}>
+  <img src={cover} alt={alt || title} loading="lazy" class="cover-img" />
+  {
+    !src && (
+      <div class="cover-fallback">
+        <span class="cover-fallback-text">{title}</span>
+      </div>
+    )
+  }
+</figure>
+
+<style lang="scss">
+  .cover {
+    @apply relative w-full rounded-lg overflow-hidden border border-[var(--border)];
+    aspect-ratio: 21 / 9;
+    margin: 0 0 1.5rem;
+  }
+  .cover-img {
+    @apply w-full h-full object-cover;
+  }
+  .cover-fallback {
+    @apply absolute inset-0 flex items-center justify-center;
+    background: color-mix(in oklab, var(--primary) 14%, var(--card-bg));
+  }
+  .cover-fallback-text {
+    @apply text-white/90 font-bold text-2xl px-6 text-center drop-shadow;
+  }
+</style>

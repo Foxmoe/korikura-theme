@@ -1,0 +1,143 @@
+---
+// 全局浮动 tooltip：为带 data-tooltip / title / aria-label 的元素在 hover 时
+// 显示美化提示，并抑制浏览器原生 title。事件委托，SPA 切换后依然生效。
+---
+
+<div id="app-tooltip" class="app-tooltip" role="tooltip" aria-hidden="true"></div>
+
+<style is:global>
+  .app-tooltip {
+    position: fixed;
+    z-index: 100000;
+    left: 0;
+    top: 0;
+    padding: 5px 9px;
+    font-size: 12px;
+    line-height: 1.35;
+    color: #fff;
+    background: color-mix(in oklab, var(--text) 90%, #000);
+    border-radius: 6px;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(4px);
+    transition:
+      opacity 0.15s ease,
+      transform 0.15s ease;
+    white-space: nowrap;
+    max-width: 260px;
+    box-shadow: 0 6px 20px -8px rgba(0, 0, 0, 0.5);
+  }
+  [data-theme="dark"] .app-tooltip {
+    color: var(--bg);
+    background: color-mix(in oklab, var(--text) 88%, #fff);
+  }
+  .app-tooltip.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .app-tooltip::after {
+    content: "";
+    position: absolute;
+    left: var(--arrow-x, 50%);
+    top: 100%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: color-mix(in oklab, var(--text) 90%, #000);
+  }
+  [data-theme="dark"] .app-tooltip::after {
+    border-top-color: color-mix(in oklab, var(--text) 88%, #fff);
+  }
+  .app-tooltip.below::after {
+    top: auto;
+    bottom: 100%;
+    border-top-color: transparent;
+    border-bottom-color: color-mix(in oklab, var(--text) 90%, #000);
+  }
+  [data-theme="dark"] .app-tooltip.below::after {
+    border-bottom-color: color-mix(in oklab, var(--text) 88%, #fff);
+  }
+</style>
+
+<script>
+  (function () {
+    const tip = document.getElementById("app-tooltip");
+    if (!tip) return;
+    let current: HTMLElement | null = null;
+
+    const isFormField = (el: HTMLElement) =>
+      /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName);
+
+    function getLabel(el: HTMLElement) {
+      return (
+        el.getAttribute("data-tooltip") ||
+        el.getAttribute("title") ||
+        el.getAttribute("aria-label") ||
+        ""
+      );
+    }
+
+    function position(el: HTMLElement) {
+      const r = el.getBoundingClientRect();
+      const tr = tip!.getBoundingClientRect();
+      let top = r.top - tr.height - 8;
+      let below = false;
+      if (top < 4) {
+        top = r.bottom + 8;
+        below = true;
+      }
+      let left = r.left + r.width / 2 - tr.width / 2;
+      left = Math.max(6, Math.min(left, window.innerWidth - tr.width - 6));
+      tip!.style.left = left + "px";
+      tip!.style.top = top + "px";
+      tip!.classList.toggle("below", below);
+      const arrowX = r.left + r.width / 2 - left;
+      tip!.style.setProperty("--arrow-x", arrowX + "px");
+    }
+
+    function show(el: HTMLElement) {
+      const label = getLabel(el);
+      if (!label) return;
+      current = el;
+      // 抑制原生 title 气泡
+      if (el.hasAttribute("title")) {
+        el.setAttribute("data-title", el.getAttribute("title") || "");
+        el.removeAttribute("title");
+      }
+      tip!.textContent = label;
+      tip!.classList.add("show");
+      position(el);
+    }
+
+    function hide() {
+      if (current && current.hasAttribute("data-title")) {
+        current.setAttribute("title", current.getAttribute("data-title") || "");
+        current.removeAttribute("data-title");
+      }
+      current = null;
+      tip!.classList.remove("show");
+    }
+
+    document.addEventListener("mouseover", (e) => {
+      const t = e.target as HTMLElement;
+      if (!t || !t.closest) return;
+      const el = t.closest<HTMLElement>(
+        "[data-tooltip],[title],[aria-label]",
+      );
+      if (!el || el === current) return;
+      if (isFormField(el)) return;
+      hide();
+      show(el);
+    });
+
+    document.addEventListener("mouseout", (e) => {
+      if (!current) return;
+      const to = (e as MouseEvent).relatedTarget as Node | null;
+      if (to && current.contains(to)) return;
+      hide();
+    });
+
+    window.addEventListener("scroll", () => hide(), true);
+    window.addEventListener("spa-navigate-start", () => hide());
+    document.addEventListener("click", () => hide());
+  })();
+</script>

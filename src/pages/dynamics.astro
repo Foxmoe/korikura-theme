@@ -1,0 +1,361 @@
+---
+import Default from "@/layouts/default.astro";
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import { profileConfig, siteConfig } from "@/config";
+import Icon from "@/components/icon.astro";
+import MomentsGrid from "@/components/moments-grid.astro";
+import { formatRelativeTime } from "@/utils/utils";
+
+const dyn = (await getCollection("dynamics")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+const items = await Promise.all(
+  dyn.map(async (d: CollectionEntry<"dynamics">) => {
+    const { Content } = await render(d);
+    const handle =
+      "@" + (profileConfig.name || siteConfig.title).toLowerCase().replace(/[^a-z0-9]/g, "");
+    const period = d.data.date.toISOString().slice(0, 7); // YYYY-MM
+    return { id: d.id, data: d.data, handle, Content, period };
+  }),
+);
+
+const monthMap = new Map<string, number>();
+for (const it of items) {
+  monthMap.set(it.period, (monthMap.get(it.period) || 0) + 1);
+}
+const months = [...monthMap.entries()]
+  .sort((a, b) => a[0].localeCompare(b[0]))
+  .map(([key, count]) => {
+    const [y, m] = key.split("-");
+    return { key, count, label: `${y}年${Number(m)}月` };
+  });
+---
+
+<Default title="动态" showSidebar={false}>
+  <section class="page feed-page">
+    <header class="page-head">
+      <h1>动态</h1>
+      <p>一些碎碎念与站点更新记录，仿推特时间线 ~(￣▽￣)~</p>
+    </header>
+
+    {
+      months.length > 0 && (
+        <div class="tl-rail" id="tl-rail">
+          <button type="button" class="tl-node active" data-period="all">
+            <span class="tl-dot" />
+            <span class="tl-label">全部</span>
+          </button>
+          {
+            months.map((mo) => (
+              <button type="button" class="tl-node" data-period={mo.key}>
+                <span class="tl-dot" />
+                <span class="tl-label">{mo.label}</span>
+                <span class="tl-count">{mo.count}</span>
+              </button>
+            ))
+          }
+        </div>
+      )
+    }
+
+    <div class="feed">
+      {
+        items.map((it, i) => (
+          <article class="feed-item" data-idx={i} data-period={it.period}>
+            <a class="feed-link" href={`/dynamics/${it.id}`}>
+              <img
+                src={profileConfig.avatar}
+                alt={profileConfig.name}
+                class="feed-avatar"
+                onerror="this.src='/favicon.svg'"
+              />
+              <div class="feed-main">
+                <div class="feed-head">
+                  <span class="feed-name">{profileConfig.name}</span>
+                  <span class="feed-handle">{it.handle}</span>
+                  <span class="feed-dot">·</span>
+                  <time class="feed-time" datetime={it.data.date.toISOString()}>
+                    {formatRelativeTime(it.data.date)}
+                  </time>
+                </div>
+                <div class="feed-body">
+                  <it.Content />
+                </div>
+              </div>
+            </a>
+            <div class="feed-actions">
+              <a class="feed-act act-comment" href={`/dynamics/${it.id}#评论`} title="评论">
+                <Icon name="message" size={16} />
+                <span class="act-count">0</span>
+              </a>
+              <button type="button" class="feed-act act-like" title="喜欢">
+                <Icon name="heart" size={16} />
+                <span class="act-count">0</span>
+              </button>
+              <button type="button" class="feed-act act-share" title="分享" data-url={`/dynamics/${it.id}`}>
+                <Icon name="share" size={16} />
+              </button>
+              <a class="feed-act act-open" href={`/dynamics/${it.id}`} title="详情">
+                <Icon name="arrow-right" size={16} />
+              </a>
+            </div>
+          </article>
+        ))
+      }
+      <div class="feed-sentinel" aria-hidden="true"></div>
+      <div class="feed-end">没有更多动态啦 ~</div>
+    </div>
+  </section>
+</Default>
+
+<MomentsGrid />
+
+<style lang="scss">
+  .feed-page {
+    @apply max-w-2xl;
+  }
+  .page-head {
+    @apply mb-5;
+    h1 {
+      @apply text-2xl font-bold text-[var(--text)];
+    }
+    p {
+      @apply text-sm text-[var(--muted)] mt-1;
+    }
+  }
+
+  
+  .tl-rail {
+    @apply relative flex items-start gap-5 overflow-x-auto pb-4 mb-5;
+    scrollbar-width: thin;
+  }
+  .tl-rail::before {
+    content: "";
+    @apply absolute left-2 right-2 top-[15px] h-0.5 rounded-full;
+    background: color-mix(in oklab, var(--border) 80%, transparent);
+  }
+  .tl-node {
+    @apply relative flex flex-col items-center gap-2 pt-1 px-1
+           bg-transparent border-0 cursor-pointer text-[var(--muted)]
+           transition shrink-0;
+    &:hover {
+      @apply text-[var(--primary)];
+    }
+    &.active {
+      @apply text-[var(--primary)];
+      .tl-label {
+        @apply text-[var(--primary)];
+      }
+      .tl-count {
+        @apply bg-[var(--primary)]/15 text-[var(--primary)];
+      }
+    }
+  }
+  .tl-dot {
+    @apply relative z-10 w-3.5 h-3.5 rounded-full bg-[var(--card-bg)]
+           border-2 border-[var(--border)] transition-all duration-200;
+  }
+  .tl-node:hover .tl-dot {
+    @apply border-[var(--primary)];
+  }
+  .tl-node.active .tl-dot {
+    @apply bg-[var(--primary)] border-[var(--primary)] scale-125;
+    box-shadow: 0 0 0 5px color-mix(in oklab, var(--primary) 18%, transparent);
+  }
+  .tl-label {
+    @apply text-xs whitespace-nowrap font-medium;
+  }
+  .tl-count {
+    @apply text-[10px] px-1.5 rounded-full bg-[var(--border)] text-[var(--muted)];
+  }
+
+  .feed {
+    @apply rounded-xl border border-[var(--border)] bg-[var(--card-bg)]/50 overflow-hidden;
+  }
+  .feed-item {
+    @apply flex flex-col gap-1 px-4 py-4 border-b border-[var(--border)] transition-colors;
+    &:hover {
+      @apply bg-[var(--primary)]/4;
+    }
+    &.feed-hidden {
+      @apply hidden;
+    }
+  }
+  .feed-link {
+    @apply flex gap-3 no-underline text-[var(--text)] rounded-lg;
+  }
+  .feed-avatar {
+    @apply w-11 h-11 rounded-full object-cover shrink-0 border border-[var(--border)];
+  }
+  .feed-main {
+    @apply flex-1 min-w-0;
+  }
+  .feed-head {
+    @apply flex items-center gap-1.5 text-sm flex-wrap;
+  }
+  .feed-name {
+    @apply font-semibold text-[var(--text)];
+  }
+  .feed-handle,
+  .feed-time {
+    @apply text-[var(--muted)];
+  }
+  .feed-dot {
+    @apply text-[var(--muted)];
+  }
+  .feed-body {
+    @apply text-sm text-[var(--text)] mt-1 leading-relaxed;
+    > :first-child {
+      @apply mt-0;
+    }
+    > :last-child {
+      @apply mb-0;
+    }
+    a {
+      @apply text-[var(--primary)] no-underline;
+    }
+    code {
+      @apply text-[0.85em] px-1 py-0.5 rounded bg-[var(--primary)]/10;
+    }
+  }
+  .feed-actions {
+    @apply flex items-center gap-6 mt-1 ml-14 text-[var(--muted)];
+  }
+  .feed-act {
+    @apply flex items-center gap-1.5 text-xs transition cursor-pointer bg-transparent border-0 p-0
+           text-[var(--muted)] no-underline;
+    &:hover {
+      @apply text-[var(--primary)];
+    }
+    &.act-like.active {
+      @apply text-pink-500;
+    }
+    &.act-repost.active {
+      @apply text-emerald-500;
+    }
+  }
+  .feed-sentinel {
+    @apply h-4;
+  }
+  .feed-toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    z-index: 9999;
+    background: color-mix(in oklab, var(--text) 88%, transparent);
+    color: var(--bg);
+    font-size: 13px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .feed-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .feed-end {
+    @apply text-center text-xs text-[var(--muted)] py-4 hidden;
+    &.show {
+      @apply block;
+    }
+  }
+</style>
+
+<script>
+  function initFeed() {
+    const feed = document.querySelector(".feed");
+    if (!feed) return;
+    const items = Array.from(feed.querySelectorAll<HTMLElement>(".feed-item"));
+    const end = feed.querySelector<HTMLElement>(".feed-end");
+    if (!items.length) return;
+
+    const STEP = 4;
+    let shown = STEP;
+
+    const reveal = () => {
+      items.forEach((el, i) => el.classList.toggle("feed-hidden", i >= shown));
+      end?.classList.toggle("show", shown >= items.length);
+    };
+    reveal();
+
+    if (shown < items.length) {
+      const sentinel = feed.querySelector<HTMLElement>(".feed-sentinel");
+      if (sentinel) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting) {
+                shown = Math.min(items.length, shown + STEP);
+                reveal();
+                if (shown >= items.length) io.disconnect();
+              }
+            });
+          },
+          { rootMargin: "240px" },
+        );
+        io.observe(sentinel);
+      }
+    }
+
+    const toast = document.createElement("div");
+    toast.className = "feed-toast";
+    document.body.appendChild(toast);
+    const showToast = (msg: string) => {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      window.clearTimeout((showToast as any)._t);
+      (showToast as any)._t = window.setTimeout(() => toast.classList.remove("show"), 1600);
+    };
+
+    items.forEach((el) => {
+      const like = el.querySelector<HTMLButtonElement>(".act-like");
+      like?.addEventListener("click", () => {
+        const on = like.classList.toggle("active");
+        const c = like.querySelector(".act-count");
+        if (c) c.textContent = String(Number(c.textContent || "0") + (on ? 1 : -1));
+      });
+      const share = el.querySelector<HTMLButtonElement>(".act-share");
+      share?.addEventListener("click", async () => {
+        const url = location.origin + (share.dataset.url || "");
+        const data = { title: document.title, url };
+        if (navigator.share) {
+          try {
+            await navigator.share(data);
+            return;
+          } catch {
+            /* 用户取消则忽略 */
+          }
+        }
+        try {
+          await navigator.clipboard.writeText(url);
+          showToast("链接已复制，去分享吧 ~");
+        } catch {
+          showToast("分享失败");
+        }
+      });
+    });
+
+    const rail = document.getElementById("tl-rail");
+    if (rail) {
+      const nodes = Array.from(rail.querySelectorAll<HTMLButtonElement>(".tl-node"));
+      nodes.forEach((node) => {
+        node.addEventListener("click", () => {
+          nodes.forEach((n) => n.classList.remove("active"));
+          node.classList.add("active");
+          const period = node.dataset.period || "all";
+          items.forEach((el) => {
+            const show = period === "all" || el.dataset.period === period;
+            el.classList.toggle("feed-hidden", !show);
+          });
+          end?.classList.remove("show");
+        });
+      });
+    }
+  }
+
+  initFeed();
+  window.addEventListener("spa-navigate", () => setTimeout(initFeed, 60));
+</script>

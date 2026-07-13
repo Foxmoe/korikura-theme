@@ -1,9 +1,50 @@
 ---
-// 404 page
-
-import Default from '@/layouts/default.astro';
+import Default from "@/layouts/default.astro";
+import Icon from "@/components/icon.astro";
 ---
-<Default> 
-    <span>404</span>
-    <span>sorry, page not found</span>
+
+<Default title="页面走丢了">
+  <section class="notfound">
+    <div class="nf-code">404</div>
+    <h1 class="nf-title">哎呀，页面走丢了 (´･_･`)</h1>
+    <p class="nf-text">
+      你访问的页面可能已被移动、删除，或者从未存在过。
+    </p>
+    <div class="nf-actions">
+      <a href="/" class="nf-btn primary">
+        <Icon name="home" size={16} /> 返回首页
+      </a>
+      <a href="/posts" class="nf-btn ghost">浏览文章</a>
+    </div>
+  </section>
 </Default>
+
+<style lang="scss">
+  .notfound {
+    @apply min-h-[calc(100vh-var(--nav-h)-12rem)] flex flex-col items-center justify-center text-center px-4;
+  }
+  .nf-code {
+    @apply text-7xl md:text-8xl font-black text-[var(--primary)] opacity-90;
+    text-shadow: 0 0 30px color-mix(in oklab, var(--primary) 40%, transparent);
+  }
+  .nf-title {
+    @apply text-xl md:text-2xl font-bold mt-4 text-[var(--text)];
+  }
+  .nf-text {
+    @apply text-sm text-[var(--muted)] mt-2 max-w-md;
+  }
+  .nf-actions {
+    @apply flex items-center gap-3 mt-8;
+  }
+  .nf-btn {
+    @apply inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-sm font-medium
+           no-underline transition;
+    &.primary {
+      @apply bg-[var(--primary)] text-white hover:opacity-90 hover:shadow-lg;
+    }
+    &.ghost {
+      @apply border border-[var(--border)] text-[var(--text)]
+             hover:border-[var(--primary)] hover:text-[var(--primary)];
+    }
+  }
+</style>

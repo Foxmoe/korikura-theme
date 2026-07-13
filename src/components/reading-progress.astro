@@ -1,0 +1,29 @@
+---
+// 阅读进度条：反映整页滚动进度，文章页高亮
+---
+
+<div id="reading-progress" class="reading-progress"></div>
+
+<style lang="scss">
+  .reading-progress {
+    @apply fixed left-0 right-0 z-[49000] h-[2px] w-0 pointer-events-none;
+    top: calc(var(--nav-h) - 2px);
+    background: color-mix(in oklab, var(--primary) 65%, transparent);
+    transition: width 0.12s linear;
+  }
+</style>
+
+<script>
+  const bar = document.getElementById("reading-progress");
+  function update() {
+    if (!bar) return;
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    const pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    bar.style.width = pct + "%";
+  }
+  window.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("resize", update);
+  window.addEventListener("spa-navigate", () => setTimeout(update, 60));
+  update();
+</script>

@@ -1,0 +1,49 @@
+---
+import { siteConfig } from "@/config";
+
+const env = siteConfig.comments?.twikooEnv || "";
+const src =
+  siteConfig.comments?.twikooSrc ||
+  "https://cdn.jsdelivr.net/npm/twikoo@1.6.41/dist/twikoo.all.min.js";
+---
+
+<section class="twikoo-comments" aria-label="评论">
+  <h2 class="comments-title">评论</h2>
+  <div id="tcomment"></div>
+
+  {
+    env ? (
+      <script is:inline src={src} />
+    ) : (
+      <p class="comments-hint">
+        评论功能需在 <code>src/config.ts</code> 的{" "}
+        <code>comments.twikooEnv</code> 中填入 Twikoo 环境 ID 后启用。
+      </p>
+    )
+  }
+
+  {
+    env && (
+      <script define:vars={{ env }}>
+        (function () {
+          function init() {
+            if (window.twikoo && window.twikoo.init) {
+              const el = document.getElementById("tcomment");
+              // 仅当容器为空时初始化，避免重复挂载
+              if (el && el.childElementCount === 0) {
+                window.twikoo.init({ envId: env, el: "#tcomment" });
+              }
+            }
+          }
+          // Twikoo 脚本可能异步加载，轮询等待其就绪（兼容首屏与 SPA 切换）
+          function wait(tries = 0) {
+            if (window.twikoo && window.twikoo.init) return init();
+            if (tries > 60) return;
+            setTimeout(() => wait(tries + 1), 100);
+          }
+          wait();
+        })();
+      </script>
+    )
+  }
+</section>

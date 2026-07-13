@@ -2,66 +2,85 @@
 interface Props {
   currentPage: number;
   totalPages: number;
-  baseUrl?: string;
+}
+const { currentPage, totalPages } = Astro.props;
+
+function pageUrl(p: number) {
+  return p <= 1 ? "/posts" : `/posts/page/${p}`;
 }
 
-const { currentPage, totalPages, baseUrl = '' } = Astro.props;
-
-function getPageUrl(page: number) {
-  const params = new URLSearchParams();
-  params.set('page', String(page));
-  return `${baseUrl}?${params.toString()}`;
+// 生成带省略号的页码序列
+function pageItems(): (number | "...")[] {
+  if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+  const items: (number | "...")[] = [1];
+  const start = Math.max(2, currentPage - 1);
+  const end = Math.min(totalPages - 1, currentPage + 1);
+  if (start > 2) items.push("...");
+  for (let i = start; i <= end; i++) items.push(i);
+  if (end < totalPages - 1) items.push("...");
+  items.push(totalPages);
+  return items;
 }
 ---
 
-{totalPages > 1 && (
-  <nav class="pagination">
-    {currentPage > 1 && (
-      <a href={getPageUrl(currentPage - 1)} class="page-btn">
-        ← 上一页
-      </a>
-    )}
-
-    <div class="page-numbers">
-      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-        <a
-          href={getPageUrl(page)}
-          class={`page-number ${page === currentPage ? 'active' : ''}`}
-          aria-current={page === currentPage ? 'page' : undefined}
-        >
-          {page}
+{
+  totalPages > 1 && (
+    <nav class="pagination" aria-label="分页">
+      {currentPage > 1 && (
+        <a href={pageUrl(currentPage - 1)} class="page-btn">
+          ← 上一页
         </a>
-      ))}
-    </div>
+      )}
 
-    {currentPage < totalPages && (
-      <a href={getPageUrl(currentPage + 1)} class="page-btn">
-        下一页 →
-      </a>
-    )}
-  </nav>
-)}
+      <div class="page-numbers">
+        {pageItems().map((item) =>
+          item === "..." ? (
+            <span class="page-ellipsis">…</span>
+          ) : (
+            <a
+              href={pageUrl(item)}
+              class={`page-number ${item === currentPage ? "active" : ""}`}
+              aria-current={item === currentPage ? "page" : undefined}
+            >
+              {item}
+            </a>
+          )
+        )}
+      </div>
+
+      {currentPage < totalPages && (
+        <a href={pageUrl(currentPage + 1)} class="page-btn">
+          下一页 →
+        </a>
+      )}
+    </nav>
+  )
+}
 
 <style lang="scss">
   .pagination {
-    @apply flex flex-wrap justify-center items-center gap-3 mt-12 pt-8 border-t border-gray-100;
+    @apply flex flex-wrap justify-center items-center gap-3 mt-12 pt-8 border-t border-[var(--border)];
   }
-
   .page-btn {
-    @apply px-4 py-2 rounded-lg text-sm font-medium text-gray-600 
-           bg-gray-50 hover:bg-gray-100 transition-colors no-underline;
+    @apply px-4 py-2 rounded-lg text-sm font-medium
+           text-[var(--text)] border border-[var(--border)]
+           bg-[var(--card-bg)]/60 transition hover:border-[var(--primary)] hover:text-[var(--primary)];
   }
-
   .page-numbers {
-    @apply flex items-center gap-2;
+    @apply flex items-center gap-1.5;
   }
-
   .page-number {
-    @apply w-10 h-10 flex items-center justify-center rounded-lg text-sm 
-           font-medium text-gray-600 hover:bg-gray-100 transition-colors no-underline;
-    
-    &.active {
-      @apply bg-gray-900 text-white hover:bg-gray-800;
+    @apply w-9 h-9 flex items-center justify-center rounded-lg text-sm
+           font-medium text-[var(--muted)] no-underline
+           border border-transparent transition;
+    &:hover {
+      @apply bg-[var(--primary)]/10 text-[var(--primary)];
     }
+    &.active {
+      @apply bg-[var(--primary)] text-white border-[var(--primary)];
+    }
+  }
+  .page-ellipsis {
+    @apply px-1 text-[var(--muted)];
   }
 </style>

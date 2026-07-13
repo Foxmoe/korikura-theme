@@ -1,0 +1,43 @@
+---
+import Default from "@/layouts/default.astro";
+import SearchModal from "@/components/search-modal.astro";
+import Icon from "@/components/icon.astro";
+---
+
+<Default title="搜索">
+  <section class="search-page">
+    <h1 class="sp-title">
+      <Icon name="search" size={22} /> 搜索文章
+    </h1>
+    <p class="sp-sub">输入关键词，检索全站文章标题、标签与正文</p>
+    <button class="sp-open" id="sp-open">
+      <Icon name="search" size={16} /> 点击打开搜索
+    </button>
+  </section>
+
+  <SearchModal />
+</Default>
+
+<style lang="scss">
+  .search-page {
+    @apply max-w-2xl mx-auto px-1 py-16 text-center;
+  }
+  .sp-title {
+    @apply text-3xl font-bold flex items-center justify-center gap-2 text-[var(--text)];
+  }
+  .sp-sub {
+    @apply text-sm text-[var(--muted)] mt-2 mb-6;
+  }
+  .sp-open {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-full
+           border border-[var(--border)] text-[var(--text)] bg-[var(--card-bg)]/60
+           transition hover:border-[var(--primary)] hover:text-[var(--primary)];
+  }
+</style>
+
+<script>
+  const open = () => document.dispatchEvent(new CustomEvent("open-search"));
+  document.getElementById("sp-open")?.addEventListener("click", open);
+  // 直接进入 /search 时自动弹出搜索框
+  open();
+</script>

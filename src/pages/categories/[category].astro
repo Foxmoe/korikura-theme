@@ -1,0 +1,68 @@
+---
+import Default from "@/layouts/default.astro";
+import Sidebar from "@/components/sidebar.astro";
+import PostCard from "@/components/post-card.astro";
+import Icon from "@/components/icon.astro";
+import { getPublishedPosts } from "@/utils/posts";
+import type { GetStaticPaths } from "astro";
+
+export const getStaticPaths = (async () => {
+  const posts = await getPublishedPosts();
+  const map = new Map<string, typeof posts>();
+  for (const post of posts) {
+    for (const cat of post.data.categories) {
+      if (!map.has(cat)) map.set(cat, []);
+      map.get(cat)!.push(post);
+    }
+  }
+  return [...map.entries()].map(([cat, list]) => ({
+    params: { category: cat },
+    props: { category: cat, posts: list },
+  }));
+}) satisfies GetStaticPaths;
+
+const { category, posts } = Astro.props;
+---
+
+<Default title={`分类：${category}`}>
+  <section class="taxonomy">
+    <nav class="crumb">
+      <a href="/categories">分类</a>
+      <Icon name="chevron" size={14} />
+      <span>{category}</span>
+    </nav>
+    <h1 class="tax-title">
+      <Icon name="folder" size={20} /> {category}
+    </h1>
+    <p class="tax-sub">共 {posts.length} 篇文章</p>
+
+    <div class="post-grid">
+      {posts.map((post) => <PostCard post={post} />)}
+    </div>
+  </section>
+
+  <div slot="sidebar">
+    <Sidebar />
+  </div>
+</Default>
+
+<style lang="scss">
+  .taxonomy {
+    @apply max-w-5xl mx-auto px-1 py-4;
+  }
+  .crumb {
+    @apply flex items-center gap-1 text-xs text-[var(--muted)] mb-3;
+    a {
+      @apply no-underline hover:text-[var(--primary)];
+    }
+  }
+  .tax-title {
+    @apply text-3xl font-bold flex items-center gap-2 text-[var(--text)];
+  }
+  .tax-sub {
+    @apply text-sm text-[var(--muted)] mt-1 mb-6;
+  }
+  .post-grid {
+    @apply grid gap-6 sm:grid-cols-2 lg:grid-cols-3;
+  }
+</style>

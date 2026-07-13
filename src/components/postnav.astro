@@ -23,8 +23,6 @@ const prev = idx > 0 ? posts[idx - 1] : undefined;
   (next || prev) && (
     <nav
       class="post-nav"
-      transition:name="post-navigation"
-      transition:animate="fade"
     >
       {prev && (
         <a href={`/posts/${prev.id}`} class="post-prev">
@@ -43,21 +41,17 @@ const prev = idx > 0 ? posts[idx - 1] : undefined;
 <style lang="scss">
   .post-nav {
     @apply flex flex-col sm:flex-row justify-between gap-4 mt-12 pt-8 
-           border-t border-gray-100 dark:border-gray-800;
+           border-t border-gray-100 dark:border-gray-800 max-w-3xl mx-auto;
   }
 
   .post-prev,
   .post-next {
-    @apply relative flex-1 flex items-center gap-3 px-5 py-4 rounded-2xl
-           bg-white dark:bg-gray-800/50 backdrop-blur
-           border border-gray-100 dark:border-gray-700/50
-           text-sm font-medium text-gray-600 dark:text-gray-300
-           transition-all duration-300 ease-out
-           hover:bg-white dark:hover:bg-gray-800
-           hover:border-gray-200 dark:hover:border-gray-600
-           hover:shadow-lg hover:shadow-gray-200/50 dark:hover:shadow-gray-900/50
-           hover:-translate-y-0.5
-           hover:text-gray-900 dark:hover:text-white;
+    @apply relative flex-1 flex items-center gap-3 px-5 py-4 rounded-lg
+           bg-[var(--card-bg)] border border-[var(--border)]
+           text-sm font-medium text-[var(--muted)]
+           transition-all duration-300 ease-out active:scale-[0.99]
+           hover:border-[var(--primary)] hover:text-[var(--primary)]
+           hover:-translate-y-0.5 hover:shadow-lg;
   }
 
   .post-prev {
@@ -70,8 +64,7 @@ const prev = idx > 0 ? posts[idx - 1] : undefined;
 
   .post-prev::before {
     content: "←";
-    @apply text-lg text-purple-400 dark:text-purple-300 
-           transition-transform duration-300 ease-out;
+    @apply text-lg text-[var(--primary)] transition-transform duration-300 ease-out;
   }
 
   .post-prev:hover::before {
@@ -80,8 +73,7 @@ const prev = idx > 0 ? posts[idx - 1] : undefined;
 
   .post-next::after {
     content: "→";
-    @apply text-lg text-purple-400 dark:text-purple-300 
-           transition-transform duration-300 ease-out;
+    @apply text-lg text-[var(--primary)] transition-transform duration-300 ease-out;
   }
 
   .post-next:hover::after {

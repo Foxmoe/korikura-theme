@@ -1,0 +1,221 @@
+---
+import {
+  getCollection,
+  type CollectionEntry,
+  render,
+} from "astro:content";
+
+import Default from "@/layouts/default.astro";
+import PostNav from "@/components/postnav.astro";
+import Sidebar from "@/components/sidebar.astro";
+import PostMeta from "@/components/post-meta.astro";
+import Outdated from "@/components/outdated.astro";
+import License from "@/components/license.astro";
+import Comments from "@/components/comments.astro";
+import Recommended from "@/components/recommended.astro";
+import Icon from "@/components/icon.astro";
+import { formatDateToISO } from "@/utils/utils";
+import { siteConfig } from "@/config";
+
+type Post = CollectionEntry<"posts">;
+
+export async function getStaticPaths() {
+  const posts = await getCollection("posts");
+  return posts.map((post: Post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props as { post: Post };
+const { Content, headings } = await render(post);
+const data = post.data;
+const cover = data.cover || siteConfig.defaultCover;
+---
+
+<Default
+  title={data.title}
+  postTitle={data.title}
+  description={data.description}
+  keywords={data.tags.join(",")}
+  ogType="article"
+  ogImage={data.cover || siteConfig.defaultCover}
+  publishedTime={formatDateToISO(data.pubDate)}
+  modifiedTime={data.updatedDate ? formatDateToISO(data.updatedDate) : undefined}
+  tags={data.tags}
+  author={data.author || siteConfig.title}
+>
+  <div slot="hero" class="article-hero">
+    <img
+      class="article-hero-img"
+      src={cover}
+      alt={data.coverAlt || data.title}
+      onerror="this.style.display='none'"
+    />
+    <div class="article-hero-mask"></div>
+    <div class="article-hero-inner">
+      <nav class="breadcrumb">
+        <a href="/">首页</a>
+        <Icon name="chevron-right" size={14} />
+        <a href="/posts">文章</a>
+      </nav>
+      <h1 class="title">{data.title}</h1>
+      <div class="hero-meta-row">
+        <PostMeta
+          pubDate={data.pubDate}
+          updatedDate={data.updatedDate}
+          author={data.author}
+          content={post.body}
+        />
+        {
+          (data.categories.length > 0 || data.tags.length > 0) && (
+            <div class="tags">
+              {data.categories.map((cat) => (
+                <a class="tag cat" href={`/categories/${encodeURIComponent(cat)}`}>
+                  <Icon name="folder" size={12} />
+                  {cat}
+                </a>
+              ))}
+              {data.tags.map((tag) => (
+                <a class="tag" href={`/tags/${encodeURIComponent(tag)}`}>
+                  <Icon name="hash" size={12} />
+                  {tag}
+                </a>
+              ))}
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </div>
+
+  <article class="article">
+    <Outdated pubDate={data.pubDate} updatedDate={data.updatedDate} />
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    {
+      (data.categories.length > 0 || data.tags.length > 0) && (
+        <div class="article-tags">
+          {data.categories.map((cat) => (
+            <a class="tag cat" href={`/categories/${encodeURIComponent(cat)}`}>
+              <Icon name="folder" size={12} />
+              {cat}
+            </a>
+          ))}
+          {data.tags.map((tag) => (
+            <a class="tag" href={`/tags/${encodeURIComponent(tag)}`}>
+              <Icon name="hash" size={12} />
+              {tag}
+            </a>
+          ))}
+        </div>
+      )
+    }
+
+    <License
+      name={data.license}
+      url={data.licenseUrl}
+      author={data.author}
+    />
+  </article>
+
+  <PostNav current={post} />
+
+  <Recommended current={post.id} />
+
+  <Comments />
+
+  <div slot="sidebar">
+    <Sidebar headings={headings} />
+  </div>
+</Default>
+
+<style lang="scss">
+  .article {
+    @apply max-w-3xl mx-auto;
+  }
+  
+  .article-hero {
+    @apply relative w-full overflow-hidden flex items-end;
+    aspect-ratio: 21 / 8;
+    margin-top: calc(-1 * (var(--nav-h) + 8px));
+  }
+  .article-hero-img {
+    @apply absolute inset-0 w-full h-full object-cover;
+  }
+  .article-hero-mask {
+    @apply absolute inset-0;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.72) 0%,
+      rgba(0, 0, 0, 0.2) 45%,
+      rgba(0, 0, 0, 0.28) 100%
+    );
+  }
+  
+  .article-hero-inner {
+    @apply relative z-10 px-6 py-8 text-white;
+    width: var(--container);
+    margin: 0 auto;
+  }
+  .breadcrumb {
+    @apply flex items-center gap-1 text-xs text-white/75 mb-3;
+    a {
+      @apply no-underline hover:text-white;
+    }
+  }
+  .title {
+    @apply text-4xl md:text-5xl font-bold tracking-tight leading-tight text-white
+           drop-shadow-[0_2px_12px_rgba(0,0,0,0.45)];
+  }
+  .tags {
+    @apply mt-4 flex flex-wrap gap-2;
+  }
+  
+  .hero-meta-row {
+    @apply flex flex-wrap items-center justify-between gap-x-4 gap-y-2 mt-3;
+  }
+  .hero-meta-row .tags {
+    @apply mt-0;
+  }
+  
+  .article-tags {
+    @apply flex flex-wrap gap-2 mt-8;
+  }
+  .article-tags .tag {
+    @apply inline-flex items-center gap-0.5 text-xs px-2.5 py-1 rounded-full
+           bg-[var(--primary)]/10 text-[var(--primary)] no-underline transition;
+    &:hover {
+      @apply bg-[var(--primary)]/20;
+    }
+  }
+  .article-tags .tag.cat {
+    @apply bg-[var(--primary)]/70 font-medium text-white;
+    &:hover {
+      @apply bg-[var(--primary)];
+    }
+  }
+  .tag {
+    @apply inline-flex items-center gap-0.5 text-xs px-2.5 py-1 rounded-full
+           bg-white/15 text-white no-underline backdrop-blur-sm transition;
+    &:hover {
+      @apply bg-white/25;
+    }
+  }
+  .tag.cat {
+    @apply bg-[var(--primary)]/70 font-medium;
+    &:hover {
+      @apply bg-[var(--primary)];
+    }
+  }
+  
+  .article-hero-inner :global(.post-meta) {
+    @apply text-white/80;
+  }
+  .article-hero-inner :global(.meta-sub) {
+    @apply text-white/60;
+  }
+</style>

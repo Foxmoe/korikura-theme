@@ -1,203 +1,274 @@
 ---
 import Default from "@/layouts/default.astro";
 import Sidebar from "@/components/sidebar.astro";
-import { getCollection } from "astro:content";
+import PostCard from "@/components/post-card.astro";
+import HomeCarousel from "@/components/home-carousel.astro";
+import Icon from "@/components/icon.astro";
+import { getPublishedPosts, getCategoryCounts, getDynamics } from "@/utils/posts";
+import { profileConfig } from "@/config";
+import { formatRelativeTime } from "@/utils/utils";
 
-const posts = await getCollection("posts");
-const latestPosts = posts
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 8);
+const posts = await getPublishedPosts();
+const latestPosts = posts.slice(0, 8);
+const cats = (await getCategoryCounts()).map((c) => c.name);
+
+const dynamics = (await getDynamics()).slice(0, 4);
+
+// 动态摘要：去掉 markdown 标记（图片 / 链接 / 符号），避免首页直接显示 md 源码
+function toPlainText(md: string): string {
+  return (md || "")
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/[#>*_`~]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 48);
+}
 ---
 
 <Default title="首页">
-  <section class="hero-section">
+  <div slot="hero" class="hero-banner">
+    <img
+      class="hero-banner-img"
+      src="/images/wallhaven-qr3j1r.jpg"
+      alt=""
+      onerror="this.style.display='none'"
+    />
+    <div class="hero-overlay">
+      <div class="hero-text">
+        <h1 class="hero-title">{profileConfig.name} 的日记</h1>
+        <p class="hero-sub">记录生活点滴，分享技术心得 ~(￣▽￣)~</p>
+      </div>
+    </div>
+  </div>
 
-    <div class="hero-content">
-      <div class="hero-emoji">=w=</div>
-      <h1 class="hero-title">
-        <span class="text-primary">Baka小狐</span>
-        <span class=""> の 日记</span>
-      </h1>
-      <p class="hero-subtitle">才不是笨蛋呢！</p>
-      <p class="hero-desc">记录日常与奇思妙想</p>
+  <!-- 顶部：左轮播卡片 + 右最新动态 -->
+  <section class="posts-section home-top">
+    <div class="home-top-grid">
+      <HomeCarousel />
+
+      <div class="home-dyn">
+        <div class="section-header">
+          <h2 class="section-title">最新动态</h2>
+          <a href="/dynamics" class="section-more">
+            更多
+            <Icon name="arrow-right" size={14} />
+          </a>
+        </div>
+        <ul class="mini-feed">
+          {
+            dynamics.map((d) => (
+              <li>
+                <a href={`/dynamics/${d.id}`} class="mini-item">
+                  <img
+                    src={profileConfig.avatar}
+                    alt=""
+                    class="mini-avatar"
+                    onerror="this.src='/favicon.svg'"
+                  />
+                  <div class="mini-body">
+                    <div class="mini-head">
+                      <span class="mini-name">{profileConfig.name}</span>
+                      <span class="mini-time">· {formatRelativeTime(d.data.date)}</span>
+                    </div>
+                    <p class="mini-text">{d.data.title || toPlainText(d.body)}</p>
+                  </div>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
     </div>
   </section>
 
   <section class="posts-section">
-    <div class="section-header">
-      <div class="divider-line"></div>
-      <h2 class="section-title">最近更新</h2>
-      <div class="divider-line"></div>
+    <div class="section-header cat-header">
+      <div class="cat-filter" id="cat-filter">
+        <button type="button" class="filter-chip active" data-cat="">全部文章</button>
+        {
+          cats.map((c) => (
+            <button type="button" class="filter-chip" data-cat={c}>
+              #{c}
+            </button>
+          ))
+        }
+      </div>
+      <a href="/posts" class="section-more">
+        查看全部
+        <Icon name="arrow-right" size={14} />
+      </a>
     </div>
 
     {
       latestPosts.length === 0 ? (
         <div class="empty-state">
           <div class="empty-icon">📭</div>
-          <p class="empty-text">还没有文章，小狐正在努力写...</p>
+          <p class="empty-text">还没有文章，正在努力写...</p>
         </div>
       ) : (
-        <div class="post-grid">
+        <div class="post-grid" id="post-grid">
           {latestPosts.map((post) => (
-            <a href={`/posts/${post.id}`} class="post-card">
-              <div class="card-image">
-                <span class="card-image-icon">📄</span>
-              </div>
-              <div class="card-content">
-                {post.data.tags && post.data.tags.length > 0 && (
-                  <div class="tag-group">
-                    {post.data.tags.slice(0, 2).map((tag: string) => (
-                      <span class="tag">{tag}</span>
-                    ))}
-                  </div>
-                )}
-
-                <h3 class="post-title">{post.data.title}</h3>
-                <p class="post-description">
-                  {post.data.description || post.body?.substring(0, 80) + "..."}
-                </p>
-
-                <div class="post-meta">
-                  <span>{post.data.pubDate.toLocaleDateString("zh-CN")}</span>
-                  <span class="meta-dot">·</span>
-                  <span>{post.data.author || "小狐"}</span>
-                </div>
-              </div>
-            </a>
+            <PostCard post={post} />
           ))}
         </div>
       )
     }
-
-    {
-      latestPosts.length > 0 && (
-        <div class="view-all-wrapper">
-          <a href="/posts" class="view-all-btn">
-            查看所有文章
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </a>
-        </div>
-      )
-    }
   </section>
-  
+
   <div slot="sidebar">
     <Sidebar />
   </div>
 </Default>
 
 <style lang="scss">
+  .hero-banner {
+    @apply relative w-full overflow-hidden;
+    aspect-ratio: 21 / 7;
+    margin-top: calc(-1 * (var(--nav-h) + 8px));
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-banner-img {
+    @apply w-full h-full object-cover;
+  }
+  .hero-overlay {
+    @apply absolute inset-0 flex items-end;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.55) 0%,
+      rgba(0, 0, 0, 0.12) 50%,
+      rgba(0, 0, 0, 0.28) 100%
+    );
+  }
+  .hero-text {
+    @apply px-6 py-8 text-white;
+    width: var(--container);
+    margin: 0 auto;
+  }
+  .hero-title {
+    @apply text-3xl md:text-4xl font-bold drop-shadow-[0_2px_12px_rgba(0,0,0,0.45)];
+  }
+  .hero-sub {
+    @apply text-sm md:text-base mt-2 text-white/85 drop-shadow;
+  }
+
+  .posts-section {
+    @apply container mx-auto px-4 pb-12 pt-8;
+  }
+  .section-header {
+    @apply flex items-center justify-between mb-5;
+  }
+  .section-title {
+    @apply text-xl font-bold text-[var(--text)] relative pl-3;
+    &::before {
+      content: "";
+      @apply absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-full bg-[var(--primary)];
+    }
+  }
+  .section-more {
+    @apply inline-flex items-center gap-1 text-sm text-[var(--muted)]
+           no-underline transition hover:text-[var(--primary)];
+  }
+  .empty-state {
+    @apply text-center py-16;
+  }
+  .empty-icon {
+    @apply text-5xl mb-4;
+  }
+  .empty-text {
+    @apply text-lg text-[var(--muted)];
+  }
+
   
-  @layer components {
-    .hero-section {
-      @apply relative overflow-hidden py-16 md:py-24;
+  .home-top-grid {
+    @apply grid gap-6 lg:grid-cols-2 items-stretch;
+  }
+  
+  .home-top {
+    @apply pt-3 pb-2;
+  }
+  .home-top + .posts-section {
+    @apply pt-2;
+  }
+  .home-dyn {
+    @apply rounded-xl border border-[var(--border)] bg-[var(--card-bg)]/50 p-4;
+  }
+  .home-dyn .section-header {
+    @apply mb-3;
+  }
+
+  
+  .cat-header {
+    @apply flex-wrap gap-3;
+  }
+  .cat-filter {
+    @apply flex flex-wrap gap-2;
+  }
+  .filter-chip {
+    @apply px-3 py-1.5 rounded-full text-xs font-medium no-underline cursor-pointer
+           border border-[var(--border)] bg-[var(--card-bg)]/60
+           text-[var(--muted)] transition;
+    &:hover {
+      @apply text-[var(--primary)] border-[var(--primary)];
     }
-    .btn-primary {
-      @apply text-white px-4 py-2 rounded-lg;
-    }
-    .bg-circle-top {
-      @apply absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-20 blur-3xl;
-    }
-    .bg-circle-bottom {
-      @apply absolute -bottom-16 -left-16 w-72 h-72 rounded-full opacity-20 blur-3xl;
-    }
-    .hero-content {
-      @apply container mx-auto px-4 text-center relative z-10;
-    }
-    .hero-emoji {
-      @apply text-6xl md:text-8xl mb-6 inline-block;
-      animation: bounce-slow 3s ease-in-out infinite;
-    }
-    .hero-title {
-      @apply text-4xl md:text-6xl font-extrabold mb-4;
-    }
-    .hero-subtitle {
-      @apply text-xl md:text-2xl mb-2;
-    }
-    .hero-desc {
-      @apply text-sm mt-6 animate-pulse;
-    }
-    .posts-section {
-      @apply container mx-auto px-4 pb-20;
-    }
-    .section-header {
-      @apply flex items-center gap-3 mb-8;
-    }
-    .divider-line {
-      @apply h-px flex-1;
-    }
-    .section-title {
-      @apply text-2xl font-bold whitespace-nowrap;
-    }
-    .empty-state {
-      @apply text-center py-16;
-    }
-    .empty-icon {
-      @apply text-5xl mb-4;
-    }
-    .empty-text {
-      @apply text-lg;
-    }
-    .post-grid {
-      @apply grid gap-6 md:grid-cols-2 lg:grid-cols-3;
-    }
-    .post-card {
-      @apply block rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1;
-    }
-    .card-image {
-      @apply h-48 flex items-center justify-center;
-    }
-    .card-image-icon {
-      @apply text-5xl opacity-30;
-    }
-    .card-content {
-      @apply p-5;
-    }
-    .tag-group {
-      @apply flex flex-wrap gap-2 mb-3;
-    }
-    .tag {
-      @apply text-xs px-2 py-1 rounded-full border;
-    }
-    .post-title {
-      @apply text-lg font-semibold mb-2 transition-colors line-clamp-2;
-    }
-    .post-description {
-      @apply text-sm mb-4 line-clamp-2;
-    }
-    .post-meta {
-      @apply flex items-center text-xs;
-    }
-    .meta-dot {
-      @apply mx-2;
-    }
-    .view-all-wrapper {
-      @apply text-center mt-12;
-    }
-    .view-all-btn {
-      @apply inline-flex items-center gap-2 px-6 py-3 text-white rounded-full font-medium hover:shadow-lg hover:opacity-90 transition-all;
+    &.active {
+      @apply bg-[var(--primary)] text-white border-[var(--primary)];
     }
   }
 
-  @keyframes bounce-slow {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
+  
+  .post-grid {
+    @apply grid gap-5 sm:grid-cols-2 items-stretch;
+  }
+
+  
+  .mini-feed {
+    @apply list-none p-0 m-0 flex flex-col gap-2;
+  }
+  .mini-item {
+    @apply flex gap-3 p-3 rounded-lg bg-transparent transition no-underline
+           hover:bg-[var(--primary)]/6;
+  }
+  .mini-avatar {
+    @apply w-9 h-9 rounded-full object-cover shrink-0 border border-[var(--border)];
+  }
+  .mini-body {
+    @apply min-w-0 flex-1;
+  }
+  .mini-head {
+    @apply flex items-center gap-1.5 text-sm;
+  }
+  .mini-name {
+    @apply font-semibold text-[var(--text)];
+  }
+  .mini-time {
+    @apply text-xs text-[var(--muted)];
+  }
+  .mini-text {
+    @apply text-sm text-[var(--text)] mt-0.5 line-clamp-2 m-0;
   }
 </style>
+
+<script>
+  function initCatFilter() {
+    const filter = document.getElementById("cat-filter");
+    const grid = document.getElementById("post-grid");
+    if (!filter || !grid) return;
+    const chips = Array.from(filter.querySelectorAll<HTMLButtonElement>(".filter-chip"));
+    const cards = Array.from(grid.querySelectorAll<HTMLElement>(".post-card"));
+    chips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        chips.forEach((c) => c.classList.remove("active"));
+        chip.classList.add("active");
+        const cat = chip.dataset.cat || "";
+        cards.forEach((card) => {
+          const cats = (card.dataset.category || "").split(",").filter(Boolean);
+          const show = !cat || cats.includes(cat);
+          card.style.display = show ? "" : "none";
+        });
+      });
+    });
+  }
+  initCatFilter();
+  window.addEventListener("spa-navigate", () => setTimeout(initCatFilter, 60));
+</script>

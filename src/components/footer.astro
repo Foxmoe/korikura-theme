@@ -1,54 +1,173 @@
 ---
-// components/footer.astro
-import { siteConfig } from "@/config";
+import { siteConfig, profileConfig } from "@/config";
+import { getPostCount, getTotalWords } from "@/utils/posts";
+import Icon from "./icon.astro";
 
-const footerLinks = [
-  { href: "/rss.xml", label: "RSS 订阅" },
-  { href: "/sitemap.xml", label: "站点地图" },
-];
+const year = new Date().getFullYear();
+const sinceRaw = siteConfig.footer.since;
+const startYear =
+  typeof sinceRaw === "number" ? sinceRaw : new Date(sinceRaw).getFullYear();
+const copyrightRange = startYear === year ? `${year}` : `${startYear}–${year}`;
+const postCount = await getPostCount();
+const totalWords = await getTotalWords();
 ---
 
-<footer>
+<footer class="site-footer">
   <div class="footer-container">
-    <p class="copyright">
-      © {new Date().getFullYear()}
-      {siteConfig.title} · 用
-      <span class="text-primary">❤️</span>和 Astro 构建
-    </p>
+    <div class="footer-main">
+      <div class="footer-left">
+        <p class="copyright">
+          © {copyrightRange}
+          <a href="/" class="footer-title">{siteConfig.title}</a>
+          <span class="footer-by">
+            <a
+              href="https://github.com/foxmoe"
+              class="text-primary"
+              target="_blank"
+              rel="noopener">KoriKura</a
+            > 主题 · 由 <span class="text-primary">Astro</span> 强力驱动
+          </span>
+        </p>
+        {
+          (siteConfig.footer.icp || siteConfig.footer.beian) && (
+            <p class="beian">
+              {siteConfig.footer.icp && <span>{siteConfig.footer.icp}</span>}
+              {siteConfig.footer.beian && (
+                <a
+                  href="https://beian.mps.gov.cn/"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  {siteConfig.footer.beian}
+                </a>
+              )}
+            </p>
+          )
+        }
+        <p class="footer-tip">
+          本站已运行 <span id="site-runtime" class="runtime">—</span>
+          文章总数：{postCount}篇 · 总字数：{totalWords}字
+        </p>
+        <p class="footer-tip">
+          <a href="https://icp.gov.moe/?keyword=20261985" target="_blank"
+            >萌ICP备20261985号</a
+          >
+          <span class="footer-sep">·</span>
+          <a
+            href={`https://www.busuanzi.cc/count.php?search=${siteConfig.url}`}
+            title="不蒜子统计"
+            target="_blank"
+          >
+            <img
+              style="width:85px;height:25px;"
+              src="https://www.busuanzi.cc/static/images/bsz-tongji.png"
+            />
+          </a>
+          
+        </p>
+      </div>
 
-    <div class="footer-links">
-      {footerLinks.map((link) => <a href={link.href}>{link.label}</a>)}
-      <a
-        href="https://github.com/Foxmoe"
-        target="_blank"
-        rel="noopener noreferrer"
-        title="GitHub"
-      >
-        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-          <path
-            d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.73.083-.73 1.205.085 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.418-1.305.762-1.604-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z"
-          ></path>
-        </svg>
-      </a>
+      <div class="footer-right">
+        <div class="footer-links">
+          <a href="/rss.xml" title="RSS 订阅" aria-label="RSS">
+            <Icon name="rss" size={18} />
+          </a>
+          <a href="/sitemap.xml" title="站点地图" aria-label="站点地图">
+            <Icon name="hash" size={18} />
+          </a>
+          {
+            profileConfig.social.map((s) => (
+              <a
+                href={s.url}
+                title={s.name}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={s.name}
+              >
+                <Icon name={s.icon} size={18} />
+              </a>
+            ))
+          }
+        </div>
+        <nav class="footer-nav">
+          {siteConfig.navLinks.map((l) => <a href={l.href}>{l.label}</a>)}
+        </nav>
+      </div>
     </div>
   </div>
 </footer>
 
 <style lang="scss">
-  
-  footer {
-    @apply w-full border-t mt-auto;
+  .site-footer {
+    @apply mt-auto w-full border-t border-[var(--border)];
+    background-color: color-mix(in oklab, var(--card-bg) 88%, transparent);
   }
   .footer-container {
-    @apply max-w-6xl mx-auto px-4 py-8 flex flex-col sm:flex-row items-center justify-between gap-4;
+    @apply max-w-6xl mx-auto px-4 py-8 flex flex-col gap-4;
   }
-  .footer-links {
-    @apply flex items-center gap-6;
-  }
-  .footer-links a {
-    @apply transition-colors duration-200 hover:text-[#ff6ff0];
+  .footer-main {
+    @apply flex flex-col sm:flex-row items-center justify-between gap-6;
   }
   .copyright {
-    @apply text-sm;
+    @apply text-sm text-[var(--muted)] m-0;
+  }
+  .footer-title {
+    @apply font-semibold text-[var(--text)] no-underline mx-1;
+  }
+  .footer-by {
+    @apply ml-1;
+  }
+  .text-primary {
+    color: var(--primary);
+  }
+  .beian {
+    @apply flex flex-wrap gap-3 text-xs text-[var(--muted)] mt-1;
+    a {
+      @apply no-underline hover:text-[var(--primary)];
+    }
+  }
+  .footer-right {
+    @apply flex flex-col items-center sm:items-end gap-3;
+  }
+  .footer-links {
+    @apply flex items-center gap-3 text-[var(--muted)];
+    a {
+      @apply transition hover:text-[var(--primary)] hover:-translate-y-0.5;
+    }
+  }
+  .footer-nav {
+    @apply flex flex-wrap items-center gap-x-4 gap-y-1 justify-center sm:justify-end;
+    a {
+      @apply text-xs text-[var(--muted)] no-underline hover:text-[var(--primary)] transition;
+    }
+  }
+  .footer-tip {
+    @apply text-left text-xs text-[var(--muted)] mt-2 flex flex-wrap items-center gap-x-1.5;
+  }
+  .footer-sep {
+    @apply opacity-50;
+  }
+  .runtime {
+    @apply text-[var(--primary)] font-medium;
   }
 </style>
+
+<script define:vars={{ sinceValue: sinceRaw }}>
+  const el = document.getElementById("site-runtime");
+  if (el) {
+    const start =
+      typeof sinceValue === "number"
+        ? new Date(sinceValue, 0, 1).getTime()
+        : new Date(sinceValue).getTime();
+    const tick = () => {
+      const s = Math.max(0, Math.floor((Date.now() - start) / 1000));
+      const days = Math.floor(s / 86400);
+      const hours = Math.floor((s % 86400) / 3600);
+      const mins = Math.floor((s % 3600) / 60);
+      const secs = s % 60;
+      el.textContent = `${days}天${hours}小时${mins}分钟${secs}秒`;
+    };
+    tick();
+    setInterval(tick, 1000);
+  }
+</script>

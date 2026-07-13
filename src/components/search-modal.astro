@@ -1,0 +1,228 @@
+---
+import Icon from "./icon.astro";
+---
+
+<div id="search-modal" class="search-modal" aria-hidden="true">
+  <div class="search-backdrop" data-close></div>
+  <div class="search-panel" role="dialog" aria-modal="true" aria-label="搜索">
+    <div class="search-input-wrap">
+      <Icon name="search" size={18} class="search-input-icon" />
+      <input
+        id="search-input"
+        class="search-input"
+        type="text"
+        placeholder="搜索文章标题、标签或正文…"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <button id="search-close" class="search-close" type="button" title="关闭" aria-label="关闭">
+        <Icon name="close" size={18} />
+      </button>
+    </div>
+    <div id="search-results" class="search-results"></div>
+    <div id="search-empty" class="search-empty">输入关键词开始搜索</div>
+  </div>
+</div>
+
+<style lang="scss" is:global>
+  .search-modal {
+    @apply fixed inset-0 z-[100000] invisible opacity-0
+           pointer-events-none transition-opacity duration-200;
+    &.open {
+      @apply visible opacity-100 pointer-events-auto;
+    }
+  }
+  .search-backdrop {
+    @apply absolute inset-0 bg-black/50 opacity-0 transition-opacity duration-200;
+  }
+  .search-modal.open .search-backdrop {
+    @apply opacity-100;
+  }
+  .search-panel {
+    @apply absolute left-1/2 top-[12%] -translate-x-1/2 w-[min(640px,92vw)]
+           max-h-[76vh] flex flex-col rounded-lg overflow-hidden
+           border border-[var(--border)] bg-[var(--card-bg)] shadow-2xl
+           scale-95 translate-y-2 opacity-0 transition-all duration-200;
+  }
+  .search-modal.open .search-panel {
+    @apply scale-100 translate-y-0 opacity-100;
+  }
+  .search-input-wrap {
+    @apply flex items-center gap-2 px-4 py-3 border-b border-[var(--border)];
+  }
+  .search-input-icon {
+    @apply text-[var(--muted)] shrink-0;
+  }
+  .search-input {
+    @apply flex-1 bg-transparent outline-none text-[var(--text)] text-sm min-w-0;
+    &::placeholder {
+      @apply text-[var(--muted)];
+    }
+  }
+  .search-close {
+    @apply flex items-center justify-center w-8 h-8 rounded-md shrink-0
+           text-[var(--muted)] transition
+           hover:text-[var(--primary)] hover:bg-[var(--primary)]/10
+           active:scale-95;
+  }
+  .search-results {
+    @apply overflow-y-auto p-2 space-y-1.5;
+  }
+  .search-empty {
+    @apply p-8 text-center text-sm text-[var(--muted)];
+  }
+  .result-item {
+    @apply flex flex-col gap-0.5 px-3.5 py-2.5 rounded-md no-underline
+           border border-transparent transition active:scale-[0.99];
+    &:hover {
+      @apply border-[var(--border)] bg-[var(--primary)]/5;
+    }
+    .r-title {
+      @apply text-sm font-semibold text-[var(--text)];
+    }
+    .r-meta {
+      @apply text-xs text-[var(--muted)] flex items-center gap-2;
+    }
+    .r-desc {
+      @apply text-xs text-[var(--muted)] mt-0.5 line-clamp-1;
+    }
+    mark {
+      @apply bg-[var(--primary)]/25 text-[var(--primary)] rounded px-0.5 font-medium;
+    }
+  }
+  .result-empty {
+    @apply p-8 text-center text-sm text-[var(--muted)];
+  }
+</style>
+
+<script>
+  type SearchItem = {
+    title: string;
+    description: string;
+    url: string;
+    tags: string[];
+    content: string;
+    pubDate: string;
+  };
+
+  let indexCache: SearchItem[] | null = null;
+
+  async function loadIndex(): Promise<SearchItem[]> {
+    if (indexCache) return indexCache;
+    try {
+      const res = await fetch("/search-index.json");
+      indexCache = (await res.json()) as SearchItem[];
+    } catch {
+      indexCache = [];
+    }
+    return indexCache;
+  }
+
+  function escapeHtml(s: string) {
+    return s.replace(/[&<>"']/g, (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c] as string)
+    );
+  }
+
+  function highlight(text: string, q: string) {
+    const safe = escapeHtml(text);
+    if (!q) return safe;
+    const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
+    return safe.replace(re, "<mark>$1</mark>");
+  }
+
+  function search(items: SearchItem[], q: string): SearchItem[] {
+    const query = q.trim().toLowerCase();
+    if (!query) return [];
+    const terms = query.split(/\s+/);
+    return items
+      .map((item) => {
+        const hayTitle = item.title.toLowerCase();
+        const hayDesc = item.description.toLowerCase();
+        const hayTags = item.tags.join(" ").toLowerCase();
+        const hayBody = item.content.toLowerCase();
+        let score = 0;
+        for (const t of terms) {
+          if (hayTitle.includes(t)) score += 10;
+          if (hayTags.includes(t)) score += 5;
+          if (hayDesc.includes(t)) score += 3;
+          if (hayBody.includes(t)) score += 1;
+        }
+        return { item, score };
+      })
+      .filter((x) => x.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 30)
+      .map((x) => x.item);
+  }
+
+  function render(items: SearchItem[], q: string) {
+    const results = document.getElementById("search-results")!;
+    const empty = document.getElementById("search-empty")!;
+    if (!q.trim()) {
+      results.innerHTML = "";
+      empty.style.display = "block";
+      empty.textContent = "输入关键词开始搜索";
+      return;
+    }
+    empty.style.display = "none";
+    if (items.length === 0) {
+      results.innerHTML = `<div class="result-empty">没有找到与 “${escapeHtml(q)}” 相关的内容</div>`;
+      return;
+    }
+    results.innerHTML = items
+      .map(
+        (it) => `
+      <a class="result-item" href="${it.url}">
+        <div class="r-title">${highlight(it.title, q)}</div>
+        <div class="r-meta">${it.pubDate}${it.tags.length ? " · " + it.tags.map((t) => highlight(t, q)).join(" / ") : ""}</div>
+        ${it.description ? `<div class="r-desc">${highlight(it.description, q)}</div>` : ""}
+      </a>`
+      )
+      .join("");
+  }
+
+  const modal = document.getElementById("search-modal")!;
+  const input = document.getElementById("search-input") as HTMLInputElement;
+  const results = document.getElementById("search-results")!;
+  const empty = document.getElementById("search-empty")!;
+
+  function openModal() {
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+    loadIndex();
+    setTimeout(() => input.focus(), 50);
+  }
+  function closeModal() {
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+    input.value = "";
+    render([], "");
+  }
+
+  document.addEventListener("open-search", openModal);
+  modal.querySelector("[data-close]")?.addEventListener("click", closeModal);
+  document.getElementById("search-close")?.addEventListener("click", closeModal);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal.classList.contains("open")) closeModal();
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+      e.preventDefault();
+      modal.classList.contains("open") ? closeModal() : openModal();
+    }
+  });
+
+  let timer: number | undefined;
+  input.addEventListener("input", () => {
+    clearTimeout(timer);
+    const q = input.value;
+    timer = window.setTimeout(async () => {
+      const items = await loadIndex();
+      render(search(items, q), q);
+    }, 120);
+  });
+
+  // 点击结果后关闭（SPA 路由会接管跳转）
+  results.addEventListener("click", (e) => {
+    if ((e.target as HTMLElement).closest("a")) closeModal();
+  });
+</script>

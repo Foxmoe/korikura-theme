@@ -1,0 +1,27 @@
+---
+import Default from "@/layouts/default.astro";
+import Icon from "@/components/icon.astro";
+import { siteConfig } from "@/config";
+
+const tools = siteConfig.tools ?? [];
+---
+
+<Default title="工具" showSidebar={false}>
+  <section class="page">
+    <header class="page-head">
+      <h1>工具箱</h1>
+      <p>日常折腾收集的一些小工具</p>
+    </header>
+    <div class="tool-grid">
+      {
+        tools.map((t) => (
+          <a class="tool-card" href={t.url} target="_blank" rel="noopener noreferrer">
+            <Icon name={t.icon || "link"} size={20} class="tool-icon" />
+            <div class="tool-name">{t.name}</div>
+            <div class="tool-desc">{t.desc}</div>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+</Default>

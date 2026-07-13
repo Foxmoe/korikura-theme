@@ -1,0 +1,155 @@
+---
+import Default from "@/layouts/default.astro";
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import { profileConfig, siteConfig } from "@/config";
+import Icon from "@/components/icon.astro";
+import MomentsGrid from "@/components/moments-grid.astro";
+import Comments from "@/components/comments.astro";
+import { formatRelativeTime, formatDateToChinese } from "@/utils/utils";
+import type { GetStaticPaths } from "astro";
+
+export const getStaticPaths = (async () => {
+  const dyn = await getCollection("dynamics");
+  return dyn.map((d) => ({ params: { id: d.id }, props: { id: d.id } }));
+}) satisfies GetStaticPaths;
+
+const { id } = Astro.props;
+const d = (await getCollection("dynamics")).find((x) => x.id === id);
+if (!d) return Astro.redirect("/dynamics");
+
+const { Content } = await render(d);
+const handle =
+  "@" + (profileConfig.name || siteConfig.title).toLowerCase().replace(/[^a-z0-9]/g, "");
+---
+
+<Default title={d.data.title || "动态"} showSidebar={false}>
+  <section class="page dynamic-detail">
+    <div class="detail-topbar">
+      <a href="/dynamics" class="detail-back">
+        <Icon name="arrow-left" size={15} /> 返回动态列表
+      </a>
+      <span class="detail-date">{formatDateToChinese(d.data.date)}</span>
+    </div>
+
+    <article class="detail-card">
+      <header class="detail-head">
+        <img
+          src={profileConfig.avatar}
+          alt={profileConfig.name}
+          class="detail-avatar"
+          onerror="this.src='/favicon.svg'"
+        />
+        <div class="detail-meta">
+          <div class="detail-name">{profileConfig.name}</div>
+          <div class="detail-sub">
+            <span class="detail-handle">{handle}</span>
+            <span class="detail-dot">·</span>
+            <time datetime={d.data.date.toISOString()}>{formatRelativeTime(d.data.date)}</time>
+          </div>
+        </div>
+      </header>
+
+      <div class="dynamic-body">
+        <Content />
+      </div>
+
+      <div class="detail-actions">
+        <a class="detail-act act-comment" href="#评论">
+          <Icon name="message" size={16} /> 评论
+        </a>
+        <button type="button" class="detail-act act-like">
+          <Icon name="heart" size={16} /> 喜欢
+        </button>
+        <button type="button" class="detail-act act-repost" data-url={`/dynamics/${id}`}>
+          <Icon name="repeat" size={16} /> 转发
+        </button>
+      </div>
+    </article>
+
+    <div id="评论" class="comment-anchor"></div>
+    <Comments />
+  </section>
+</Default>
+
+<MomentsGrid />
+
+<style lang="scss">
+  .dynamic-detail {
+    @apply max-w-2xl;
+  }
+  .detail-topbar {
+    @apply flex items-center justify-between mb-4;
+  }
+  .detail-date {
+    @apply text-xs text-[var(--muted)];
+  }
+  .detail-card {
+    @apply rounded-xl border border-[var(--border)] bg-[var(--card-bg)]/60 p-5;
+  }
+  .detail-head {
+    @apply flex items-center gap-3 mb-3;
+  }
+  .detail-avatar {
+    @apply w-12 h-12 rounded-full object-cover shrink-0 border border-[var(--border)];
+  }
+  .detail-name {
+    @apply font-semibold text-[var(--text)];
+  }
+  .detail-sub {
+    @apply flex items-center gap-1.5 text-xs text-[var(--muted)];
+  }
+  .dynamic-body {
+    @apply text-[var(--text)] leading-relaxed;
+    > :first-child {
+      @apply mt-0;
+    }
+    > :last-child {
+      @apply mb-0;
+    }
+    a {
+      @apply text-[var(--primary)] no-underline;
+    }
+    code {
+      @apply text-[0.85em] px-1 py-0.5 rounded bg-[var(--primary)]/10;
+    }
+  }
+  .detail-actions {
+    @apply mt-5 pt-4 border-t border-[var(--border)] flex items-center gap-6
+           text-[var(--muted)];
+  }
+  .detail-act {
+    @apply inline-flex items-center gap-1.5 text-sm no-underline cursor-pointer
+           bg-transparent border-0 p-0 text-[var(--muted)] transition;
+    &:hover {
+      @apply text-[var(--primary)];
+    }
+    &.act-like.active {
+      @apply text-pink-500;
+    }
+  }
+  .detail-back {
+    @apply inline-flex items-center gap-1.5 text-sm text-[var(--muted)]
+           no-underline transition hover:text-[var(--primary)];
+  }
+</style>
+
+<script define:vars={{ detailUrl: `/dynamics/${id}` }}>
+  const root = document.querySelector(".dynamic-detail");
+  if (root) {
+    const like = root.querySelector<HTMLButtonElement>(".act-like");
+    like?.addEventListener("click", () => like.classList.toggle("active"));
+    const repost = root.querySelector<HTMLButtonElement>(".act-repost");
+    repost?.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(location.origin + detailUrl);
+        const t = document.createElement("div");
+        t.className = "feed-toast show";
+        t.textContent = "已复制链接，可去转发 ~";
+        document.body.appendChild(t);
+        window.setTimeout(() => t.remove(), 1600);
+      } catch {
+        /* 复制失败忽略 */
+      }
+    });
+  }
+</script>

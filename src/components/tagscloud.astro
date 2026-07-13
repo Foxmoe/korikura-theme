@@ -1,41 +1,60 @@
 ---
-const tags = [
-  { name: "Astro", count: 12 },
-  { name: "CSS", count: 8 },
-  { name: "Anime", count: 20 },
-  { name: "Sakura", count: 5 },
-];
+import { getTagCounts } from "@/utils/posts";
+import { tagToSlug } from "@/utils/utils";
+import Icon from "./icon.astro";
+
+const tags = await getTagCounts();
+const max = tags.length ? Math.max(...tags.map((t) => t.count)) : 1;
+const min = tags.length ? Math.min(...tags.map((t) => t.count)) : 1;
+
+function size(count: number) {
+  if (max === min) return 0.95;
+  const ratio = (count - min) / (max - min);
+  return 0.8 + ratio * 0.6; // 0.8rem ~ 1.4rem
+}
 ---
 
 <div class="card">
-  <div class="title">Tags</div>
-
+  <div class="card-title">
+    <Icon name="tag" size={15} />
+    <span>标签云</span>
+    <a href="/tags" class="card-more" title="全部标签">全部</a>
+  </div>
   <div class="cloud">
-    {tags.map(tag => (
-      <a
-        class="tag"
-        href={`/tags/${tag.name.toLowerCase()}`}
-        style={`font-size: ${0.75 + tag.count * 0.02}rem`}
-      >
-        {tag.name}
-      </a>
-    ))}
+    {
+      tags.map((tag) => (
+        <a
+          href={`/tags/${tagToSlug(tag.name)}`}
+          class="cloud-tag"
+          style={`font-size:${size(tag.count).toFixed(2)}rem`}
+          title={`${tag.name} · ${tag.count} 篇`}
+        >
+          {tag.name}
+          <sup class="cloud-count">{tag.count}</sup>
+        </a>
+      ))
+    }
   </div>
 </div>
 
 <style lang="scss">
-  
-  .title {
-    @apply text-sm font-semibold text-pink-500 mb-2;
+  .card-title {
+    @apply flex items-center gap-1.5 text-sm font-semibold mb-3 text-[var(--primary)];
   }
-
+  .card-more {
+    @apply ml-auto text-xs font-normal text-[var(--muted)] no-underline hover:text-[var(--primary)];
+  }
   .cloud {
     @apply flex flex-wrap gap-2;
   }
-
-  .tag {
-    @apply px-2 py-1 rounded-full bg-pink-100/40
-           text-gray-600 hover:bg-pink-200/40
-           transition;
+  .cloud-tag {
+    @apply inline-flex items-start px-2.5 py-1 rounded-full no-underline
+           bg-[var(--primary)]/8 text-[var(--text)] transition;
+    &:hover {
+      @apply bg-[var(--primary)]/15 text-[var(--primary)] -translate-y-0.5;
+    }
+  }
+  .cloud-count {
+    @apply text-[10px] ml-0.5 text-[var(--muted)];
   }
 </style>

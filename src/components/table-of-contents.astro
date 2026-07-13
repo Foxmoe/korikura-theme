@@ -1,0 +1,89 @@
+---
+import Icon from "./icon.astro";
+const { headings = [] } = Astro.props;
+---
+
+<div class="card toc" id="toc" style={headings.length ? "" : "display:none"}>
+  <div class="toc-head">
+    <Icon name="hash" size={15} />
+    <span>目录</span>
+  </div>
+  <nav class="toc-body" id="toc-body"></nav>
+</div>
+
+<style lang="scss">
+  .toc-head {
+    @apply flex items-center gap-1.5 text-sm font-semibold mb-2 text-[var(--primary)];
+  }
+  .toc-body {
+    @apply text-sm;
+  }
+  .toc-body .toc-list {
+    @apply list-none m-0 p-0;
+  }
+  .toc-body .toc-list .toc-list {
+    @apply ml-1 pl-3 border-l border-[var(--border)];
+  }
+  .toc-body .toc-link {
+    @apply block py-1 pl-3 -ml-px border-l-2 border-transparent
+           text-[var(--muted)] no-underline rounded-r transition
+           hover:text-[var(--primary)] hover:bg-[var(--primary)]/5;
+  }
+  .toc-body .toc-link.is-active {
+    @apply text-[var(--primary)] border-[var(--primary)] font-medium bg-[var(--primary)]/8;
+  }
+  .toc-body .toc-link.node-name--H1 {
+    @apply font-semibold;
+  }
+  .toc-body .toc-link.node-name--H2 {
+    @apply text-[0.9rem] opacity-95;
+  }
+  .toc-body .toc-link.node-name--H3 {
+    @apply text-[0.85rem] opacity-90;
+  }
+  .toc-body .is-collapsed > .toc-list {
+    @apply hidden;
+  }
+</style>
+
+<script>
+  import * as tocbot from "tocbot";
+
+  function initToc() {
+    const root = document.getElementById("toc");
+    const body = document.getElementById("toc-body");
+    if (!root || !body) return;
+
+    const headings = document.querySelectorAll(
+      "#main-container .prose :is(h1, h2, h3)",
+    );
+    if (!headings.length) {
+      root.style.display = "none";
+      return;
+    }
+    root.style.display = "";
+
+    try {
+      tocbot.destroy?.();
+    } catch {
+      /* 未初始化时 destroy 可能抛错，忽略 */
+    }
+    body.innerHTML = "";
+    tocbot.init({
+      tocSelector: "#toc-body",
+      contentSelector: "#main-container .prose",
+      headingSelector: "h1, h2, h3",
+      hasInnerContainers: true,
+      scrollSmooth: true,
+      scrollSmoothDuration: 420,
+      headingsOffset: 84,
+      scrollSmoothOffset: -84,
+      activeLinkClass: "is-active",
+      collapseDepth: 6,
+      orderedList: false,
+    });
+  }
+
+  initToc();
+  window.addEventListener("spa-navigate", () => setTimeout(initToc, 80));
+</script>

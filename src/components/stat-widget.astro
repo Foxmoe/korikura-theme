@@ -1,0 +1,73 @@
+---
+import Icon from "./icon.astro";
+---
+
+<div class="card count-widget" id="enter-count">
+  <div class="count-content">
+    <div class="enter-count-title-wrapper">
+      <img
+        class="enter-count-title"
+        src="/images/entercount/title.png"
+        alt="网站访问人数"
+        onerror="this.style.display='none'"
+      />
+    </div>
+    <div class="enter-count-digits" id="enter-count-digits" aria-label="访问量"></div>
+  </div>
+</div>
+
+<style lang="scss">
+  .count-content {
+    @apply flex flex-col gap-2.5;
+  }
+  .enter-count-title-wrapper {
+    @apply w-full flex justify-start;
+  }
+  .enter-count-title {
+    height: 20px;
+    width: auto;
+    opacity: 0.85;
+  }
+  .enter-count-digits {
+    @apply w-full flex items-center justify-end gap-0.5 min-h-[24px];
+  }
+</style>
+
+<style is:global>
+  .enter-count-digit {
+    height: 22px;
+    width: auto;
+    display: block;
+    border-radius: 3px;
+  }
+</style>
+
+<script>
+  let observer;
+  function renderEnterCount() {
+    const box = document.getElementById("enter-count-digits");
+    const src = document.getElementById("busuanzi_value_site_pv");
+    if (!box || !src) return;
+    const n = parseInt((src.textContent || "0").replace(/[^\d]/g, ""), 10);
+    if (isNaN(n)) return;
+    const digits = String(n).padStart(6, "0");
+    box.innerHTML = digits
+      .split("")
+      .map(
+        (d) =>
+          `<img class="enter-count-digit" src="/images/entercount/${d}.png" alt="${d}" onerror="this.replaceWith(document.createTextNode('${d}'))" />`,
+      )
+      .join("");
+  }
+  function bind() {
+    const src = document.getElementById("busuanzi_value_site_pv");
+    if (!src) return;
+    if (observer) observer.disconnect();
+    observer = new MutationObserver(renderEnterCount);
+    observer.observe(src, { childList: true, characterData: true, subtree: true });
+    renderEnterCount();
+  }
+
+  bind();
+  window.addEventListener("spa-navigate", () => setTimeout(bind, 400));
+</script>

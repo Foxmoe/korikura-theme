@@ -1,0 +1,149 @@
+---
+import type { Post } from "@/utils/posts";
+import { siteConfig } from "@/config";
+import { formatDateToChinese, getReadingTime } from "@/utils/utils";
+import Icon from "./icon.astro";
+
+interface Props {
+  post: Post;
+  horizontal?: boolean;
+}
+const { post, horizontal = false } = Astro.props;
+const data = post.data;
+const cover = data.cover || siteConfig.defaultCover;
+const reading = getReadingTime(post.body || "", siteConfig.readingSpeed);
+---
+
+<a
+  href={`/posts/${post.id}`}
+  class={`post-card${horizontal ? " horizontal" : ""}`}
+  data-tags={data.tags.join(",")}
+  data-category={data.categories.join(",")}
+>
+  <div class="card-cover">
+    <img src={cover} alt={data.coverAlt || data.title} loading="lazy" class="cover-img" />
+    {
+      !data.cover && (
+        <div class="cover-fallback">
+          <span>{data.title}</span>
+        </div>
+      )
+    }
+    {
+      data.categories.length > 0 && (
+        <span class="category-badge">
+          <Icon name="folder" size={12} /> {data.categories[0]}
+        </span>
+      )
+    }
+    {
+      data.featured && (
+        <span class="featured-badge">
+          <Icon name="star" size={12} /> 置顶
+        </span>
+      )
+    }
+  </div>
+  <div class="card-body">
+    <h3 class="card-title">{data.title}</h3>
+    <p class="card-desc">{data.description}</p>
+    <div class="card-meta">
+      <div class="meta-left">
+        <span>{data.author || siteConfig.title}</span>
+        <span class="dot">·</span>
+        <span>{formatDateToChinese(data.pubDate)}</span>
+      </div>
+      <div class="meta-tags">
+        {
+          data.tags.slice(0, 2).map((t) => (
+            <span class="tag">#{t}</span>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</a>
+
+<style lang="scss">
+  .post-card {
+    @apply block h-full rounded-md overflow-hidden no-underline
+           border border-[var(--border)]
+           bg-[var(--card-bg)]
+           transition-all duration-300;
+    box-shadow: 0 4px 18px -14px rgba(0, 0, 0, 0.28);
+    &:hover {
+      @apply -translate-y-1 shadow-lg;
+    }
+  }
+  
+  .post-card.horizontal {
+    @apply flex flex-col sm:flex-row;
+  }
+  .horizontal .card-cover {
+    @apply w-full sm:w-48 aspect-[2/1] sm:aspect-[4/3];
+  }
+  .horizontal .card-body {
+    @apply flex-1;
+  }
+  .card-cover {
+    @apply relative aspect-[2/1] overflow-hidden;
+    &::after {
+      content: "";
+      @apply absolute inset-x-0 top-0 h-1/2 pointer-events-none;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.35), transparent);
+    }
+  }
+  .cover-img {
+    @apply w-full h-full object-cover transition-transform duration-500;
+  }
+  .post-card:hover .cover-img {
+    @apply scale-105;
+  }
+  .cover-fallback {
+    @apply absolute inset-0 flex items-center justify-center p-4;
+    background: color-mix(in oklab, var(--primary) 12%, var(--card-bg));
+    span {
+      @apply text-[var(--text)]/80 font-semibold text-center text-sm;
+    }
+  }
+  .featured-badge {
+    @apply absolute top-2 right-2 inline-flex items-center gap-1
+           text-[11px] px-2 py-0.5 rounded-full
+           bg-[var(--primary)] text-white shadow z-10;
+  }
+  .category-badge {
+    @apply absolute top-2 left-2 inline-flex items-center gap-1
+           text-[11px] font-medium px-2.5 py-1 rounded-full shadow z-10;
+    background: var(--primary);
+    color: #43111f;
+  }
+  .card-body {
+    @apply p-4;
+  }
+  .tag {
+    @apply text-xs px-2 py-0.5 rounded-full
+           bg-[var(--primary)]/10 text-[var(--primary)];
+  }
+  .card-title {
+    @apply text-lg font-semibold text-[var(--text)] mb-1.5 line-clamp-2
+           transition-colors;
+    .post-card:hover & {
+      @apply text-[var(--primary)];
+    }
+  }
+  .card-desc {
+    @apply text-sm text-[var(--muted)] line-clamp-2 mb-3;
+  }
+  .card-meta {
+    @apply flex items-center justify-between gap-2 text-xs text-[var(--muted)];
+  }
+  .meta-left {
+    @apply flex items-center gap-1.5 min-w-0 truncate;
+  }
+  .meta-tags {
+    @apply flex items-center gap-1 shrink-0;
+  }
+  .card-meta .dot {
+    @apply opacity-60;
+  }
+</style>

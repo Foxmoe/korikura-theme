@@ -1,16 +1,28 @@
 ---
 import { siteConfig, profileConfig } from "@/config";
 import type { THEME_MODE } from "@/constants/constants";
-import SpaRouter from "@/components/spaRouter.astro";
-import ProgressBar from "@/components/progressbar.astro";
+import SpaRouter from "@/components/spa-router.astro";
+import Seo from "@/components/seo.astro";
+import SearchModal from "@/components/search-modal.astro";
+import BackToTop from "@/components/back-to-top.astro";
+import RestoreStyle from "@/components/restore-style.astro";
+import CodeEnhancer from "@/components/code-enhancer.astro";
+import Lightbox from "@/components/lightbox.astro";
+import Tooltip from "@/components/tooltip.astro";
+import "katex/dist/katex.min.css";
 import styleUrl from "@/styles/style.css?url";
-import Progressbar from "@/components/progressbar.astro";
 
 export interface Props {
     title?: string;
     description?: string;
     keywords?: string;
     themeMode?: THEME_MODE;
+    ogType?: "website" | "article";
+    ogImage?: string;
+    publishedTime?: string;
+    modifiedTime?: string;
+    tags?: string[];
+    author?: string;
 }
 
 let {
@@ -18,53 +30,93 @@ let {
     description = siteConfig.description,
     keywords = siteConfig.keywords,
     themeMode = siteConfig.themeMode,
+    ogType = "website",
+    ogImage = siteConfig.defaultCover,
+    publishedTime,
+    modifiedTime,
+    tags,
+    author = profileConfig.name,
 } = Astro.props;
 
-title = title ? title + " - " + siteConfig.title : siteConfig.title;
+const fullTitle = title ? title + " - " + siteConfig.title : siteConfig.title;
 ---
 
 <!doctype html>
 <html lang={siteConfig.lang}>
     <head>
+        <script is:inline>
+            (function () {
+                try {
+                    var saved = localStorage.getItem("theme-mode") || "auto";
+                    var dark =
+                        saved === "dark" ||
+                        (saved === "auto" &&
+                            window.matchMedia("(prefers-color-scheme: dark)").matches);
+                    var root = document.documentElement;
+                    root.setAttribute("data-theme", dark ? "dark" : "light");
+                    root.setAttribute("data-mode", saved);
+                    root.classList.toggle("dark", dark);
+                } catch (e) {}
+            })();
+        </script>
+
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
         <meta name="description" content={description} />
         <meta name="keywords" content={keywords} />
-        <meta name="author" content={profileConfig.name} />
+        <meta name="author" content={author} />
         <meta name="generator" content={Astro.generator} />
+        <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
 
-        <meta property="og:site_name" content={siteConfig.title} />
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content={description} />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={siteConfig.url} />
+        <Seo
+            title={fullTitle}
+            description={description}
+            type={ogType}
+            image={ogImage}
+            url={Astro.url.pathname}
+            publishedTime={publishedTime}
+            modifiedTime={modifiedTime}
+            tags={tags}
+            author={author}
+        />
 
         <link rel="sitemap" href="/sitemap.xml" />
         <link rel="icon" href="/favicon.ico" />
-
-        <link rel="stylesheet" href={styleUrl} data-permanent />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
         <link
             rel="alternate"
             type="application/rss+xml"
-            title="Rss Feed"
+            title="RSS Feed"
             href="/rss.xml"
         />
 
-        <title>{title}</title>
+        <title>{fullTitle}</title>
+
+        <link rel="stylesheet" href={styleUrl} data-permanent />
+
+        <script is:inline defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
     </head>
 
     <body>
-        <Progressbar />
         <SpaRouter
             contentSelector="#main-container"
+            heroSelector="#hero-slot"
             scrollToTop={true}
             prefetch={false}
             ignoreHash={false}
             scrollBehavior="smooth"
         />
+        <SearchModal />
+        <RestoreStyle />
+        <CodeEnhancer />
+        <Lightbox />
         <slot />
+
+        <BackToTop />
+        <Tooltip />
     </body>
 </html>

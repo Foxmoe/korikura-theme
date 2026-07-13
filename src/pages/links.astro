@@ -1,0 +1,35 @@
+---
+import Default from "@/layouts/default.astro";
+import Icon from "@/components/icon.astro";
+import { siteConfig } from "@/config";
+
+const links = siteConfig.friendLinks ?? [];
+---
+
+<Default title="友链" showSidebar={false}>
+  <section class="page">
+    <header class="page-head">
+      <h1>友情链接</h1>
+      <p>这里收集了一些我喜欢的站点，欢迎互相交换友链 ~(￣▽￣)~</p>
+    </header>
+    <div class="link-grid">
+      {
+        links.map((l) => (
+          <a class="link-card" href={l.url} target="_blank" rel="noopener noreferrer">
+            <img
+              src={l.avatar || "/favicon.svg"}
+              alt=""
+              class="link-avatar"
+              onerror="this.src='/favicon.svg'"
+            />
+            <div class="link-meta">
+              <div class="link-name">{l.name}</div>
+              <div class="link-desc">{l.desc}</div>
+            </div>
+            <Icon name="external" size={16} class="link-go" />
+          </a>
+        ))
+      }
+    </div>
+  </section>
+</Default>

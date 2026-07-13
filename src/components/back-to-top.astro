@@ -1,0 +1,63 @@
+---
+import Icon from "./icon.astro";
+---
+
+<button id="back-to-top" class="back-to-top" type="button" title="返回顶部" aria-label="返回顶部">
+  <svg class="progress-ring" viewBox="0 0 44 44" aria-hidden="true">
+    <circle class="ring-track" cx="22" cy="22" r="20" />
+    <circle class="ring-progress" cx="22" cy="22" r="20" />
+  </svg>
+  <Icon name="arrow-up" size={20} />
+</button>
+
+<style lang="scss">
+  .back-to-top {
+    @apply fixed right-5 bottom-5 z-[90000] w-11 h-11 rounded-full
+           flex items-center justify-center
+           border border-transparent text-[var(--text)]
+           bg-[var(--card-bg)] shadow-lg
+           opacity-0 translate-y-3 pointer-events-none
+           transition hover:text-[var(--primary)] active:scale-90;
+    &.show {
+      @apply opacity-100 translate-y-0 pointer-events-auto;
+    }
+  }
+  .progress-ring {
+    @apply absolute inset-0 w-full h-full -rotate-90 pointer-events-none;
+  }
+  .ring-track {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 2;
+  }
+  .ring-progress {
+    fill: none;
+    stroke: var(--primary);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 125.66;
+    stroke-dashoffset: 125.66;
+    transition: stroke-dashoffset 0.1s linear;
+  }
+</style>
+
+<script>
+  const btn = document.getElementById("back-to-top");
+  const ring = btn?.querySelector(".ring-progress") as SVGCircleElement | null;
+  function update() {
+    if (!btn || !ring) return;
+    const doc = document.documentElement;
+    const max = doc.scrollHeight - doc.clientHeight;
+    const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+    const C = ring.getTotalLength();
+    ring.style.strokeDasharray = String(C);
+    ring.style.strokeDashoffset = String(C * (1 - p));
+    btn.classList.toggle("show", window.scrollY > 400);
+  }
+  window.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("spa-navigate", update);
+  btn?.addEventListener("click", () =>
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  );
+  update();
+</script>

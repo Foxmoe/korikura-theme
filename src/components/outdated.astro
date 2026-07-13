@@ -1,0 +1,45 @@
+---
+import { siteConfig } from "@/config";
+import Icon from "./icon.astro";
+
+interface Props {
+  pubDate: Date;
+  updatedDate?: Date;
+  days?: number;
+}
+const { pubDate, updatedDate, days = siteConfig.outdatedDays } = Astro.props;
+
+const base = updatedDate ?? pubDate;
+const diffDays = Math.floor((Date.now() - base.getTime()) / (24 * 3600 * 1000));
+const outdated = diffDays > days;
+---
+
+{
+  outdated && (
+    <div class="outdated" role="note">
+      <Icon name="info" size={18} class="outdated-icon" />
+      <div>
+        <p class="outdated-title">内容可能已过时</p>
+        <p class="outdated-text">
+          本文最后更新于 {diffDays} 天前，部分信息可能已不再准确，请结合最新资料参考。
+        </p>
+      </div>
+    </div>
+  )
+}
+
+<style lang="scss">
+  .outdated {
+    @apply flex gap-3 items-start rounded-md p-4 my-6
+           border border-amber-500/50 bg-amber-50 dark:bg-amber-950/40;
+  }
+  .outdated-icon {
+    @apply text-amber-600 dark:text-amber-400 shrink-0 mt-0.5;
+  }
+  .outdated-title {
+    @apply text-sm font-semibold text-amber-900 dark:text-amber-200 m-0;
+  }
+  .outdated-text {
+    @apply text-xs text-amber-900/90 dark:text-amber-100/85 mt-1 leading-relaxed m-0;
+  }
+</style>

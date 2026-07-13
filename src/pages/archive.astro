@@ -1,0 +1,101 @@
+---
+import Default from "@/layouts/default.astro";
+import Sidebar from "@/components/sidebar.astro";
+import { getPostsByYear } from "@/utils/posts";
+import { formatDateToChinese } from "@/utils/utils";
+import Icon from "@/components/icon.astro";
+
+const groups = await getPostsByYear();
+const total = groups.reduce((n, g) => n + g.posts.length, 0);
+---
+
+<Default title="归档">
+  <section class="archive">
+    <div class="arc-head">
+      <h1 class="arc-title">
+        <Icon name="archive" size={22} /> 文章归档
+      </h1>
+      <p class="arc-sub">共 {total} 篇文章 · {groups.length} 个年份</p>
+    </div>
+
+    {
+      groups.map((group) => (
+        <div class="arc-year">
+          <div class="year-label">
+            <span class="year-num">{group.year}</span>
+            <span class="year-count">{group.posts.length} 篇</span>
+          </div>
+          <ul class="arc-list">
+            {group.posts.map((post) => (
+              <li class="arc-item">
+                <span class="arc-date">
+                  {formatDateToChinese(post.data.pubDate).replace(
+                    post.data.pubDate.getFullYear() + "年",
+                    ""
+                  )}
+                </span>
+                <span class="arc-dot" />
+                <a href={`/posts/${post.id}`} class="arc-link">
+                  {post.data.title}
+                </a>
+                {post.data.tags[0] && (
+                  <span class="arc-tag">#{post.data.tags[0]}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </section>
+
+  <div slot="sidebar">
+    <Sidebar />
+  </div>
+</Default>
+
+<style lang="scss">
+  .archive {
+    @apply max-w-3xl mx-auto px-1 py-4;
+  }
+  .arc-head {
+    @apply mb-8;
+  }
+  .arc-title {
+    @apply text-3xl font-bold flex items-center gap-2 text-[var(--text)];
+  }
+  .arc-sub {
+    @apply text-sm text-[var(--muted)] mt-1;
+  }
+  .arc-year {
+    @apply mb-8;
+  }
+  .year-label {
+    @apply flex items-baseline gap-3 mb-3 sticky top-[calc(var(--nav-h)+12px)] z-10;
+    .year-num {
+      @apply text-2xl font-bold text-[var(--primary)];
+    }
+    .year-count {
+      @apply text-xs text-[var(--muted)];
+    }
+  }
+  .arc-list {
+    @apply list-none p-0 m-0 border-l-2 border-[var(--border)] ml-1;
+  }
+  .arc-item {
+    @apply relative flex items-center gap-3 pl-5 py-2 ml-1;
+    .arc-date {
+      @apply text-xs text-[var(--muted)] tabular-nums w-16 shrink-0;
+    }
+    .arc-dot {
+      @apply absolute -left-[5px] w-2.5 h-2.5 rounded-full bg-[var(--primary)]/60
+             ring-2 ring-[var(--bg)];
+    }
+    .arc-link {
+      @apply text-sm text-[var(--text)] no-underline transition hover:text-[var(--primary)];
+    }
+    .arc-tag {
+      @apply text-xs text-[var(--muted)] ml-auto;
+    }
+  }
+</style>

@@ -1,0 +1,43 @@
+---
+import type { Post } from "@/utils/posts";
+import PostCard from "./post-card.astro";
+import Pagination from "./pagination.astro";
+
+interface Props {
+  posts: Post[];
+  page: number;
+  totalPages: number;
+}
+const { posts, page, totalPages } = Astro.props;
+---
+
+<section class="list">
+  <div class="list-head">
+    <h1 class="list-title">文章列表</h1>
+    <p class="list-count">共 {posts.length} 篇</p>
+  </div>
+
+  <div class="post-grid">
+    {posts.map((post) => <PostCard post={post} />)}
+  </div>
+
+  <Pagination currentPage={page} totalPages={totalPages} />
+</section>
+
+<style lang="scss">
+  .list {
+    @apply max-w-5xl mx-auto px-1 py-4;
+  }
+  .list-head {
+    @apply mb-6;
+  }
+  .list-title {
+    @apply text-3xl font-bold tracking-tight text-[var(--text)];
+  }
+  .list-count {
+    @apply text-sm text-[var(--muted)] mt-1;
+  }
+  .post-grid {
+    @apply grid gap-6 sm:grid-cols-2 lg:grid-cols-3;
+  }
+</style>

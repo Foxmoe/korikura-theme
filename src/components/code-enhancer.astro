@@ -1,0 +1,217 @@
+---
+// 增强文章内代码块：
+//  - 把连续、且带相同 `group=xxx` 的 <pre> 组合为可切换选项卡的 .code-group
+//  - 为普通代码块添加语言标签 + 复制按钮
+//  - 超过阈值可手动折叠，>100 行自动折叠
+//  - 将 `> [!NOTE]` 等 GitHub 提示框转换为彩色卡片
+// 随 SPA 导航在文章页重新执行。
+---
+
+<script>
+  function getLang(pre: HTMLElement): string {
+    const preLang = pre.getAttribute("data-language");
+    if (preLang) return preLang;
+    const code = pre.querySelector("code");
+    if (!code) return "";
+    const cls = (code.getAttribute("class") || "") as string;
+    const m = /language-([\w+#-]+)/.exec(cls);
+    return m ? m[1] : "";
+  }
+
+  function buildHeader(wrap: HTMLElement, pre: HTMLElement) {
+    if (wrap.querySelector(".code-tools")) return;
+    const head = document.createElement("div");
+    head.className = "code-tools";
+
+    const lang = document.createElement("span");
+    lang.className = "code-lang";
+    lang.textContent = getLang(pre) || "text";
+
+    const btn = document.createElement("button");
+    btn.className = "copy-btn";
+    btn.type = "button";
+    btn.textContent = "复制";
+    btn.addEventListener("click", async () => {
+      const text = pre.querySelector("code")?.textContent ?? pre.textContent ?? "";
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.textContent = "已复制";
+      } catch {
+        btn.textContent = "复制失败";
+      }
+      setTimeout(() => (btn.textContent = "复制"), 1500);
+    });
+
+    head.appendChild(lang);
+    head.appendChild(btn);
+    wrap.insertBefore(head, wrap.firstChild);
+  }
+
+  // 为代码块添加折叠按钮（行数足够时）；>100 行默认折叠
+  function addCollapse(wrap: HTMLElement, pre: HTMLElement) {
+    if (wrap.querySelector(".code-toggle")) return;
+    const code = pre.querySelector("code");
+    const lines = code ? (code.textContent || "").split("\n").length : 0;
+    if (lines < 20) return;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "code-toggle";
+    btn.innerHTML =
+      '<span class="label-expand">展开代码</span><span class="label-collapse">收起代码</span>';
+    wrap.appendChild(btn);
+    if (lines > 100) wrap.classList.add("is-collapsed");
+    btn.addEventListener("click", () => wrap.classList.toggle("is-collapsed"));
+  }
+
+  function wrapPre(pre: HTMLElement): HTMLElement {
+    const parent = pre.parentElement;
+    if (parent && parent.classList.contains("code-block")) return parent;
+    const wrap = document.createElement("div");
+    wrap.className = "code-block";
+    pre.parentNode?.insertBefore(wrap, pre);
+    wrap.appendChild(pre);
+    buildHeader(wrap, pre);
+    addCollapse(wrap, pre);
+    return wrap;
+  }
+
+  // GitHub 提示框：把 `> [!NOTE]` 等引用转换为彩色卡片
+  const GITHUB_ALERT_ICONS: Record<string, string> = {
+    note: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>',
+    tip: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg>',
+    important: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
+    warning: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    caution: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+  };
+  const ALERT_TITLES: Record<string, string> = {
+    note: "备注",
+    tip: "提示",
+    important: "重要",
+    warning: "警告",
+    caution: "注意",
+  };
+
+  function enhanceGithubAlerts() {
+    document.querySelectorAll(".prose blockquote").forEach((bq) => {
+      const el = bq as HTMLElement;
+      if (el.dataset.githubEnhanced) return;
+      const firstP = el.querySelector("p");
+      if (!firstP) return;
+      const m = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*$/i.exec(
+        (firstP.textContent || "").trim()
+      );
+      if (!m) return;
+      el.dataset.githubEnhanced = "true";
+      const type = m[1].toLowerCase();
+      firstP.remove();
+
+      const alert = document.createElement("div");
+      alert.className = `github-alert alert-${type}`;
+      const title = document.createElement("div");
+      title.className = "alert-title";
+      const icon = document.createElement("span");
+      icon.className = "alert-icon";
+      icon.innerHTML = GITHUB_ALERT_ICONS[type] || "";
+      title.appendChild(icon);
+      title.appendChild(document.createTextNode(ALERT_TITLES[type] || type));
+      const body = document.createElement("div");
+      body.className = "alert-body";
+      while (el.firstChild) body.appendChild(el.firstChild);
+      alert.appendChild(title);
+      alert.appendChild(body);
+      el.replaceWith(alert);
+    });
+  }
+
+  // 把连续同组的 <pre> 包进 .code-group，便于生成选项卡
+  function groupCodeBlocks() {
+    const pres = Array.from(
+      document.querySelectorAll("pre.astro-code[data-group]")
+    ) as HTMLElement[];
+    let i = 0;
+    while (i < pres.length) {
+      const g = pres[i].getAttribute("data-group");
+      if (!g || pres[i].closest(".code-group")) {
+        i++;
+        continue;
+      }
+      const run: HTMLElement[] = [pres[i]];
+      let j = i + 1;
+      while (j < pres.length) {
+        const p = pres[j];
+        if (p.closest(".code-group")) break;
+        if (p.getAttribute("data-group") === g) {
+          run.push(p);
+          j++;
+        } else {
+          break;
+        }
+      }
+      if (run.length > 1) {
+        const div = document.createElement("div");
+        div.className = "code-group";
+        div.setAttribute("data-group", g);
+        const first = run[0];
+        first.parentNode?.insertBefore(div, first);
+        run.forEach((p) => div.appendChild(p));
+      }
+      i = j;
+    }
+  }
+
+  function initCodeBlocks() {
+    groupCodeBlocks();
+
+    // 1) 分组代码块：构建选项卡
+    document.querySelectorAll(".code-group").forEach((group) => {
+      const g = group as HTMLElement;
+      const pres = Array.from(
+        g.querySelectorAll(":scope > pre.astro-code")
+      ) as HTMLElement[];
+      if (pres.length === 0) return;
+
+      let tabs = g.querySelector(":scope > .code-tabs") as HTMLElement | null;
+      if (!tabs) {
+        tabs = document.createElement("div");
+        tabs.className = "code-tabs";
+        g.insertBefore(tabs, g.firstChild);
+      }
+
+      pres.forEach((pre, idx) => {
+        const wrap = wrapPre(pre);
+        wrap.classList.add("code-pane");
+        pre.classList.toggle("is-active", idx === 0);
+        wrap.classList.toggle("is-active", idx === 0);
+
+        const tab = document.createElement("button");
+        tab.className = "code-tab" + (idx === 0 ? " active" : "");
+        tab.type = "button";
+        tab.textContent = getLang(pre) || "text";
+        tab.addEventListener("click", () => {
+          pres.forEach((p, i) => {
+            p.classList.toggle("is-active", i === idx);
+            p.closest(".code-block")?.classList.toggle("is-active", i === idx);
+          });
+          tabs?.querySelectorAll(".code-tab").forEach((t) =>
+            t.classList.remove("active")
+          );
+          tab.classList.add("active");
+        });
+        tabs?.appendChild(tab);
+      });
+    });
+
+    // 2) 普通代码块
+    document.querySelectorAll("pre.astro-code").forEach((pre) => {
+      const p = pre as HTMLElement;
+      if (p.closest(".code-group")) return;
+      wrapPre(p);
+    });
+
+    // 3) GitHub 提示框
+    enhanceGithubAlerts();
+  }
+
+  initCodeBlocks();
+  window.addEventListener("spa-navigate", () => setTimeout(initCodeBlocks, 60));
+</script>

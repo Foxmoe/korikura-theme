@@ -1,0 +1,56 @@
+---
+import { siteConfig, profileConfig } from "@/config";
+
+interface Props {
+  name?: string;
+  url?: string;
+  author?: string;
+}
+const { name = siteConfig.license.name, url = siteConfig.license.url, author = profileConfig.name } =
+  Astro.props;
+---
+
+<div class="license">
+  <span class="license-cc" aria-hidden="true">CC</span>
+  <div class="license-inner">
+    <div class="license-title">
+      <span>版权声明</span>
+    </div>
+    <p class="license-text">
+      本站所有文章除特别注明外，均由 <strong>{author}</strong> 创作，采用
+      <a href={url} target="_blank" rel="noopener noreferrer">{name}</a>
+      许可协议授权，请您在转载时注明文章来源为
+      <a href={siteConfig.url} target="_blank" rel="noopener noreferrer">{siteConfig.title}</a>。
+    </p>
+  </div>
+</div>
+
+<style lang="scss">
+  .license {
+    @apply relative my-5 p-5 rounded-xl overflow-hidden border border-[var(--border)];
+    background: color-mix(in oklab, var(--primary) 5%, var(--card-bg));
+    box-shadow: 0 10px 30px -22px color-mix(in oklab, var(--primary) 60%, transparent);
+  }
+  
+  .license-cc {
+    @apply absolute right-2 bottom-[-.16em] font-black select-none pointer-events-none;
+    font-size: 7.5rem;
+    line-height: 1;
+    color: color-mix(in oklab, var(--primary) 16%, transparent);
+  }
+  .license-inner {
+    @apply relative z-10;
+  }
+  .license-title {
+    @apply flex items-center gap-2 text-base font-bold text-[var(--text)] mb-2;
+  }
+  .license-text {
+    @apply text-sm text-[var(--muted)] leading-relaxed m-0;
+    a {
+      @apply text-[var(--primary)] no-underline font-medium hover:underline;
+    }
+    strong {
+      @apply text-[var(--text)];
+    }
+  }
+</style>

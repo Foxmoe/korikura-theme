@@ -28,9 +28,8 @@ const {
         scrollBehavior,
     }}
 >
-    if (!document.startViewTransition) {
-    } else {
-        const DYNAMIC_SCRIPT_ATTR = "data-spa-dynamic-script";
+        if (document.startViewTransition) {
+            const DYNAMIC_SCRIPT_ATTR = "data-spa-dynamic-script";
         const EXTRA_GLOBAL_ATTR = "data-spa-global-extra";
 
         let baseGlobalStyles = null;
@@ -126,7 +125,10 @@ const {
             document.title = newTitle;
         }
 
+        let navToken = 0;
+
         async function navigate(url, pushState = true) {
+            const token = ++navToken;
             window.dispatchEvent(
                 new CustomEvent("spa-navigate-start", { detail: { url } }),
             );
@@ -140,43 +142,42 @@ const {
             }
 
             try {
-                const disableNewStyle = document.createElement("style");
-                disableNewStyle.textContent =
-                    "::view-transition-new(main) { animation: none !important; }";
-                document.head.appendChild(disableNewStyle);
+                // 先拉取新内容，拿到后再一次性交换，避免“先清空”导致的空白闪烁
+                const newDoc = await fetchContent(url);
+                if (token !== navToken) return; // 已有更新的导航，放弃本次
 
-                const leaveTransition = document.startViewTransition(() => {
-                    container.innerHTML = "";
-                });
-
-                const newDocPromise = fetchContent(url);
-                await leaveTransition.finished;
-                if (scrollToTop && (ignoreHash || !hasHash)) {
-                    window.scrollTo({ top: 0, behavior: scrollBehavior });
-                }
-
-                disableNewStyle.remove();
-
-                const newDoc = await newDocPromise;
                 const newContent = newDoc.querySelector(contentSelector);
                 if (!newContent) throw new Error("Missing content");
 
                 const newHero = newDoc.querySelector(heroSelector);
                 const heroContainer = getHeroContainer();
 
-                removeDynamicScripts();
-                updateHeadStyles(newDoc);
-
-                const enterTransition = document.startViewTransition(() => {
+                const swap = () => {
+                    removeDynamicScripts();
+                    updateHeadStyles(newDoc);
                     container.innerHTML = newContent.innerHTML;
                     if (heroContainer) {
                         heroContainer.innerHTML =
                             (newHero && newHero.innerHTML) || "";
                     }
                     executeScripts(container);
-                });
+                    if (scrollToTop && (ignoreHash || !hasHash)) {
+                        window.scrollTo({ top: 0, behavior: "auto" });
+                    }
+                };
 
-                await enterTransition.finished;
+                const t = document.startViewTransition(swap);
+                await t.finished.catch(() => {});
+
+                // 跨页锚点（如动态详情 #评论）：新内容已就位后滚动到目标
+                if (hasHash) {
+                    const target = document.getElementById(
+                        decodeURIComponent(targetUrl.hash.slice(1)),
+                    );
+                    if (target) {
+                        target.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                }
 
                 if (pushState) {
                     window.history.pushState(null, "", url);

@@ -1,30 +1,74 @@
 ---
-const posts = [
-  { title: "樱花落下的那一刻", href: "#" },
-  { title: "Astro 动态路由整理", href: "#" },
-];
+import { getPublishedPosts } from "@/utils/posts";
+import { formatDateToChinese } from "@/utils/utils";
+import Icon from "./icon.astro";
+
+const posts = (await getPublishedPosts()).slice(0, 5);
 ---
 
 <div class="card">
-  <div class="title">Recent</div>
-
-  <ul>
-    {posts.map(p => (
-      <li class="item">
-        <a href={p.href}>{p.title}</a>
-      </li>
-    ))}
+  <div class="card-title">
+    <Icon name="clock" size={15} />
+    <span>最近更新</span>
+    <a href="/posts" class="recent-more">
+      更多
+      <Icon name="arrow-right" size={13} />
+    </a>
+  </div>
+  <ul class="recent-list">
+    {
+      posts.map((post) => (
+        <li>
+          <a href={`/posts/${post.id}`} class="recent-item" data-category={post.data.categories.join(",")}>
+            <span class="recent-dot" />
+            <span class="recent-text">
+              <span class="recent-title">{post.data.title}</span>
+              <span class="recent-date">
+                {formatDateToChinese(post.data.pubDate)}
+                {
+                  post.data.categories.length > 0 && (
+                    <span class="recent-cat"> · {post.data.categories[0]}</span>
+                  )
+                }
+              </span>
+            </span>
+          </a>
+        </li>
+      ))
+    }
   </ul>
 </div>
 
 <style lang="scss">
-  
-
-  .title {
-    @apply text-sm font-semibold mb-2 text-pink-500;
+  .card-title {
+    @apply flex items-center gap-1.5 text-sm font-semibold mb-3 text-[var(--primary)];
   }
-
-  .item {
-    @apply text-xs py-1 text-gray-600 hover:text-pink-500;
+  .recent-more {
+    @apply ml-auto text-xs text-[var(--muted)] no-underline inline-flex items-center gap-0.5 transition;
+    &:hover {
+      @apply text-[var(--primary)];
+    }
+  }
+  .recent-list {
+    @apply list-none p-0 m-0 space-y-1;
+  }
+  .recent-item {
+    @apply flex items-center gap-2.5 px-2 py-2 rounded-lg no-underline
+           text-[var(--text)] transition hover:bg-[var(--primary)]/8;
+  }
+  .recent-dot {
+    @apply w-1.5 h-1.5 rounded-full bg-[var(--primary)]/60 shrink-0;
+  }
+  .recent-text {
+    @apply flex flex-col min-w-0;
+  }
+  .recent-title {
+    @apply text-sm truncate;
+  }
+  .recent-date {
+    @apply text-xs text-[var(--muted)];
+  }
+  .recent-cat {
+    @apply text-[var(--primary)]/80;
   }
 </style>

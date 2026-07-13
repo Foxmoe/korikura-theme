@@ -1,79 +1,77 @@
 ---
-// posts list page
-
+// 文章列表首页（第 1 页）
 import Default from "@/layouts/default.astro";
-import { getCollection } from "astro:content";
-import { formatDateToChinese } from "@/utils/utils";
+import Sidebar from "@/components/sidebar.astro";
+import PostCard from "@/components/post-card.astro";
 import Pagination from "@/components/pagination.astro";
+import Icon from "@/components/icon.astro";
+import { getPublishedPosts } from "@/utils/posts";
+import { siteConfig } from "@/config";
+import { PAGE_SIZE } from "@/constants/constants";
 
-const posts = await getCollection("posts");
-
-// 分页参数
-const pageSize = 10;
-const currentPage = parseInt(Astro.url.searchParams.get("page") || "1");
-const totalPages = Math.ceil(posts.length / pageSize);
-const start = (currentPage - 1) * pageSize;
-const paginatedPosts = posts.slice(start, start + pageSize);
+const pageSize = PAGE_SIZE;
+const all = await getPublishedPosts();
+const totalPages = Math.max(1, Math.ceil(all.length / pageSize));
+const posts = all.slice(0, pageSize);
 ---
 
-<Default>
-  <div class="posts-page">
-    <h1 class="page-title">文章列表</h1>
-    <p class="post-count">共计 {posts.length} 篇文章</p>
-
-    <ul class="post-list">
-      {paginatedPosts.map((post) => (
-        <li class="post-item">
-          <a class="post-link" href={`/posts/${post.id}`}>
-            <span class="post-title">{post.data.title}</span>
-            <span class="post-date">{formatDateToChinese(post.data.pubDate)}</span>
-          </a>
-        </li>
-      ))}
-    </ul>
-
-    <!-- 引入分页组件 -->
-    <Pagination 
-      currentPage={currentPage} 
-      totalPages={totalPages} 
-      baseUrl={Astro.url.pathname}
+<Default title="文章">
+  <div slot="hero" class="hero-banner">
+    <img
+      class="hero-banner-img"
+      src={siteConfig.defaultCover}
+      alt=""
+      onerror="this.style.display='none'"
     />
+  </div>
+
+  <section class="posts-section">
+    <div class="section-header">
+      <h2 class="section-title">全部文章</h2>
+      <span class="section-more">{all.length} 篇</span>
+    </div>
+
+    <div class="post-list">
+      {posts.map((post) => <PostCard post={post} horizontal />)}
+    </div>
+
+    <Pagination currentPage={1} totalPages={totalPages} />
+  </section>
+
+  <div slot="sidebar">
+    <Sidebar />
   </div>
 </Default>
 
 <style lang="scss">
-  .posts-page {
-    @apply max-w-2xl mx-auto px-6 py-16;
+  
+  .hero-banner {
+    @apply relative w-full overflow-hidden;
+    aspect-ratio: 21 / 7;
+    margin-top: calc(-1 * (var(--nav-h) + 8px));
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-banner-img {
+    @apply w-full h-full object-cover;
   }
 
-  .page-title {
-    @apply text-4xl font-bold tracking-tight text-gray-900 mb-2;
+  .posts-section {
+    @apply container mx-auto px-2 pb-20 pt-8;
   }
-
-  .post-count {
-    @apply text-gray-500 mb-8 text-sm;
+  .section-header {
+    @apply flex items-center justify-between mb-6;
   }
-
-  .post-list {
-    @apply list-none p-0 m-0 flex flex-col gap-5;
-  }
-
-  .post-item {
-    @apply rounded-xl bg-white border border-gray-100 transition-all duration-200 shadow-sm;
-    &:hover {
-      @apply border-gray-300 shadow-md -translate-y-0.5;
+  .section-title {
+    @apply text-xl font-bold text-[var(--text)] relative pl-3;
+    &::before {
+      content: "";
+      @apply absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-full bg-[var(--primary)];
     }
   }
-
-  .post-link {
-    @apply flex justify-between items-baseline p-5 no-underline text-inherit gap-4 flex-wrap;
+  .section-more {
+    @apply text-sm text-[var(--muted)];
   }
-
-  .post-title {
-    @apply text-lg font-semibold text-gray-900 leading-snug;
-  }
-
-  .post-date {
-    @apply text-sm text-gray-400 whitespace-nowrap tabular-nums;
+  .post-list {
+    @apply flex flex-col gap-4;
   }
 </style>

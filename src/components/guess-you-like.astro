@@ -1,0 +1,72 @@
+---
+import { getRandomPosts } from "@/utils/posts";
+import { siteConfig } from "@/config";
+import { formatDateToChinese } from "@/utils/utils";
+import Icon from "./icon.astro";
+
+const posts = (await getRandomPosts(5)).filter((p) => !p.data.draft);
+---
+
+<div class="card">
+  <div class="card-title">
+    <Icon name="star" size={15} />
+    <span>猜你喜欢</span>
+  </div>
+  <ul class="guess-list">
+    {
+      posts.map((post) => (
+        <li>
+          <a href={`/posts/${post.id}`} class="guess-item" data-category={post.data.categories.join(",")}>
+            <img
+              src={post.data.cover || siteConfig.defaultCover}
+              alt=""
+              class="guess-cover"
+              loading="lazy"
+              onerror="this.style.visibility='hidden'"
+            />
+            <span class="guess-meta">
+              <span class="guess-title">{post.data.title}</span>
+              <span class="guess-date">
+                {formatDateToChinese(post.data.pubDate)}
+                {
+                  post.data.categories.length > 0 && (
+                    <span class="guess-cat"> · {post.data.categories[0]}</span>
+                  )
+                }
+              </span>
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style lang="scss">
+  .card-title {
+    @apply flex items-center gap-1.5 text-sm font-semibold mb-3 text-[var(--primary)];
+  }
+  .guess-list {
+    @apply list-none p-0 m-0 space-y-1;
+  }
+  .guess-item {
+    @apply flex items-center gap-2.5 px-2 py-2 rounded-lg no-underline
+           text-[var(--text)] transition hover:bg-[var(--primary)]/8;
+  }
+  .guess-cover {
+    @apply w-12 h-12 rounded-md object-cover shrink-0
+           border border-[var(--border)] bg-[var(--card-bg)];
+  }
+  .guess-meta {
+    @apply flex flex-col min-w-0;
+  }
+  .guess-title {
+    @apply text-sm truncate;
+  }
+  .guess-date {
+    @apply text-xs text-[var(--muted)];
+  }
+  .guess-cat {
+    @apply text-[var(--primary)]/80;
+  }
+</style>

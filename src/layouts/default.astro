@@ -8,16 +8,49 @@ interface Props {
   description?: string;
   keywords?: string;
   showSidebar?: boolean;
+  ogType?: "website" | "article";
+  ogImage?: string;
+  publishedTime?: string;
+  modifiedTime?: string;
+  tags?: string[];
+  author?: string;
+  postTitle?: string;
 }
 
-const { title, description, keywords, showSidebar = true } = Astro.props;
+const {
+  title,
+  description,
+  keywords,
+  showSidebar = true,
+  ogType,
+  ogImage,
+  publishedTime,
+  modifiedTime,
+  tags,
+  author,
+  postTitle,
+} = Astro.props;
 ---
 
-<Base {title} {description} {keywords}>
+<Base
+  {title}
+  {description}
+  {keywords}
+  {ogType}
+  {ogImage}
+  {publishedTime}
+  {modifiedTime}
+  {tags}
+  {author}
+>
   <div class="layout">
     <header class="header">
-      <Navbar />
+      <Navbar postTitle={postTitle} />
     </header>
+
+    <div id="hero-slot" class="hero-slot">
+      <slot name="hero" />
+    </div>
 
     <main id="main-container">
       <div class="article-content">
@@ -52,6 +85,5 @@ const { title, description, keywords, showSidebar = true } = Astro.props;
 
   .sidebar-container {
     @apply w-72 hidden xl:block shrink-0;
-    background: rgba(0, 0, 0, 0);
   }
 </style>

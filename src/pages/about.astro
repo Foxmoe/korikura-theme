@@ -1,16 +1,104 @@
 ---
-// about page
+import Default from "@/layouts/default.astro";
+import Sidebar from "@/components/sidebar.astro";
+import Comments from "@/components/comments.astro";
+import { profileConfig, siteConfig } from "@/config";
+import Icon from "@/components/icon.astro";
 
-import Default from "../layouts/default.astro";
+const stats = [
+  { label: "主题", value: "Astro + Tailwind" },
+  { label: "部署", value: "Cloudflare Pages" },
+  { label: "留言", value: "欢迎邮件" },
+];
 ---
 
-<Default title="关于我 · 桜の日記">
-  <h1 style="color: #d4888f; font-size: 2rem;">🌸 关于这里</h1>
-  <p style="color: #6a5a5a; line-height: 1.8; margin-top: 1rem;">
-    这里是一个藏在樱花树下的角落 🐾<br />
-    记录着一些关于代码、生活和美好事物的碎片。
-  </p>
-  <p style="color: #b88a8a; margin-top: 1rem;">
-    喜欢：🌸 粉色 · 🦊 狐狸 · ☕ 咖啡 · 📖 阅读
-  </p>
+<Default title="关于我">
+  <div slot="sidebar">
+    <Sidebar headings={[]} />
+  </div>
+  <section class="about">
+    <div class="about-hero">
+      <img src={profileConfig.avatar} alt={profileConfig.name} class="about-avatar" />
+      <h1 class="about-name">{profileConfig.name}</h1>
+      <p class="about-bio">{profileConfig.bio}</p>
+      <div class="about-socials">
+        {
+          profileConfig.social.map((s) => (
+            <a href={s.url} title={s.name} target="_blank" rel="noopener noreferrer" aria-label={s.name}>
+              <Icon name={s.icon} size={18} />
+            </a>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="about-card prose">
+      <h2>关于这里</h2>
+      <p>
+        这里是一个藏在角落的小站，记录着关于代码、生活和美好事物的碎片。
+        我喜欢粉色、狐狸、咖啡与阅读，也喜欢把折腾过的东西写下来分享给大家。
+      </p>
+      <h2>这个站点</h2>
+      <ul>
+        <li>基于 <strong>Astro</strong> 构建，极致轻量、默认零 JS。</li>
+        <li>样式使用 <strong>Tailwind CSS</strong>，支持亮色 / 暗色 / 跟随系统。</li>
+        <li>评论与互动欢迎通过社交账号联系我 ~(￣▽￣)~</li>
+      </ul>
+    </div>
+
+    <div class="about-stats">
+      {
+        stats.map((s) => (
+          <div class="stat">
+            <div class="stat-value">{s.value}</div>
+            <div class="stat-label">{s.label}</div>
+          </div>
+        ))
+      }
+    </div>
+
+    <Comments />
+  </section>
 </Default>
+
+<style lang="scss">
+  .about {
+    @apply max-w-2xl mx-auto px-1 py-6;
+  }
+  .about-hero {
+    @apply text-center py-8;
+  }
+  .about-avatar {
+    @apply w-24 h-24 rounded-full mx-auto mb-4 object-cover
+           border-4 border-[var(--card-bg)] shadow-lg;
+  }
+  .about-name {
+    @apply text-2xl font-bold text-[var(--text)];
+  }
+  .about-bio {
+    @apply text-sm text-[var(--muted)] mt-1;
+  }
+  .about-socials {
+    @apply flex items-center justify-center gap-4 mt-4 text-[var(--muted)];
+    a {
+      @apply transition hover:text-[var(--primary)] hover:-translate-y-0.5;
+    }
+  }
+  .about-card {
+    @apply rounded-xl border border-[var(--border)] p-6 mt-4
+           bg-[var(--card-bg)]/50;
+  }
+  .about-stats {
+    @apply grid grid-cols-3 gap-3 mt-4;
+  }
+  .stat {
+    @apply rounded-lg border border-[var(--border)] p-4 text-center
+           bg-[var(--card-bg)]/50;
+    .stat-value {
+      @apply text-sm font-semibold text-[var(--text)];
+    }
+    .stat-label {
+      @apply text-xs text-[var(--muted)] mt-1;
+    }
+  }
+</style>

@@ -1,0 +1,75 @@
+---
+import Default from "@/layouts/default.astro";
+import Sidebar from "@/components/sidebar.astro";
+import { getCategoryCounts } from "@/utils/posts";
+import { tagToSlug } from "@/utils/utils";
+import Icon from "@/components/icon.astro";
+
+const cats = await getCategoryCounts();
+---
+
+<Default title="分类">
+  <section class="taxonomy">
+    <div class="tax-head">
+      <h1 class="tax-title">
+        <Icon name="folder" size={22} /> 全部分类
+      </h1>
+      <p class="tax-sub">共 {cats.length} 个分类</p>
+    </div>
+
+    {
+      cats.length === 0 ? (
+        <p class="tax-empty">暂无分类</p>
+      ) : (
+        <div class="cat-list">
+          {cats.map((c) => (
+            <a href={`/categories/${tagToSlug(c.name)}`} class="cat-item">
+              <Icon name="folder" size={16} />
+              <span class="cat-name">{c.name}</span>
+              <span class="cat-count">{c.count}</span>
+            </a>
+          ))}
+        </div>
+      )
+    }
+  </section>
+
+  <div slot="sidebar">
+    <Sidebar />
+  </div>
+</Default>
+
+<style lang="scss">
+  .taxonomy {
+    @apply max-w-3xl mx-auto px-1 py-4;
+  }
+  .tax-head {
+    @apply mb-8;
+  }
+  .tax-title {
+    @apply text-3xl font-bold flex items-center gap-2 text-[var(--text)];
+  }
+  .tax-sub {
+    @apply text-sm text-[var(--muted)] mt-1;
+  }
+  .tax-empty {
+    @apply text-[var(--muted)];
+  }
+  .cat-list {
+    @apply flex flex-col gap-2;
+  }
+  .cat-item {
+    @apply flex items-center gap-2 px-4 py-3 rounded-lg no-underline
+           border border-[var(--border)] bg-[var(--card-bg)]/50
+           text-[var(--text)] transition;
+    &:hover {
+      @apply border-[var(--primary)] text-[var(--primary)];
+    }
+  }
+  .cat-name {
+    @apply flex-1 font-medium;
+  }
+  .cat-count {
+    @apply text-xs px-2 py-0.5 rounded-full bg-[var(--primary)]/10 text-[var(--primary)];
+  }
+</style>

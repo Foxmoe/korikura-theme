@@ -1,0 +1,33 @@
+---
+// 文章列表分页页（第 2 页起）：/posts/page/{page}
+import Default from "@/layouts/default.astro";
+import Sidebar from "@/components/sidebar.astro";
+import PostList from "@/components/post-list.astro";
+import { getPublishedPosts } from "@/utils/posts";
+import { PAGE_SIZE } from "@/constants/constants";
+import type { GetStaticPaths } from "astro";
+
+export const getStaticPaths = (async () => {
+  const all = await getPublishedPosts();
+  const totalPages = Math.max(1, Math.ceil(all.length / PAGE_SIZE));
+  const paths = [];
+  for (let page = 2; page <= totalPages; page++) {
+    const start = (page - 1) * PAGE_SIZE;
+    paths.push({
+      params: { page: String(page) },
+      props: { posts: all.slice(start, start + PAGE_SIZE), page, totalPages },
+    });
+  }
+  return paths;
+}) satisfies GetStaticPaths;
+
+const { posts, page, totalPages } = Astro.props;
+---
+
+<Default title={`文章 · 第 ${page} 页`}>
+  <PostList posts={posts} page={page} totalPages={totalPages} />
+
+  <div slot="sidebar">
+    <Sidebar />
+  </div>
+</Default>

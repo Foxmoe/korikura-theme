@@ -1,0 +1,136 @@
+---
+import { getPublishedPosts, type Post } from "@/utils/posts";
+import { siteConfig } from "@/config";
+import { formatDateToChinese } from "@/utils/utils";
+import Icon from "./icon.astro";
+
+interface Props {
+  current: string;
+}
+const { current } = Astro.props;
+
+const all = await getPublishedPosts();
+const cur = all.find((p) => p.id === current);
+const others = all.filter((p) => p.id !== current);
+
+// 优先同标签，不足则随机补足
+const related = others.filter((p) =>
+  cur ? p.data.tags.some((t) => cur.data.tags.includes(t)) : false,
+);
+if (related.length < 3) {
+  const pool = others.filter((p) => !related.includes(p));
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  related.push(...pool.slice(0, 3 - related.length));
+}
+const list: Post[] = related.slice(0, 3);
+---
+
+{
+  list.length > 0 && (
+    <section class="recommend">
+      <h2 class="recommend-title">
+        <Icon name="star" size={16} />
+        推荐阅读
+      </h2>
+      <div class="recommend-grid">
+        {list.map((p) => (
+          <a href={`/posts/${p.id}`} class="rec-card" data-category={p.data.categories.join(",")}>
+            <img
+              src={p.data.cover || siteConfig.defaultCover}
+              alt={p.data.coverAlt || p.data.title}
+              class="rec-img"
+              loading="lazy"
+              onerror="this.style.visibility='hidden'"
+            />
+            {
+              p.data.categories.length > 0 && (
+                <span class="rec-cat">
+                  <Icon name="folder" size={11} /> {p.data.categories[0]}
+                </span>
+              )
+            }
+            <div class="rec-info">
+              <div class="rec-title">{p.data.title}</div>
+              <div class="rec-meta">
+                {formatDateToChinese(p.data.pubDate)}
+                {p.data.author ? ` · ${p.data.author}` : ""}
+              </div>
+              {
+                p.data.tags.length > 0 && (
+                  <div class="rec-hover">
+                    <div class="rec-tags">
+                      {p.data.tags.slice(0, 3).map((t) => (
+                        <span class="rec-tag">#{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                )
+              }
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+<style lang="scss">
+  .recommend {
+    @apply mt-12 pt-8 border-t border-[var(--border)];
+  }
+  .recommend-title {
+    @apply flex items-center gap-1.5 text-lg font-bold text-[var(--text)] mb-4;
+    :global(svg) {
+      @apply text-[var(--primary)];
+    }
+  }
+  .recommend-grid {
+    @apply grid gap-4 grid-cols-2 sm:grid-cols-3;
+  }
+  .rec-card {
+    @apply relative block aspect-[4/3] rounded-lg overflow-hidden no-underline
+           border border-[var(--border)] transition;
+    box-shadow: 0 4px 18px -14px rgba(0, 0, 0, 0.3);
+    &:hover {
+      @apply -translate-y-0.5;
+      border-color: color-mix(in oklab, var(--primary) 50%, var(--border));
+    }
+  }
+  .rec-img {
+    @apply absolute inset-0 w-full h-full object-cover transition-transform duration-500;
+  }
+  .rec-card:hover .rec-img {
+    @apply scale-105;
+  }
+  .rec-cat {
+    @apply absolute top-2 left-2 z-10 inline-flex items-center gap-1
+           text-[11px] px-2 py-0.5 rounded-full text-white shadow
+           backdrop-blur-sm;
+    background: color-mix(in oklab, var(--text) 55%, transparent);
+  }
+  .rec-info {
+    @apply absolute inset-0 flex flex-col justify-end p-3 text-white
+           bg-gradient-to-t from-black/80 via-black/35 to-transparent;
+  }
+  .rec-title {
+    @apply text-sm font-semibold line-clamp-2 drop-shadow;
+  }
+  .rec-meta {
+    @apply text-xs text-white/85 mt-1.5;
+  }
+  .rec-hover {
+    @apply max-h-0 opacity-0 overflow-hidden transition-all duration-300;
+  }
+  .rec-card:hover .rec-hover {
+    @apply max-h-20 opacity-100 mt-1.5;
+  }
+  .rec-tags {
+    @apply flex flex-wrap gap-1;
+  }
+  .rec-tag {
+    @apply text-[11px] px-1.5 py-0.5 rounded-full bg-white/20 backdrop-blur-sm;
+  }
+</style>

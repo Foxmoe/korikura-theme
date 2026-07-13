@@ -19,12 +19,12 @@ import Icon from "./icon.astro";
     @apply flex items-center justify-center w-9 h-9 rounded
            border border-[var(--border)] text-[var(--text)]
            bg-[var(--card-bg)]/50 transition active:scale-95
-           hover:text-[var(--primary)] hover:border-[var(--primary)];
+           hover:text-[var(--primary)];
   }
   .theme-icon {
     @apply hidden;
   }
-  /* 根据 html 上的 data-mode 决定显示哪个图标 */
+  
   html[data-mode="light"] .theme-icon[data-mode="light"],
   html[data-mode="dark"] .theme-icon[data-mode="dark"],
   html[data-mode="auto"] .theme-icon[data-mode="auto"] {
@@ -67,7 +67,18 @@ import Icon from "./icon.astro";
     document.body.appendChild(ripple);
     ripple.addEventListener("animationend", () => ripple.remove());
 
-    applyTheme(next);
+    // 用 View Transitions 做平滑的主题切换（GPU 合成，无逐元素过渡卡顿）
+    const swap = () => applyTheme(next);
+    if (typeof document.startViewTransition === "function") {
+      document.startViewTransition(swap);
+    } else {
+      swap();
+      document.documentElement.classList.add("theme-transition");
+      window.setTimeout(
+        () => document.documentElement.classList.remove("theme-transition"),
+        400,
+      );
+    }
   });
 
   // 跟随系统变化（仅 auto 模式）

@@ -2,7 +2,9 @@
 import ProfileCard from "./profilecard.astro";
 import RecentPosts from "./recentposts.astro";
 import TagsCloud from "./tagscloud.astro";
-import TableOfContents from "./tableofcontents.astro";
+import GuessYouLike from "./guess-you-like.astro";
+import StatWidget from "./stat-widget.astro";
+import TableOfContents from "./table-of-contents.astro";
 import "@/styles/sidebar.css";
 
 const { headings } = Astro.props;
@@ -17,6 +19,8 @@ const { headings } = Astro.props;
             )
         }
         <RecentPosts />
+        <GuessYouLike />
         <TagsCloud />
+        <StatWidget />
     </div>
 </aside>

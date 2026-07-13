@@ -1,0 +1,422 @@
+---
+// 增强灯箱：分组画廊、缩放、上一张/下一张、复制图片、分享图片。
+// 对文章 .prose 与动态 .moments-grid 内的图片统一生效，SPA 切换后依旧可用。
+---
+
+<style is:global>
+  .lb-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5vh 5vw;
+    background: rgba(0, 0, 0, 0.86);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease;
+  }
+  .lb-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .lb-stage {
+    position: relative;
+    max-width: 100%;
+    max-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .lb-img {
+    max-width: 90vw;
+    max-height: 82vh;
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    transform: scale(1);
+    transition: transform 0.2s ease;
+    user-select: none;
+    cursor: zoom-in;
+  }
+  .lb-img.zoomed {
+    cursor: zoom-out;
+  }
+  .lb-counter {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    font-size: 13px;
+    background: rgba(255, 255, 255, 0.12);
+    padding: 3px 12px;
+    border-radius: 999px;
+    pointer-events: none;
+  }
+  .lb-toolbar {
+    position: absolute;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border-radius: 999px;
+    background: rgba(20, 20, 20, 0.6);
+    backdrop-filter: blur(8px);
+  }
+  .lb-btn {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: #fff;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.18s;
+  }
+  .lb-btn:hover {
+    background: rgba(255, 255, 255, 0.18);
+  }
+  .lb-btn:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+  .lb-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+  .lb-close {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: none;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .lb-close:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+  .lb-toast {
+    position: fixed;
+    bottom: 84px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.82);
+    color: #fff;
+    font-size: 13px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .lb-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  
+  .moments-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    margin: 10px 0;
+    max-width: 320px;
+  }
+  .moments-grid.cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 220px;
+  }
+  .moments-grid .moments-img {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 6px;
+    cursor: zoom-in;
+    background: color-mix(in oklab, var(--card-bg) 60%, transparent);
+  }
+  .moments-grid .moments-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .moments-grid.single {
+    display: block;
+    max-width: 220px;
+  }
+  .moments-grid.single .moments-img {
+    aspect-ratio: auto;
+    border-radius: 8px;
+  }
+  .moments-grid.single .moments-img img {
+    object-fit: contain;
+    max-height: 260px;
+  }
+</style>
+
+<script>
+  (function () {
+    if (document.querySelector(".lb-overlay")) return;
+
+    const overlay = document.createElement("div");
+    overlay.className = "lb-overlay";
+    overlay.innerHTML = `
+      <button class="lb-close" type="button" aria-label="关闭" data-tooltip="关闭">×</button>
+      <div class="lb-counter" aria-hidden="true"></div>
+      <div class="lb-stage">
+        <img class="lb-img" alt="" />
+      </div>
+      <div class="lb-toolbar">
+        <button class="lb-btn" data-lb="zoom-out" type="button" aria-label="缩小" data-tooltip="缩小">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        </button>
+        <button class="lb-btn" data-lb="zoom-reset" type="button" aria-label="还原" data-tooltip="还原大小">100%</button>
+        <button class="lb-btn" data-lb="zoom-in" type="button" aria-label="放大" data-tooltip="放大">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        </button>
+        <button class="lb-btn" data-lb="prev" type="button" aria-label="上一张" data-tooltip="上一张">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="lb-btn" data-lb="next" type="button" aria-label="下一张" data-tooltip="下一张">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button class="lb-btn" data-lb="copy" type="button" aria-label="复制图片" data-tooltip="复制图片">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+        </button>
+        <button class="lb-btn" data-lb="share" type="button" aria-label="分享图片" data-tooltip="分享图片">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.5" x2="15.4" y2="6.5"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/></svg>
+        </button>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    const toast = document.createElement("div");
+    toast.className = "lb-toast";
+    document.body.appendChild(toast);
+
+    const stage = overlay.querySelector<HTMLElement>(".lb-stage")!;
+    const lbImg = overlay.querySelector<HTMLImageElement>(".lb-img")!;
+    const counter = overlay.querySelector<HTMLElement>(".lb-counter")!;
+    const btnPrev = overlay.querySelector<HTMLButtonElement>('[data-lb="prev"]')!;
+    const btnNext = overlay.querySelector<HTMLButtonElement>('[data-lb="next"]')!;
+
+    let gallery: { src: string; alt: string }[] = [];
+    let index = 0;
+    let scale = 1;
+    let panX = 0;
+    let panY = 0;
+
+    const showToast = (msg: string) => {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      window.clearTimeout((showToast as any)._t);
+      (showToast as any)._t = window.setTimeout(() => toast.classList.remove("show"), 1600);
+    };
+
+    const applyZoom = () => {
+      // 先平移（屏幕像素）再缩放，放大后可通过拖拽查看整张图而非局部
+      lbImg.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+      lbImg.classList.toggle("zoomed", scale > 1);
+      lbImg.style.cursor = scale > 1 ? "grab" : "zoom-in";
+      const reset = overlay.querySelector<HTMLButtonElement>('[data-lb="zoom-reset"]');
+      if (reset) reset.textContent = `${Math.round(scale * 100)}%`;
+    };
+
+    const render = () => {
+      const item = gallery[index];
+      if (!item) return;
+      lbImg.src = item.src;
+      lbImg.alt = item.alt || "";
+      scale = 1;
+      panX = 0;
+      panY = 0;
+      applyZoom();
+      counter.textContent = gallery.length > 1 ? `${index + 1} / ${gallery.length}` : "";
+      counter.style.display = gallery.length > 1 ? "" : "none";
+      const multi = gallery.length > 1;
+      btnPrev.disabled = !multi;
+      btnNext.disabled = !multi;
+    };
+
+    const open = (imgs: { src: string; alt: string }[], i: number) => {
+      if (!imgs.length) return;
+      gallery = imgs;
+      index = i;
+      render();
+      overlay.classList.add("open");
+      document.body.style.overflow = "hidden";
+    };
+
+    const close = () => {
+      overlay.classList.remove("open");
+      document.body.style.overflow = "";
+    };
+
+    const step = (d: number) => {
+      if (gallery.length <= 1) return;
+      index = (index + d + gallery.length) % gallery.length;
+      render();
+    };
+
+    const zoomBy = (d: number) => {
+      scale = Math.min(4, Math.max(1, +(scale + d).toFixed(2)));
+      applyZoom();
+    };
+
+    const copyImage = async () => {
+      const item = gallery[index];
+      if (!item) return;
+      try {
+        const blob = await (await fetch(item.src)).blob();
+        if (navigator.clipboard && "write" in navigator.clipboard && typeof ClipboardItem !== "undefined") {
+          await navigator.clipboard.write([new ClipboardItem({ [blob.type || "image/png"]: blob })]);
+          showToast("图片已复制");
+          return;
+        }
+      } catch {
+        /* 跨域或环境不支持，回退到复制链接 */
+      }
+      try {
+        await navigator.clipboard.writeText(item.src);
+        showToast("图片链接已复制");
+      } catch {
+        showToast("复制失败");
+      }
+    };
+
+    const shareImage = async () => {
+      const item = gallery[index];
+      if (!item) return;
+      const shareData = { title: document.title, text: item.alt || document.title, url: location.href };
+      if (navigator.share) {
+        try {
+          await navigator.share(shareData);
+          return;
+        } catch {
+          /* 用户取消则忽略 */
+        }
+      }
+      try {
+        await navigator.clipboard.writeText(item.src);
+        showToast("图片链接已复制");
+      } catch {
+        showToast("分享失败");
+      }
+    };
+
+    overlay.querySelector<HTMLButtonElement>(".lb-close")!.addEventListener("click", close);
+    overlay.addEventListener("click", (e) => {
+      const t = e.target as HTMLElement;
+      if (t === overlay || t === stage) close();
+    });
+    overlay.querySelector<HTMLButtonElement>('[data-lb="zoom-in"]')!.addEventListener("click", () => zoomBy(0.25));
+    overlay.querySelector<HTMLButtonElement>('[data-lb="zoom-out"]')!.addEventListener("click", () => zoomBy(-0.25));
+    overlay.querySelector<HTMLButtonElement>('[data-lb="zoom-reset"]')!.addEventListener("click", () => { scale = 1; applyZoom(); });
+    btnPrev.addEventListener("click", () => step(-1));
+    btnNext.addEventListener("click", () => step(1));
+    overlay.querySelector<HTMLButtonElement>('[data-lb="copy"]')!.addEventListener("click", copyImage);
+    overlay.querySelector<HTMLButtonElement>('[data-lb="share"]')!.addEventListener("click", shareImage);
+
+    lbImg.addEventListener("click", () => { scale = scale > 1 ? 1 : 2; applyZoom(); });
+
+    // 放大后拖拽平移，查看整张图片（点击与拖拽区分：拖动超过阈值不算点击）
+    let dragging = false;
+    let moved = 0;
+    let sx = 0;
+    let sy = 0;
+    lbImg.addEventListener("pointerdown", (e: PointerEvent) => {
+      if (scale <= 1) return;
+      dragging = true;
+      moved = 0;
+      sx = e.clientX;
+      sy = e.clientY;
+      lbImg.setPointerCapture(e.pointerId);
+      lbImg.style.cursor = "grabbing";
+    });
+    lbImg.addEventListener("pointermove", (e: PointerEvent) => {
+      if (!dragging) return;
+      const dx = e.clientX - sx;
+      const dy = e.clientY - sy;
+      moved = Math.max(moved, Math.hypot(dx, dy));
+      panX += dx;
+      panY += dy;
+      sx = e.clientX;
+      sy = e.clientY;
+      applyZoom();
+    });
+    const endDrag = (e: PointerEvent) => {
+      if (!dragging) return;
+      dragging = false;
+      try {
+        lbImg.releasePointerCapture(e.pointerId);
+      } catch {
+        /* 指针已释放 */
+      }
+      lbImg.style.cursor = scale > 1 ? "grab" : "zoom-in";
+    };
+    lbImg.addEventListener("pointerup", endDrag);
+    lbImg.addEventListener("pointercancel", endDrag);
+    overlay.addEventListener("wheel", (e) => {
+      if (!overlay.classList.contains("open")) return;
+      e.preventDefault();
+      zoomBy(e.deltaY < 0 ? 0.15 : -0.15);
+    }, { passive: false });
+
+    document.addEventListener("keydown", (e) => {
+      if (!overlay.classList.contains("open")) return;
+      if (e.key === "Escape") close();
+      else if (e.key === "ArrowLeft") step(-1);
+      else if (e.key === "ArrowRight") step(1);
+      else if (e.key === "+" || e.key === "=") zoomBy(0.25);
+      else if (e.key === "-" || e.key === "_") zoomBy(-0.25);
+    });
+
+    // 点击文章 .prose、动态 .moments-grid / .feed-item 内的图片打开灯箱
+    // 使用捕获阶段：先于 SPA 路由执行，避免触发外层链接（如动态详情）的跳转
+    document.addEventListener(
+      "click",
+      (e) => {
+      const img = (e.target as HTMLElement)?.closest?.("img");
+      if (!img) return;
+      const scope =
+        img.closest(".moments-grid") ||
+        img.closest(".feed-item") ||
+        img.closest(".prose") ||
+        img.closest("article");
+      if (!scope) return;
+      const inScope =
+        img.closest(".moments-grid") || img.closest(".prose") || img.closest(".feed-item");
+      if (!inScope) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const imgs = Array.from(scope.querySelectorAll<HTMLImageElement>("img"))
+        .filter(
+          (im) =>
+            im.closest(".moments-grid") || im.closest(".prose") || im.closest(".feed-item"),
+        )
+        .map((im) => ({ src: im.currentSrc || im.src, alt: im.alt }));
+      if (!imgs.length) return;
+      const i = imgs.findIndex((it) => it.src === (img.currentSrc || img.src));
+      open(imgs, i < 0 ? 0 : i);
+    },
+      true,
+    );
+  })();
+</script>
