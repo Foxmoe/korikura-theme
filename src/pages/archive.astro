@@ -2,11 +2,12 @@
 import Default from "@/layouts/default.astro";
 import Sidebar from "@/components/sidebar.astro";
 import { getPostsByYear } from "@/utils/posts";
-import { formatDateToChinese } from "@/utils/utils";
+import { tagToSlug } from "@/utils/utils";
 import Icon from "@/components/icon.astro";
 
 const groups = await getPostsByYear();
 const total = groups.reduce((n, g) => n + g.posts.length, 0);
+const monthDay = (d: Date) => `${d.getMonth() + 1}月${d.getDate()}日`;
 ---
 
 <Default title="归档">
@@ -19,33 +20,51 @@ const total = groups.reduce((n, g) => n + g.posts.length, 0);
     </div>
 
     {
-      groups.map((group) => (
-        <div class="arc-year">
-          <div class="year-label">
-            <span class="year-num">{group.year}</span>
-            <span class="year-count">{group.posts.length} 篇</span>
-          </div>
-          <ul class="arc-list">
-            {group.posts.map((post) => (
-              <li class="arc-item">
-                <span class="arc-date">
-                  {formatDateToChinese(post.data.pubDate).replace(
-                    post.data.pubDate.getFullYear() + "年",
-                    ""
-                  )}
-                </span>
-                <span class="arc-dot" />
-                <a href={`/posts/${post.id}`} class="arc-link">
-                  {post.data.title}
-                </a>
-                {post.data.tags[0] && (
-                  <span class="arc-tag">#{post.data.tags[0]}</span>
-                )}
-              </li>
-            ))}
-          </ul>
+      groups.length === 0 ? (
+        <div class="arc-empty">
+          <div class="empty-icon">🗂️</div>
+          <p class="empty-text">还没有文章，正在努力写...</p>
         </div>
-      ))
+      ) : (
+        <div class="tl">
+          {groups.map((group) => (
+            <div class="tl-year">
+              <div class="tl-year-marker">
+                <span class="tl-year-num">{group.year}</span>
+                <span class="tl-year-count">{group.posts.length} 篇</span>
+              </div>
+              <ul class="tl-list">
+                {group.posts.map((post) => (
+                  <li class="tl-item reveal">
+                    <span class="tl-node" aria-hidden="true" />
+                    <article class="tl-card">
+                      <div class="tl-line">
+                        <time
+                          class="tl-date"
+                          datetime={post.data.pubDate.toISOString()}
+                        >
+                          {monthDay(post.data.pubDate)}
+                        </time>
+                        <a href={`/posts/${post.id}`} class="tl-link">
+                          {post.data.title}
+                        </a>
+                      </div>
+                      {post.data.tags[0] && (
+                        <a
+                          href={`/tags/${tagToSlug(post.data.tags[0])}`}
+                          class="tl-tag"
+                        >
+                          #{post.data.tags[0]}
+                        </a>
+                      )}
+                    </article>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )
     }
   </section>
 
@@ -67,35 +86,64 @@ const total = groups.reduce((n, g) => n + g.posts.length, 0);
   .arc-sub {
     @apply text-sm text-(--muted) mt-1;
   }
-  .arc-year {
-    @apply mb-8;
+  .arc-empty {
+    @apply text-center py-20;
   }
-  .year-label {
-    @apply flex items-baseline gap-3 mb-3 sticky top-[calc(var(--nav-h)+12px)] z-10;
-    .year-num {
-      @apply text-2xl font-bold text-(--primary);
-    }
-    .year-count {
-      @apply text-xs text-(--muted);
-    }
+  .empty-icon {
+    @apply text-5xl mb-4;
   }
-  .arc-list {
-    @apply list-none p-0 m-0 border-l-2 border-(--border) ml-1;
+  .empty-text {
+    @apply text-lg text-(--muted);
   }
-  .arc-item {
-    @apply relative flex items-center gap-3 pl-5 py-2 ml-1;
-    .arc-date {
-      @apply text-xs text-(--muted) tabular-nums w-16 shrink-0;
-    }
-    .arc-dot {
-      @apply absolute -left-[5px] w-2.5 h-2.5 rounded-full bg-(--primary)/60
-             ring-2 ring-(--bg);
-    }
-    .arc-link {
-      @apply text-sm text-(--text) no-underline transition hover:text-(--primary);
-    }
-    .arc-tag {
-      @apply text-xs text-(--muted) ml-auto;
-    }
+
+  /* 时间轴 */
+  .tl {
+    @apply relative;
+  }
+  .tl-year {
+    @apply mb-10;
+  }
+  .tl-year-marker {
+    @apply sticky top-[calc(var(--nav-h)+12px)] z-10 inline-flex items-center gap-2
+           px-3.5 py-1.5 rounded-full mb-4
+           bg-(--primary) text-white font-semibold shadow-md;
+  }
+  .tl-year-count {
+    @apply text-xs opacity-85 font-normal;
+  }
+  .tl-list {
+    @apply list-none m-0 p-0 relative;
+  }
+  .tl-list::before {
+    content: "";
+    @apply absolute top-1 bottom-1 left-0 w-[2px] rounded-full bg-(--border);
+  }
+  .tl-item {
+    @apply relative pl-6 py-1.5;
+  }
+  .tl-node {
+    @apply absolute left-[-5px] top-4 w-3 h-3 rounded-full
+           bg-(--card-bg) border-2 border-(--primary) transition-all duration-200;
+  }
+  .tl-item:hover .tl-node {
+    @apply bg-(--primary) scale-110;
+  }
+  .tl-card {
+    @apply block rounded-lg border border-(--border) bg-(--card-bg)/50
+           px-4 py-2.5 transition
+           hover:border-(--primary) hover:-translate-y-0.5 hover:shadow-md;
+  }
+  .tl-line {
+    @apply flex items-baseline gap-3;
+  }
+  .tl-date {
+    @apply text-xs text-(--muted) tabular-nums w-14 shrink-0;
+  }
+  .tl-link {
+    @apply text-sm text-(--text) no-underline font-medium transition hover:text-(--primary);
+  }
+  .tl-tag {
+    @apply inline-block mt-1.5 text-xs px-2 py-0.5 rounded-full no-underline
+           bg-(--primary)/10 text-(--primary) transition hover:bg-(--primary)/20;
   }
 </style>

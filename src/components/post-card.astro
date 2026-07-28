@@ -23,7 +23,7 @@ const reading = getReadingTime(post.body || "", siteConfig.readingSpeed);
   style={`--reveal-delay:${delay}ms`}
 >
   <div class="card-cover">
-    <img src={cover} alt={data.coverAlt || data.title} loading="lazy" class="cover-img" />
+    <img src={cover} alt={data.coverAlt || ""} loading="lazy" decoding="async" class="cover-img" />
     {
       !data.cover && (
         <div class="cover-fallback">
@@ -54,6 +54,8 @@ const reading = getReadingTime(post.body || "", siteConfig.readingSpeed);
         <span>{data.author || siteConfig.title}</span>
         <span class="dot">·</span>
         <span>{formatDateToChinese(data.pubDate)}</span>
+        <span class="dot">·</span>
+        <span>{reading.minutes} 分钟</span>
       </div>
       <div class="meta-tags">
         {
@@ -71,12 +73,15 @@ const reading = getReadingTime(post.body || "", siteConfig.readingSpeed);
     @apply block h-full rounded-xl overflow-hidden no-underline
            border border-(--border)
            bg-(--card-bg)
-           transition-all duration-300 will-change-transform;
-    box-shadow: 0 4px 18px -14px rgba(0, 0, 0, 0.28);
+           transition-all duration-300;
+    box-shadow: 0 2px 10px -8px rgba(0, 0, 0, 0.22);
+    /* 下滑吸顶：卡片顶部抵达导航栏下方后固定，不随页面滚走（单列布局下呈“叠放”效果） */
+    position: sticky;
+    top: calc(var(--nav-h) + 16px);
     &:hover {
       @apply -translate-y-1.5;
-      border-color: color-mix(in oklab, var(--primary) 45%, var(--border));
-      box-shadow: 0 20px 40px -18px color-mix(in oklab, var(--primary) 45%, rgba(0, 0, 0, 0.45));
+      border-color: color-mix(in oklab, var(--primary) 30%, var(--border));
+      box-shadow: 0 12px 26px -20px color-mix(in oklab, var(--primary) 32%, rgba(0, 0, 0, 0.4));
     }
   }
   
@@ -84,13 +89,13 @@ const reading = getReadingTime(post.body || "", siteConfig.readingSpeed);
     @apply flex flex-col sm:flex-row;
   }
   .horizontal .card-cover {
-    @apply w-full sm:w-48 aspect-[2/1] sm:aspect-[4/3];
+    @apply w-full sm:w-48 aspect-2/1 sm:aspect-4/3;
   }
   .horizontal .card-body {
     @apply flex-1;
   }
   .card-cover {
-    @apply relative aspect-[2/1] overflow-hidden;
+    @apply relative aspect-2/1 overflow-hidden;
     &::after {
       content: "";
       @apply absolute inset-x-0 top-0 h-1/2 pointer-events-none;

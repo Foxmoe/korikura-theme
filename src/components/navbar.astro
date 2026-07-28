@@ -92,7 +92,7 @@ const isPost = Boolean(postTitle);
     background-color: color-mix(in oklab, var(--card-bg) 82%, transparent);
     -webkit-backdrop-filter: blur(16px);
     backdrop-filter: blur(16px);
-    box-shadow: 0 12px 32px -16px color-mix(in oklab, var(--text) 38%, transparent);
+    box-shadow: 0 12px 32px -16px color-mix(in oklab, var(--text) 10%, transparent);
   }
 
   .logo {
@@ -198,6 +198,13 @@ const isPost = Boolean(postTitle);
            hover:text-(--primary);
   }
 
+  /* 桌面端（sm: 及以上）导航链接已常驻，隐藏冗余的汉堡按钮，仅移动端出现 */
+  @media (min-width: 640px) {
+    #menu-open {
+      @apply hidden;
+    }
+  }
+
   .mobile-menu {
     position: absolute;
     top: calc(100% + 8px);
@@ -236,6 +243,8 @@ const isPost = Boolean(postTitle);
       const isActive =
         href === path || (href !== "/" && path.startsWith(href));
       el.classList.toggle("active", isActive);
+      if (isActive) el.setAttribute("aria-current", "page");
+      else el.removeAttribute("aria-current");
     });
   }
 

@@ -39,11 +39,20 @@ const toc = generateToc(headings);
   <div class="toc-head">
     <Icon name="hash" size={15} />
     <span>目录</span>
+    <button
+      class="toc-toggle"
+      id="toc-toggle"
+      type="button"
+      aria-label="折叠目录"
+      aria-expanded="true"
+    >
+      <Icon name="chevron" size={14} class="toc-toggle-icon" />
+    </button>
     <span class="toc-progress-track" title="阅读进度">
       <span class="toc-progress-bar" id="toc-progress"></span>
     </span>
   </div>
-  <nav class="toc-body" id="toc-body">
+  <nav class="toc-body" id="toc-body" aria-label="文章目录">
     <ol class="toc-list">
       {
         toc.map((item) => (
@@ -78,6 +87,20 @@ const toc = generateToc(headings);
 <style lang="scss">
   .toc-head {
     @apply flex items-center gap-1.5 text-sm font-semibold mb-3 text-(--primary);
+  }
+  .toc-toggle {
+    @apply flex items-center justify-center w-6 h-6 rounded
+           text-(--muted) bg-transparent border-0 cursor-pointer
+           transition hover:text-(--primary) hover:bg-(--primary)/10 active:scale-95;
+  }
+  .toc-toggle-icon {
+    @apply transition-transform duration-200;
+  }
+  .toc.is-collapsed .toc-toggle-icon {
+    @apply -rotate-90;
+  }
+  .toc.is-collapsed .toc-body {
+    @apply hidden;
   }
   .toc-progress-track {
     @apply ml-auto w-16 h-1 rounded-full overflow-hidden bg-(--border)/60;
@@ -143,7 +166,9 @@ const toc = generateToc(headings);
 
 <script>
   function initToc() {
+    const tocRoot = document.getElementById("toc");
     const tocBody = document.getElementById("toc-body");
+    const toggle = document.getElementById("toc-toggle");
     const progress = document.getElementById("toc-progress");
     const content = document.querySelector("#main-container .prose");
     if (!tocBody) return;
@@ -157,7 +182,21 @@ const toc = generateToc(headings);
       if (id) map[id] = l;
     });
 
-    // 点击有子项的父标题：仅折叠/展开，不跳转
+    // 折叠 / 展开整块目录
+    toggle?.addEventListener("click", () => {
+      if (!tocRoot) return;
+      const collapsed = tocRoot.classList.toggle("is-collapsed");
+      toggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
+      toggle.setAttribute("aria-label", collapsed ? "展开目录" : "折叠目录");
+    });
+
+    // 可折叠父项：初始化 aria-expanded，点击仅折叠/展开不跳转
+    links.forEach((a) => {
+      const li = a.parentElement;
+      if (li && li.querySelector(":scope > .toc-list")) {
+        a.setAttribute("aria-expanded", "true");
+      }
+    });
     tocBody.addEventListener("click", (e) => {
       const a = (e.target as HTMLElement)?.closest?.(".toc-link") as
         | HTMLAnchorElement
@@ -166,7 +205,8 @@ const toc = generateToc(headings);
       const li = a.parentElement;
       if (li && li.querySelector(":scope > .toc-list")) {
         e.preventDefault();
-        li.classList.toggle("is-collapsed");
+        const collapsed = li.classList.toggle("is-collapsed");
+        a.setAttribute("aria-expanded", collapsed ? "false" : "true");
       }
     });
 
@@ -189,8 +229,26 @@ const toc = generateToc(headings);
 
       if (current !== activeId) {
         activeId = current;
-        links.forEach((l) => l.classList.remove("is-active"));
-        if (map[current]) map[current].classList.add("is-active");
+        links.forEach((l) => {
+          const on = l.dataset.target === current;
+          l.classList.toggle("is-active", on);
+          if (on) l.setAttribute("aria-current", "location");
+          else l.removeAttribute("aria-current");
+        });
+        // 自动展开所有祖先节点，确保当前项可见
+        const active = map[current];
+        if (active) {
+          let li = active.closest(".toc-item");
+          while (li) {
+            const nested = li.querySelector(":scope > .toc-list");
+            if (nested) {
+              li.classList.remove("is-collapsed");
+              const pa = li.querySelector<HTMLElement>(":scope > .toc-link");
+              pa?.setAttribute("aria-expanded", "true");
+            }
+            li = li.parentElement?.closest(".toc-item") ?? null;
+          }
+        }
       }
 
       // 阅读进度条

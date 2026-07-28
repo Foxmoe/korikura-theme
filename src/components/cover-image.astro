@@ -12,7 +12,7 @@ const cover = src || siteConfig.defaultCover;
 ---
 
 <figure class={`cover ${cls}`}>
-  <img src={cover} alt={alt || title} loading="lazy" class="cover-img" />
+  <img src={cover} alt={alt || title} loading="lazy" decoding="async" class="cover-img" />
   {
     !src && (
       <div class="cover-fallback">

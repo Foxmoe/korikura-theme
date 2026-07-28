@@ -56,7 +56,7 @@ const siteMessages = [
     <!-- 天气 -->
     <div class="hc-panel" data-panel="weather">
       <div class="hc-panel-head">
-        <Icon name="sun" size={15} /> 今日天气
+        <Icon name="sun" size={18} /> 今日天气
       </div>
       <div class="hc-weather" id="hc-weather">
         <div class="hc-w-loading">加载中…</div>
@@ -66,7 +66,7 @@ const siteMessages = [
     <!-- 一言 -->
     <div class="hc-panel" data-panel="hitokoto">
       <div class="hc-panel-head">
-        <Icon name="message" size={15} /> 一言
+        <Icon name="message" size={18} /> 一言
       </div>
       <blockquote class="hc-hitokoto" id="hc-hitokoto">
         生活不止眼前的苟且，还有诗和远方。
@@ -77,7 +77,7 @@ const siteMessages = [
     <!-- 更新日历 -->
     <div class="hc-panel" data-panel="calendar">
       <div class="hc-panel-head">
-        <Icon name="calendar" size={15} /> 更新日历
+        <Icon name="calendar" size={18} /> 更新日历
       </div>
       <div class="hc-cal">
         <div class="hc-cal-grid">
@@ -106,13 +106,13 @@ const siteMessages = [
     <!-- 全站消息 -->
     <div class="hc-panel" data-panel="messages">
       <div class="hc-panel-head">
-        <Icon name="info" size={15} /> 全站消息
+        <Icon name="info" size={18} /> 全站消息
       </div>
       <ul class="hc-msg-list">
         {
           siteMessages.map((m) => (
             <li class="hc-msg">
-              <Icon name={m.icon} size={15} />
+              <Icon name={m.icon} size={18} />
               <span>{m.text}</span>
             </li>
           ))
@@ -132,22 +132,27 @@ const siteMessages = [
 <style lang="scss">
   .hc {
     @apply relative rounded-xl border border-(--border)
-           bg-(--card-bg)/60 overflow-hidden min-h-[320px];
-    box-shadow: 0 4px 18px -14px rgba(0, 0, 0, 0.28);
+           bg-(--card-bg)/50 overflow-hidden min-h-[260px];
+    box-shadow: 0 2px 10px -8px rgba(0, 0, 0, 0.22);
   }
   .hc-panels {
     @apply relative;
-    min-height: 320px;
+    min-height: 260px;
   }
   .hc-panel {
-    @apply absolute inset-0 p-5 pb-9 flex flex-col gap-3
+    @apply absolute inset-0 p-4 pb-8 flex flex-col gap-2
            opacity-0 pointer-events-none transition-opacity duration-500;
     &.active {
       @apply opacity-100 pointer-events-auto;
     }
   }
+  /* 与首页其他区块标题统一：左侧主色竖条 + 文字主色 + 同字号/字重 */
   .hc-panel-head {
-    @apply flex items-center gap-1.5 text-sm font-semibold text-(--primary);
+    @apply flex items-center gap-1.5 text-xl font-bold text-(--text) relative pl-3 mb-2;
+    &::before {
+      content: "";
+      @apply absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-full bg-(--primary);
+    }
   }
   .hc-weather {
     @apply flex-1 flex items-center justify-center;
@@ -155,20 +160,32 @@ const siteMessages = [
   .hc-w-loading {
     @apply text-sm text-(--muted);
   }
-  .hc-w-card {
-    @apply flex items-center gap-4 text-(--text);
+  /* 天气卡片由客户端脚本 innerHTML 注入，元素不带组件 scoped 属性，故用 :global 命中 */
+  :global(.hc-w-card) {
+    @apply w-full flex items-center gap-4 rounded-xl px-4 py-3.5
+           bg-(--primary)/6 border border-(--primary)/15;
   }
-  .hc-w-emoji {
-    @apply text-5xl leading-none;
+  :global(.hc-w-emoji-wrap) {
+    @apply w-14 h-14 rounded-2xl flex items-center justify-center shrink-0
+           bg-(--primary)/12 text-3xl;
   }
-  .hc-w-temp {
-    @apply text-3xl font-bold;
+  :global(.hc-w-emoji) {
+    @apply leading-none;
   }
-  .hc-w-meta {
-    @apply text-sm text-(--muted) mt-0.5;
+  :global(.hc-w-main) {
+    @apply min-w-0 flex-1;
+  }
+  :global(.hc-w-temp) {
+    @apply text-2xl font-bold text-(--text) leading-none;
+  }
+  :global(.hc-w-meta) {
+    @apply text-sm text-(--muted) mt-1 truncate;
+  }
+  :global(.hc-w-sub) {
+    @apply text-xs text-(--muted) mt-0.5 truncate;
   }
   .hc-hitokoto {
-    @apply flex-1 flex items-center text-lg leading-relaxed text-(--text)
+    @apply flex-1 flex items-center text-base leading-relaxed text-(--text)
            border-l-2 border-(--primary) pl-4 my-0 italic;
   }
   .hc-hitokoto-from {
@@ -260,9 +277,16 @@ const siteMessages = [
 
     // 天气（open-meteo，默认北京；失败有兜底）
     const wBox = document.getElementById("hc-weather");
-    const drawWeather = (emoji: string, temp: string, meta: string) => {
+    const drawWeather = (emoji: string, temp: string, meta: string, sub = "") => {
       if (!wBox) return;
-      wBox.innerHTML = `<div class="hc-w-card"><div class="hc-w-emoji">${emoji}</div><div><div class="hc-w-temp">${temp}</div><div class="hc-w-meta">${meta}</div></div></div>`;
+      wBox.innerHTML = `<div class="hc-w-card">
+        <div class="hc-w-emoji-wrap"><span class="hc-w-emoji">${emoji}</span></div>
+        <div class="hc-w-main">
+          <div class="hc-w-temp">${temp}</div>
+          <div class="hc-w-meta">${meta}</div>
+          ${sub ? `<div class="hc-w-sub">${sub}</div>` : ""}
+        </div>
+      </div>`;
     };
     const wmap: Record<number, [string, string]> = {
       0: ["☀️", "晴"], 1: ["🌤️", "晴间多云"], 2: ["⛅", "多云"], 3: ["☁️", "阴"],
@@ -280,9 +304,14 @@ const siteMessages = [
         const w = j.current_weather;
         if (!w) throw new Error("no weather");
         const [emoji, desc] = wmap[w.weathercode] || ["🌡️", "未知"];
-        drawWeather(emoji, `${Math.round(w.temperature)}°C`, `北京 · ${desc}`);
+        drawWeather(
+          emoji,
+          `${Math.round(w.temperature)}°C`,
+          `北京 · ${desc}`,
+          `风速 ${Math.round(w.windspeed)} km/h`,
+        );
       })
-      .catch(() => drawWeather("🌤️", "23°C", "北京 · 多云"));
+      .catch(() => drawWeather("🌤️", "23°C", "北京 · 多云", "风速 8 km/h"));
 
     // 一言（hitokoto）
     const hk = document.getElementById("hc-hitokoto");

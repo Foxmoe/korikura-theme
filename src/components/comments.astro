@@ -10,11 +10,77 @@ const walineServer = siteConfig.comments?.walineServer ?? "https://waline.foxmoe
   <div id="waline"></div>
 </section>
 
+<style lang="scss" is:global>
+  /* 评论区主题化：用站点主色变量覆盖 Waline 默认蓝，并统一输入框/按钮/头像风格 */
+  .comments {
+    --waline-theme-color: var(--primary);
+    --waline-active-color: var(--primary-hover);
+    --waline-color: var(--text);
+    --waline-bgcolor: var(--card-bg);
+    --waline-bgcolor-light: color-mix(in oklab, var(--card-bg) 85%, var(--bg));
+    --waline-bgcolor-sub: color-mix(in oklab, var(--card-bg) 68%, var(--bg));
+    --waline-border-color: var(--border);
+    --waline-disable-bgcolor: var(--border);
+    --waline-disable-color: var(--muted);
+    --waline-code-bgcolor: color-mix(in oklab, var(--primary) 12%, var(--card-bg));
+
+    .wl-panel {
+      font-family: var(--font-sans);
+    }
+    .wl-btn {
+      border-radius: 0.6rem;
+      transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    }
+    /* 主按钮用加深后的主色，保证白字可读（主色本身偏浅，白字对比不足） */
+    .wl-btn-primary {
+      background: color-mix(in oklab, var(--primary) 68%, #000);
+      border-color: color-mix(in oklab, var(--primary) 68%, #000);
+      color: #fff;
+      &:hover {
+        background: color-mix(in oklab, var(--primary) 58%, #000);
+        border-color: color-mix(in oklab, var(--primary) 58%, #000);
+      }
+    }
+    .wl-editor,
+    .wl-input {
+      background: var(--card-bg);
+      color: var(--text);
+      border-color: var(--border);
+      border-radius: 0.6rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      &:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 18%, transparent);
+      }
+    }
+    .wl-editor {
+      background: color-mix(in oklab, var(--card-bg) 80%, var(--bg));
+    }
+    .wl-card {
+      border-color: var(--border);
+    }
+    .wl-card .wl-content {
+      color: var(--text);
+    }
+    .wl-avatar {
+      border-radius: 9999px;
+    }
+    .wl-like {
+      border-color: var(--border);
+      transition: color 0.2s, border-color 0.2s;
+      &:hover {
+        color: var(--primary);
+        border-color: var(--primary);
+      }
+    }
+  }
+</style>
+
 <link
   rel="stylesheet"
   href="https://unpkg.com/@waline/client@v3/dist/waline.css"
 />
-<script is:inline src="https://unpkg.com/@waline/client@v3/dist/waline.umd.js"></script>
+<script is:inline defer src="https://unpkg.com/@waline/client@v3/dist/waline.umd.js"></script>
 
 <script is:inline define:vars={{ walineServer }}>
   (function () {

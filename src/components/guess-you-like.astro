@@ -61,7 +61,10 @@ const posts = (await getRandomPosts(5)).filter((p) => !p.data.draft);
     @apply flex flex-col min-w-0;
   }
   .guess-title {
-    @apply text-sm truncate;
+    @apply text-sm truncate transition-colors;
+  }
+  .guess-item:hover .guess-title {
+    @apply text-(--primary);
   }
   .guess-date {
     @apply text-xs text-(--muted);

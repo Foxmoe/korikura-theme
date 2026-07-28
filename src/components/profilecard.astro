@@ -4,15 +4,19 @@ import Icon from "./icon.astro";
 ---
 
 <div class="card profile">
-  <div class="avatar">
-    <img
-      src={profileConfig.avatar}
-      alt={profileConfig.name}
-      class="w-full h-full object-cover rounded-full"
-    />
+  <div class="pf-top">
+    <div class="avatar">
+      <img
+        src={profileConfig.avatar}
+        alt={profileConfig.name}
+        class="w-full h-full object-cover rounded-full"
+      />
+    </div>
+    <div class="pf-info">
+      <div class="name">{profileConfig.name}</div>
+      <div class="desc">{profileConfig.bio}</div>
+    </div>
   </div>
-  <div class="name">{profileConfig.name}</div>
-  <div class="desc">{profileConfig.bio}</div>
   <div class="socials">
     {
       profileConfig.social.map((s) => (
@@ -26,25 +30,34 @@ import Icon from "./icon.astro";
 
 <style lang="scss">
   .profile {
-    @apply text-center;
+    @apply text-left;
+  }
+  .pf-top {
+    @apply flex items-center gap-3;
   }
   .avatar {
-    @apply w-20 h-20 mx-auto rounded-full mb-3 p-0.5;
+    @apply w-16 h-16 rounded-full p-0.5 shrink-0;
     background: color-mix(in oklab, var(--primary) 22%, var(--card-bg));
     img {
       @apply border-2 border-(--card-bg);
     }
   }
+  .pf-info {
+    @apply min-w-0;
+  }
   .name {
-    @apply font-semibold text-(--text);
+    @apply font-bold text-(--text) text-base leading-tight;
   }
   .desc {
-    @apply text-xs text-(--muted) mt-1 leading-relaxed;
+    @apply text-xs text-(--muted) mt-1 leading-relaxed line-clamp-2;
   }
   .socials {
-    @apply flex items-center justify-center gap-3 mt-3 text-(--muted);
+    @apply flex items-center gap-2.5 mt-3 pt-3 border-t border-(--border);
     a {
-      @apply transition hover:text-(--primary) hover:-translate-y-0.5;
+      @apply w-8 h-8 rounded-lg flex items-center justify-center
+             border border-(--border) text-(--muted)
+             transition hover:text-(--primary) hover:border-(--primary)
+             hover:bg-(--primary)/8 active:scale-95;
     }
   }
 </style>

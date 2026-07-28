@@ -1,42 +1,135 @@
 ---
 import Default from "@/layouts/default.astro";
 import Sidebar from "@/components/sidebar.astro";
-import { getCategoryCounts } from "@/utils/posts";
+import { getCategoryCounts, getTagCounts } from "@/utils/posts";
 import { tagToSlug } from "@/utils/utils";
 import Icon from "@/components/icon.astro";
 
 const cats = await getCategoryCounts();
+const tags = await getTagCounts();
+
+const tagMax = tags.length ? Math.max(...tags.map((t) => t.count)) : 1;
+const tagMin = tags.length ? Math.min(...tags.map((t) => t.count)) : 1;
+function tagSize(count: number) {
+  if (tagMax === tagMin) return 0.95;
+  return 0.8 + ((count - tagMin) / (tagMax - tagMin)) * 0.7;
+}
 ---
 
 <Default title="分类">
   <section class="taxonomy">
     <div class="tax-head">
       <h1 class="tax-title">
-        <Icon name="folder" size={22} /> 全部分类
+        <Icon name="folder" size={22} /> 分类 &amp; 标签
       </h1>
-      <p class="tax-sub">共 {cats.length} 个分类</p>
+      <p class="tax-sub">共 {cats.length} 个分类 · {tags.length} 个标签</p>
     </div>
 
-    {
-      cats.length === 0 ? (
-        <p class="tax-empty">暂无分类</p>
-      ) : (
-        <div class="cat-list">
-          {cats.map((c) => (
-            <a href={`/categories/${tagToSlug(c.name)}`} class="cat-item">
-              <Icon name="folder" size={16} />
-              <span class="cat-name">{c.name}</span>
-              <span class="cat-count">{c.count}</span>
-            </a>
-          ))}
-        </div>
-      )
-    }
+    <div class="tax-tabs" role="tablist" aria-label="分类或标签">
+      <button
+        class="tax-tab active"
+        data-tab="cat"
+        role="tab"
+        aria-selected="true"
+        aria-controls="panel-cat"
+        type="button"
+      >
+        <Icon name="folder" size={15} /> 分类
+      </button>
+      <button
+        class="tax-tab"
+        data-tab="tag"
+        role="tab"
+        aria-selected="false"
+        aria-controls="panel-tag"
+        type="button"
+      >
+        <Icon name="hash" size={15} /> 标签
+      </button>
+    </div>
+
+    <section
+      class="tax-panel"
+      id="panel-cat"
+      data-panel="cat"
+      role="tabpanel"
+      aria-label="全部分类"
+    >
+      {
+        cats.length === 0 ? (
+          <p class="tax-empty">暂无分类</p>
+        ) : (
+          <div class="cat-list">
+            {cats.map((c) => (
+              <a href={`/categories/${tagToSlug(c.name)}`} class="cat-item">
+                <Icon name="folder" size={16} />
+                <span class="cat-name">{c.name}</span>
+                <span class="cat-count">{c.count}</span>
+              </a>
+            ))}
+          </div>
+        )
+      }
+    </section>
+
+    <section
+      class="tax-panel"
+      id="panel-tag"
+      data-panel="tag"
+      role="tabpanel"
+      aria-label="全部标签"
+      hidden
+    >
+      {
+        tags.length === 0 ? (
+          <p class="tax-empty">暂无标签</p>
+        ) : (
+          <div class="cloud">
+            {tags.map((t) => (
+              <a
+                href={`/tags/${tagToSlug(t.name)}`}
+                class="cloud-tag"
+                style={`font-size:${tagSize(t.count).toFixed(2)}rem`}
+                title={`${t.name} · ${t.count} 篇`}
+              >
+                #{t.name}
+                <sup>{t.count}</sup>
+              </a>
+            ))}
+          </div>
+        )
+      }
+    </section>
   </section>
 
   <div slot="sidebar">
     <Sidebar />
   </div>
+
+  <script is:inline>
+    (function () {
+      function onTaxClick(e) {
+        var tab = e.target instanceof Element ? e.target.closest(".tax-tab") : null;
+        if (!tab) return;
+        var root = tab.closest(".taxonomy");
+        if (!root) return;
+        var key = tab.getAttribute("data-tab");
+        root.querySelectorAll(".tax-tab").forEach(function (t) {
+          var on = t === tab;
+          t.classList.toggle("active", on);
+          t.setAttribute("aria-selected", on ? "true" : "false");
+        });
+        root.querySelectorAll(".tax-panel").forEach(function (p) {
+          p.hidden = p.getAttribute("data-panel") !== key;
+        });
+      }
+      // 仅绑定一次：点击事件委托到 document，SPA 切换后无需重新绑定
+      if (!window.__taxTabsBound) {
+        document.addEventListener("click", onTaxClick);
+        window.__taxTabsBound = true;
+      }
+    })();
+  </script>
 </Default>
 
 <style lang="scss">
@@ -44,7 +137,7 @@ const cats = await getCategoryCounts();
     @apply max-w-3xl mx-auto px-1 py-4;
   }
   .tax-head {
-    @apply mb-8;
+    @apply mb-6;
   }
   .tax-title {
     @apply text-3xl font-bold flex items-center gap-2 text-(--text);
@@ -55,6 +148,25 @@ const cats = await getCategoryCounts();
   .tax-empty {
     @apply text-(--muted);
   }
+
+  /* 选项卡 */
+  .tax-tabs {
+    @apply flex items-center gap-1 p-1 mb-6 rounded-xl
+           bg-(--card-bg)/60 border border-(--border) w-fit;
+  }
+  .tax-tab {
+    @apply inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm
+           font-medium no-underline cursor-pointer text-(--muted)
+           bg-transparent border-0 transition active:scale-95;
+    &:hover {
+      @apply text-(--primary);
+    }
+    &.active {
+      @apply text-(--primary) bg-(--primary)/12 shadow-sm;
+    }
+  }
+
+  /* 分类列表 */
   .cat-list {
     @apply flex flex-col gap-2;
   }
@@ -63,7 +175,7 @@ const cats = await getCategoryCounts();
            border border-(--border) bg-(--card-bg)/50
            text-(--text) transition;
     &:hover {
-      @apply border-(--primary) text-(--primary);
+      @apply border-(--primary) text-(--primary) -translate-y-0.5;
     }
   }
   .cat-name {
@@ -71,5 +183,21 @@ const cats = await getCategoryCounts();
   }
   .cat-count {
     @apply text-xs px-2 py-0.5 rounded-full bg-(--primary)/10 text-(--primary);
+  }
+
+  /* 标签云 */
+  .cloud {
+    @apply flex flex-wrap gap-3;
+  }
+  .cloud-tag {
+    @apply inline-flex items-start px-3 py-1.5 rounded-full no-underline
+           bg-(--primary)/8 text-(--text)
+           border border-(--border) transition;
+    &:hover {
+      @apply bg-(--primary)/18 text-(--primary) -translate-y-0.5;
+    }
+    sup {
+      @apply text-xs ml-0.5 text-(--muted);
+    }
   }
 </style>

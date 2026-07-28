@@ -23,7 +23,6 @@
     "@astrojs/sitemap": "^3.7.3",
     "@astrojs/svelte": "^9.0.1",
     "@material/material-color-utilities": "^0.4.0",
-    "@swup/astro": "^1.8.0",
     "@tailwindcss/typography": "^0.5.20",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
@@ -60,6 +59,7 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",
+    "playwright": "^1.62.0",
     "sass": "^1.101.0"
   }
 }

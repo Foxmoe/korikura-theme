@@ -4,12 +4,12 @@
 
 ## 特性
 
-- **SPA 体验**：基于 View Transitions（`@swup/astro`），页面切换带平滑过渡，无需整页刷新；脚本在 `spa-navigate` 后自动重跑。
+- **SPA 体验**：基于原生 View Transitions API 的自定义 SPA 路由（`src/components/spa-router.astro`），页面切换带平滑过渡，无需整页刷新；脚本在 `spa-navigate` 后自动重跑。
 - **主题系统**：`auto / light / dark` 三态，默认跟随系统，记忆用户选择；通过 CSS 变量 + Material 色板驱动。
 - **内容形态**：
   - 文章（`/posts`）：Markdown / MDX，支持代码高亮（Shiki / rehype-pretty-code）、数学公式（KaTeX）、代码分组（tabbed code group）、过期提示。
   - 动态（`/dynamics`）：仿微信朋友圈的九宫格图片流，点击进灯箱。
-  - 友链、工具、归档、标签、分类、关于等独立页面。
+  - 友链、工具、归档、分类（标签与分类合并为同一页面）、关于等独立页面。
 - **交互组件**：返回顶部按钮（带顺时针阅读进度环）、目录树（tocbot，H1–H3 层级）、图片灯箱、站内搜索（Pagefind）、访客计数。
 - **评论系统**：Waline（`@waline/client` 前端 + 独立 Cloudflare Workers + D1 后端）。
 - **无障碍 / 性能**：静态生成 + 增量岛屿，按需加载 JS；构建产物经 `astro-compressor` 压缩。
@@ -25,7 +25,7 @@
 | 目录 | tocbot |
 | 公式 | KaTeX（remark-math / rehype-katex） |
 | 搜索 | Pagefind（`astro-pagefind`） |
-| 过渡 | @swup/astro（View Transitions） |
+| 过渡 | 自定义 SPA 路由（`spa-router.astro`，原生 View Transitions API） |
 | 其他 | React 19 / Svelte 5（岛屿）、Shiki |
 
 ## 环境要求

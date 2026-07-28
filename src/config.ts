@@ -22,7 +22,6 @@ export const siteConfig = {
         { href: "/posts", label: "文章" },
         { href: "/dynamics", label: "动态" },
         { href: "/archive", label: "归档" },
-        { href: "/tags", label: "标签" },
         { href: "/categories", label: "分类" },
         { href: "/tools", label: "工具" },
         { href: "/links", label: "友链" },

@@ -100,8 +100,11 @@ body::before {
 }
 
 html {
+  font-size: 15px;
   scroll-behavior: smooth;
   scrollbar-gutter: stable;
+  /* 锚点 / TOC 跳转时为固定导航栏留出空间，避免标题被遮住 */
+  scroll-padding-top: calc(var(--nav-h) + 16px);
 }
 
 /* 键盘导航时的可见焦点轮廓（鼠标点击不显示） */
@@ -342,6 +345,14 @@ button,
 .prose img {
   @apply rounded-md;
   border: 0;
+}
+/* 内联代码：品牌浅粉圆角胶囊，弱化默认背景的厚重感 */
+.prose :where(code):not(pre code) {
+  @apply rounded bg-(--primary)/10 px-1.5 py-0.5 text-[0.85em] font-medium text-(--primary);
+  &::before,
+  &::after {
+    content: "";
+  }
 }
 .moments-grid {
   @apply grid grid-cols-3 gap-1.5 mt-2;
@@ -620,7 +631,11 @@ html.theme-transition * {
   @apply mt-10 pt-8 border-t border-(--border);
 }
 .comments .comments-title {
-  @apply text-lg font-bold text-(--text) mb-4;
+  @apply text-lg font-bold text-(--text) mb-4 relative pl-3;
+  &::before {
+    content: "";
+    @apply absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 rounded-full bg-(--primary);
+  }
 }
 
 /* 入场 / 滚动揭示动画：元素先隐藏，进入视口后淡入上移，缓解“生硬”感 */
@@ -654,5 +669,29 @@ html.theme-transition * {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+
+  /* 关闭页面 / 英雄区的视图过渡与主题切换动画，尊重用户的减弱动态偏好 */
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  ::view-transition-old(main),
+  ::view-transition-new(main),
+  ::view-transition-old(hero),
+  ::view-transition-new(hero) {
+    animation: none !important;
+  }
+
+  html.theme-transition,
+  html.theme-transition * {
+    transition: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }

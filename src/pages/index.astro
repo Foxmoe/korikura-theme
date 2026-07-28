@@ -17,7 +17,7 @@ const posts = await getPublishedPosts();
 const latestPosts = posts.slice(0, 8);
 const cats = (await getCategoryCounts()).map((c) => c.name);
 
-const dynamics = (await getDynamics()).slice(0, 4);
+const dynamics = (await getDynamics()).slice(0, 3);
 
 // 动态摘要：去掉 markdown 标记（图片 / 链接 / 符号），避免首页直接显示 md 源码
 function toPlainText(md: string): string {
@@ -130,6 +130,34 @@ function toPlainText(md: string): string {
   <div slot="sidebar">
     <Sidebar />
   </div>
+
+  <script is:inline>
+    (function () {
+      function onFilterClick(e) {
+        var chip = e.target instanceof Element ? e.target.closest(".filter-chip") : null;
+        if (!chip) return;
+        var filter = document.getElementById("cat-filter");
+        var grid = document.getElementById("post-grid");
+        if (!filter || !grid) return;
+        var cat = chip.getAttribute("data-cat") || "";
+        filter.querySelectorAll(".filter-chip").forEach(function (c) {
+          c.classList.toggle("active", c === chip);
+        });
+        grid.querySelectorAll(".post-card").forEach(function (card) {
+          var cats = (card.getAttribute("data-category") || "")
+            .split(",")
+            .filter(Boolean);
+          var show = !cat || cats.indexOf(cat) >= 0;
+          card.style.display = show ? "" : "none";
+        });
+      }
+      // 仅绑定一次：委托到 document，SPA 切换后无需重新绑定
+      if (!window.__catFilterBound) {
+        document.addEventListener("click", onFilterClick);
+        window.__catFilterBound = true;
+      }
+    })();
+  </script>
 </Default>
 
 <style lang="scss">
@@ -235,7 +263,7 @@ function toPlainText(md: string): string {
       @apply text-(--primary) border-(--primary);
     }
     &.active {
-      @apply bg-(--primary) text-white border-(--primary);
+      @apply bg-(--primary)/15 text-(--primary) border-(--primary)/50 font-semibold;
     }
   }
 
@@ -269,29 +297,3 @@ function toPlainText(md: string): string {
     @apply text-sm text-(--text) mt-0.5 line-clamp-2 m-0;
   }
 </style>
-
-<script>
-  function initCatFilter() {
-    const filter = document.getElementById("cat-filter");
-    const grid = document.getElementById("post-grid");
-    if (!filter || !grid) return;
-    const chips = Array.from(
-      filter.querySelectorAll<HTMLButtonElement>(".filter-chip"),
-    );
-    const cards = Array.from(grid.querySelectorAll<HTMLElement>(".post-card"));
-    chips.forEach((chip) => {
-      chip.addEventListener("click", () => {
-        chips.forEach((c) => c.classList.remove("active"));
-        chip.classList.add("active");
-        const cat = chip.dataset.cat || "";
-        cards.forEach((card) => {
-          const cats = (card.dataset.category || "").split(",").filter(Boolean);
-          const show = !cat || cats.includes(cat);
-          card.style.display = show ? "" : "none";
-        });
-      });
-    });
-  }
-  initCatFilter();
-  window.addEventListener("spa-navigate", () => setTimeout(initCatFilter, 60));
-</script>

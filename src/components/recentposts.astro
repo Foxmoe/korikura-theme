@@ -63,7 +63,10 @@ const posts = (await getPublishedPosts()).slice(0, 5);
     @apply flex flex-col min-w-0;
   }
   .recent-title {
-    @apply text-sm truncate;
+    @apply text-sm truncate transition-colors;
+  }
+  .recent-item:hover .recent-title {
+    @apply text-(--primary);
   }
   .recent-date {
     @apply text-xs text-(--muted);
