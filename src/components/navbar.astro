@@ -11,7 +11,7 @@ const { postTitle = "" } = Astro.props;
 const isPost = Boolean(postTitle);
 ---
 
-<nav class={`nav-wrapper${isPost ? " has-post" : ""}`} data-nav="top">
+<nav class={`nav-wrapper${isPost ? " has-post" : ""}`} data-nav="top" aria-label="主导航">
     <div class="nav-card">
       <a href="/" class="logo">
         <img src="/favicon.ico" alt="" class="logo-img" />

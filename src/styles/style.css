@@ -104,6 +104,34 @@ html {
   scrollbar-gutter: stable;
 }
 
+/* 键盘导航时的可见焦点轮廓（鼠标点击不显示） */
+:where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* 跳到主要内容：默认移出视口，键盘聚焦时滑入 */
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100000;
+  padding: 0.5rem 1rem;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 0 0 0.5rem 0.5rem;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: top 0.2s ease;
+}
+.skip-link:focus {
+  top: 0;
+}
+#main-container:focus {
+  outline: none;
+}
+
 ::selection {
   background: #ffb7c5;
   color: #4a2030;
@@ -384,6 +412,7 @@ button,
 @layer animation {
   #main-container {
     view-transition-name: main;
+    scroll-margin-top: calc(var(--nav-h) + 16px);
   }
   ::view-transition {
     pointer-events: none;

@@ -1,6 +1,5 @@
 ---
 import { siteConfig, profileConfig } from "@/config";
-import type { THEME_MODE } from "@/constants/constants";
 import SpaRouter from "@/components/spa-router.astro";
 import Seo from "@/components/seo.astro";
 import SearchModal from "@/components/search-modal.astro";
@@ -26,11 +25,18 @@ export interface Props {
     author?: string;
 }
 
+const walineHost = (() => {
+    try {
+        return new URL(siteConfig.comments.walineServer).host;
+    } catch {
+        return "";
+    }
+})();
+
 let {
     title,
     description = siteConfig.description,
     keywords = siteConfig.keywords,
-    themeMode = siteConfig.themeMode,
     ogType = "website",
     ogImage = siteConfig.defaultCover,
     publishedTime,
@@ -63,7 +69,11 @@ const fullTitle = title ? title + " - " + siteConfig.title : siteConfig.title;
 
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="color-scheme" content="light dark" />
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+        <link rel="preconnect" href="https://busuanzi.ibruce.info" crossorigin />
+        {walineHost && <link rel="preconnect" href={`https://${walineHost}`} crossorigin />}
 
         <meta name="description" content={description} />
         <meta name="keywords" content={keywords} />
@@ -103,6 +113,7 @@ const fullTitle = title ? title + " - " + siteConfig.title : siteConfig.title;
     </head>
 
     <body>
+        <a class="skip-link" href="#main-container">跳到主要内容</a>
         <SpaRouter
             contentSelector="#main-container"
             heroSelector="#hero-slot"

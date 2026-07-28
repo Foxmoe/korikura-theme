@@ -125,6 +125,26 @@ const {
             document.title = newTitle;
         }
 
+        // SPA 切换时同步 <head> 中的 SEO 元信息（description / canonical / OG / Twitter / JSON-LD）
+        const META_SELECTORS = [
+            'meta[name="description"]',
+            'meta[property^="og:"]',
+            'meta[name^="twitter:"]',
+            'link[rel="canonical"]',
+            'script[type="application/ld+json"]',
+        ];
+        function syncHeadMeta(newDoc) {
+            const head = document.head;
+            META_SELECTORS.forEach((sel) => {
+                head.querySelectorAll(sel).forEach((el) => el.remove());
+            });
+            META_SELECTORS.forEach((sel) => {
+                newDoc.head.querySelectorAll(sel).forEach((el) => {
+                    head.appendChild(el.cloneNode(true));
+                });
+            });
+        }
+
         let navToken = 0;
 
         async function navigate(url, pushState = true) {
@@ -155,6 +175,7 @@ const {
                 const swap = () => {
                     removeDynamicScripts();
                     updateHeadStyles(newDoc);
+                    syncHeadMeta(newDoc);
                     container.innerHTML = newContent.innerHTML;
                     if (heroContainer) {
                         heroContainer.innerHTML =
@@ -231,6 +252,7 @@ const {
         });
 
         if (prefetch) {
+            const prefetched = new Set();
             document.addEventListener(
                 "mouseover",
                 (e) => {
@@ -238,6 +260,10 @@ const {
                     if (!link) return;
                     const url = new URL(link.href, location.origin);
                     if (url.origin !== location.origin) return;
+                    if (url.pathname === location.pathname) return;
+                    const key = url.pathname + url.search;
+                    if (prefetched.has(key)) return;
+                    prefetched.add(key);
                     fetch(url.href, { priority: "low" }).catch(() => {});
                 },
                 { passive: true },
