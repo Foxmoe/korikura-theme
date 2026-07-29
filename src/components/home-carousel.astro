@@ -53,11 +53,8 @@ const siteMessages = [
 
 <div class="hc" id="home-carousel">
   <div class="hc-panels">
-    <!-- 天气 -->
-    <div class="hc-panel" data-panel="weather">
-      <div class="hc-panel-head">
-        <Icon name="sun" size={18} /> 今日天气
-      </div>
+    <!-- 天气（整块 M3 卡片，背景随天气变化） -->
+    <div class="hc-panel hc-weather-panel" data-panel="weather">
       <div class="hc-weather" id="hc-weather">
         <div class="hc-w-loading">加载中…</div>
       </div>
@@ -74,12 +71,15 @@ const siteMessages = [
       <div class="hc-hitokoto-from" id="hc-hitokoto-from"></div>
     </div>
 
-    <!-- 更新日历 -->
-    <div class="hc-panel" data-panel="calendar">
-      <div class="hc-panel-head">
-        <Icon name="calendar" size={18} /> 更新日历
-      </div>
+    <!-- 更新日历（满铺卡片） -->
+    <div class="hc-panel hc-cal-panel" data-panel="calendar">
       <div class="hc-cal">
+        <div class="hc-cal-top">
+          <div class="hc-cal-title">
+            <Icon name="calendar" size={18} /> 更新日历
+          </div>
+          <div class="hc-cal-total">近半年共 {totalContrib} 次更新</div>
+        </div>
         <div class="hc-cal-grid">
           {
             weeks.map((col) => (
@@ -99,7 +99,6 @@ const siteMessages = [
           {[0, 1, 2, 3, 4].map((l) => <span class={`hc-cell lv-${l}`} />)}
           <span>多</span>
         </div>
-        <div class="hc-cal-total">近半年共 {totalContrib} 次更新</div>
       </div>
     </div>
 
@@ -154,35 +153,88 @@ const siteMessages = [
       @apply absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-full bg-(--primary);
     }
   }
+  /* 天气面板：整块 M3 卡片，去除内边距让渐变 hero 满铺 */
+  .hc-weather-panel {
+    @apply p-0;
+  }
   .hc-weather {
-    @apply flex-1 flex items-center justify-center;
+    @apply w-full h-full;
   }
   .hc-w-loading {
-    @apply text-sm text-(--muted);
+    @apply text-sm text-(--muted) flex items-center justify-center h-full;
   }
-  /* 天气卡片由客户端脚本 innerHTML 注入，元素不带组件 scoped 属性，故用 :global 命中 */
-  :global(.hc-w-card) {
-    @apply w-full flex items-center gap-4 rounded-xl px-4 py-3.5
-           bg-(--primary)/6 border border-(--primary)/15;
+  /* 天气 hero 由客户端脚本 innerHTML 注入，元素不带组件 scoped 属性，故用 :global 命中 */
+  :global(.hc-w-hero) {
+    @apply relative w-full h-full overflow-hidden flex flex-col
+           text-white px-5 pt-4 pb-9 justify-between;
+    border-radius: inherit;
+    box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.45);
+    animation: hc-w-in 0.5s ease both;
   }
-  :global(.hc-w-emoji-wrap) {
-    @apply w-14 h-14 rounded-2xl flex items-center justify-center shrink-0
-           bg-(--primary)/12 text-3xl;
+  @keyframes hc-w-in {
+    from { opacity: 0; transform: scale(0.98); }
+    to { opacity: 1; transform: scale(1); }
   }
-  :global(.hc-w-emoji) {
-    @apply leading-none;
+  /* M3 柔光点缀 */
+  :global(.hc-w-glow) {
+    @apply absolute w-56 h-56 rounded-full pointer-events-none;
+    top: -22%;
+    right: -18%;
+    background: rgba(255, 255, 255, 0.18);
+    filter: blur(6px);
+  }
+  :global(.hc-w-glow2) {
+    @apply absolute w-40 h-40 rounded-full pointer-events-none;
+    bottom: -16%;
+    left: -12%;
+    background: rgba(255, 255, 255, 0.1);
+    filter: blur(8px);
+  }
+  :global(.hc-w-label) {
+    @apply text-sm font-medium opacity-90 relative z-10;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
   }
   :global(.hc-w-main) {
-    @apply min-w-0 flex-1;
+    @apply flex items-center gap-3 relative z-10 mt-auto;
+  }
+  :global(.hc-w-icon) {
+    @apply text-[3.5rem] leading-none drop-shadow;
   }
   :global(.hc-w-temp) {
-    @apply text-2xl font-bold text-(--text) leading-none;
+    @apply text-6xl font-bold leading-none drop-shadow-md;
   }
-  :global(.hc-w-meta) {
-    @apply text-sm text-(--muted) mt-1 truncate;
+  :global(.hc-w-cond) {
+    @apply flex items-center gap-3 relative z-10 mt-2 text-sm;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  }
+  :global(.hc-w-desc) {
+    @apply font-semibold;
   }
   :global(.hc-w-sub) {
-    @apply text-xs text-(--muted) mt-0.5 truncate;
+    @apply opacity-85;
+  }
+
+  /* ===== 按天气类型切换的背景渐变（AccuWeather 风格） ===== */
+  :global(.hc-w-hero[data-w="clear"]) {
+    background: linear-gradient(150deg, #2193b0 0%, #6dd5ed 100%);
+  }
+  :global(.hc-w-hero[data-w="partly"]) {
+    background: linear-gradient(150deg, #4b6cb7 0%, #9aa7b1 100%);
+  }
+  :global(.hc-w-hero[data-w="cloudy"]) {
+    background: linear-gradient(150deg, #536976 0%, #292e49 100%);
+  }
+  :global(.hc-w-hero[data-w="fog"]) {
+    background: linear-gradient(150deg, #5c6e7a 0%, #9aa7b1 100%);
+  }
+  :global(.hc-w-hero[data-w="rain"]) {
+    background: linear-gradient(150deg, #2c3e50 0%, #4ca1af 100%);
+  }
+  :global(.hc-w-hero[data-w="snow"]) {
+    background: linear-gradient(150deg, #4b79a1 0%, #283e51 100%);
+  }
+  :global(.hc-w-hero[data-w="storm"]) {
+    background: linear-gradient(150deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
   }
   .hc-hitokoto {
     @apply flex-1 flex items-center text-base leading-relaxed text-(--text)
@@ -191,9 +243,30 @@ const siteMessages = [
   .hc-hitokoto-from {
     @apply text-sm text-(--muted) text-right;
   }
+  /* 更新日历满铺卡片：整块填充面板，轻微主色渐变呼应天气卡 */
+  .hc-cal-panel {
+    @apply p-0;
+  }
   .hc-cal {
-    @apply flex flex-col gap-2 rounded-lg p-3
-           bg-(--bg)/40 border border-(--border);
+    @apply w-full h-full flex flex-col gap-3 p-4 rounded-[14px];
+    background: linear-gradient(
+      160deg,
+      color-mix(in oklab, var(--primary) 8%, var(--card-bg)),
+      var(--card-bg)
+    );
+  }
+  .hc-cal-top {
+    @apply flex items-center justify-between gap-2;
+  }
+  .hc-cal-title {
+    @apply flex items-center gap-1.5 text-base font-bold text-(--text) relative pl-3;
+    &::before {
+      content: "";
+      @apply absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-full bg-(--primary);
+    }
+    :global(svg) {
+      @apply text-(--primary);
+    }
   }
   .hc-cal-grid {
     @apply flex gap-1 overflow-x-auto pb-1;
@@ -215,7 +288,7 @@ const siteMessages = [
     @apply w-2.5 h-2.5 rounded-[2px];
   }
   .hc-cal-total {
-    @apply text-xs text-(--muted);
+    @apply text-xs text-(--muted) shrink-0;
   }
   .hc-msg-list {
     @apply list-none p-0 m-0 flex flex-col gap-2 flex-1 justify-center;
@@ -277,14 +350,26 @@ const siteMessages = [
 
     // 天气（open-meteo，默认北京；失败有兜底）
     const wBox = document.getElementById("hc-weather");
-    const drawWeather = (emoji: string, temp: string, meta: string, sub = "") => {
+    const drawWeather = (
+      theme: string,
+      emoji: string,
+      temp: string,
+      location: string,
+      desc: string,
+      sub = "",
+    ) => {
       if (!wBox) return;
-      wBox.innerHTML = `<div class="hc-w-card">
-        <div class="hc-w-emoji-wrap"><span class="hc-w-emoji">${emoji}</span></div>
+      wBox.innerHTML = `<div class="hc-w-hero" data-w="${theme}">
+        <div class="hc-w-glow"></div>
+        <div class="hc-w-glow2"></div>
+        <div class="hc-w-label">📍 ${location} · 今日天气</div>
         <div class="hc-w-main">
+          <div class="hc-w-icon">${emoji}</div>
           <div class="hc-w-temp">${temp}</div>
-          <div class="hc-w-meta">${meta}</div>
-          ${sub ? `<div class="hc-w-sub">${sub}</div>` : ""}
+        </div>
+        <div class="hc-w-cond">
+          <span class="hc-w-desc">${desc}</span>
+          ${sub ? `<span class="hc-w-sub">${sub}</span>` : ""}
         </div>
       </div>`;
     };
@@ -296,6 +381,28 @@ const siteMessages = [
       81: ["🌦️", "阵雨"], 82: ["⛈️", "强阵雨"], 85: ["🌨️", "阵雪"], 86: ["🌨️", "阵雪"],
       95: ["⛈️", "雷阵雨"], 96: ["⛈️", "雷阵雨伴雹"], 99: ["⛈️", "强雷暴"],
     };
+    // 天气代码 -> 背景主题
+    const themeOf = (code: number): string => {
+      if (code === 0) return "clear";
+      if (code === 1 || code === 2) return "partly";
+      if (code === 3) return "cloudy";
+      if (code === 45 || code === 48) return "fog";
+      if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) return "rain";
+      if ([71, 73, 75, 85, 86].includes(code)) return "snow";
+      if ([95, 96, 99].includes(code)) return "storm";
+      return "cloudy";
+    };
+    const drawFrom = (w: { weathercode: number; temperature: number; windspeed: number }) => {
+      const [emoji, desc] = wmap[w.weathercode] || ["🌡️", "未知"];
+      drawWeather(
+        themeOf(w.weathercode),
+        emoji,
+        `${Math.round(w.temperature)}°C`,
+        "北京",
+        desc,
+        `风速 ${Math.round(w.windspeed)} km/h`,
+      );
+    };
     fetch(
       "https://api.open-meteo.com/v1/forecast?latitude=39.9042&longitude=116.4074&current_weather=true",
     )
@@ -303,15 +410,9 @@ const siteMessages = [
       .then((j) => {
         const w = j.current_weather;
         if (!w) throw new Error("no weather");
-        const [emoji, desc] = wmap[w.weathercode] || ["🌡️", "未知"];
-        drawWeather(
-          emoji,
-          `${Math.round(w.temperature)}°C`,
-          `北京 · ${desc}`,
-          `风速 ${Math.round(w.windspeed)} km/h`,
-        );
+        drawFrom(w);
       })
-      .catch(() => drawWeather("🌤️", "23°C", "北京 · 多云", "风速 8 km/h"));
+      .catch(() => drawFrom({ weathercode: 2, temperature: 23, windspeed: 8 }));
 
     // 一言（hitokoto）
     const hk = document.getElementById("hc-hitokoto");

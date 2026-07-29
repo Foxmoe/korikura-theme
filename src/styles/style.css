@@ -12,7 +12,7 @@
   --color-muted: var(--muted);
   --color-border: var(--border);
 
-  --font-sans: "SweiFist", system-ui, -apple-system, "Segoe UI", Roboto,
+  --font-sans: "LemiHuiYuanTi", system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, "Noto Sans CJK SC", "PingFang SC",
     "Microsoft YaHei", sans-serif;
 }
@@ -29,6 +29,11 @@
   --nav-h: 60px;
   --container: min(1360px, 97vw);
   --hero-tint: var(--bg);
+  /* 定义在“无层”的 :root 上，优先级高于 Tailwind @layer theme 里的默认 --font-sans，
+     否则会被 ui-sans-serif 默认栈覆盖，导致自定义字体不生效 */
+  --font-sans: "LemiHuiYuanTi", system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans CJK SC", "PingFang SC",
+    "Microsoft YaHei", sans-serif;
 }
 
 [data-theme="dark"] {
@@ -67,12 +72,17 @@ body {
   font-synthesis: weight style;
   color: var(--text);
   background-color: var(--bg);
-  background-image: url("/images/wallhaven-qr3j1r.jpg");
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-attachment: fixed;
-  background-position: center;
   min-height: 100vh;
+}
+
+/* 壁纸放在固定伪元素上，避免 background-attachment:fixed 在滚动时反复重绘导致卡顿 */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: url("/images/wallhaven-qr3j1r.jpg") center / cover no-repeat;
+  pointer-events: none;
 }
 
 body::before {
@@ -171,6 +181,14 @@ html {
   @font-face {
     font-family: "SweiFist";
     src: url("/fonts/SweiFistLegCJKSC-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "LemiHuiYuanTi";
+    src: url("/fonts/LemiHuiYuanTi-Regular.woff2") format("woff2"),
+      url("/fonts/LemiHuiYuanTi-Regular.woff") format("woff");
     font-weight: 400;
     font-style: normal;
     font-display: swap;
@@ -291,12 +309,16 @@ button,
 .prose a {
   position: relative;
   text-decoration: none;
-  border-bottom: 1px solid color-mix(in oklab, var(--primary) 40%, transparent);
-  transition: color 0.2s, border-color 0.2s;
+  color: var(--primary);
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 1.5px;
+  transition: background-size 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.2s ease;
 }
 .prose a:hover {
-  color: var(--primary);
-  border-bottom-color: transparent;
+  background-size: 100% 1.5px;
 }
 .prose .heading-anchor {
   border: none;
@@ -395,6 +417,16 @@ button,
 .github-alert {
   --alert: #0969da;
   @apply my-5 rounded-md border-l-4 px-4 py-3 text-sm;
+  background: color-mix(in oklab, var(--alert) 7%, var(--card-bg));
+}
+/* .prose blockquote 特异性高于 .github-alert，用 .prose 前缀提权以彻底覆盖引用样式 */
+.prose .github-alert {
+  margin: 1.25rem 0;
+  border: 0;
+  border-left: 4px solid var(--alert);
+  font-style: normal;
+  quotes: none;
+  color: var(--text);
   background: color-mix(in oklab, var(--alert) 7%, var(--card-bg));
 }
 .github-alert .alert-title {
@@ -500,6 +532,28 @@ button,
 @keyframes theme-ripple {
   to {
     transform: scale(60);
+    opacity: 0;
+  }
+}
+
+/* 可复用的点击波纹扩散：给任意元素加 data-ripple 即可，自动裁剪溢出 */
+[data-ripple] {
+  position: relative;
+  overflow: hidden;
+}
+.ripple-ink {
+  position: absolute;
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--primary) 38%, transparent);
+  transform: scale(0);
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 1;
+  animation: ripple-ink 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes ripple-ink {
+  to {
+    transform: scale(2.8);
     opacity: 0;
   }
 }

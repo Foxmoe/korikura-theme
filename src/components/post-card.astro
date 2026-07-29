@@ -21,6 +21,7 @@ const reading = getReadingTime(post.body || "", siteConfig.readingSpeed);
   data-tags={data.tags.join(",")}
   data-category={data.categories.join(",")}
   style={`--reveal-delay:${delay}ms`}
+  data-ripple
 >
   <div class="card-cover">
     <img src={cover} alt={data.coverAlt || ""} loading="lazy" decoding="async" class="cover-img" />

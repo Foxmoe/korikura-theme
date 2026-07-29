@@ -112,32 +112,24 @@ const toc = generateToc(headings);
   .toc-body {
     @apply text-sm relative;
   }
-  /* 竖向轨道 */
+  /* 竖向轨道（仅作为层级缩进容器，去掉长条装饰，指示器改用 toc-link 的 ::after 竖矩形） */
   .toc-body .toc-list {
     @apply list-none m-0 p-0 relative;
   }
-  .toc-body .toc-list::before {
-    content: "";
-    @apply absolute top-1.5 bottom-1.5 left-[5px] w-[2px] rounded-full bg-(--border);
-  }
-  /* 嵌套层级缩进，并保留自己的轨道以体现层级 */
+  /* 嵌套层级缩进 */
   .toc-body .toc-list .toc-list {
     @apply ml-3.5 mt-0.5;
-  }
-  .toc-body .toc-list .toc-list::before {
-    @apply left-[3px];
   }
   .toc-body .toc-link {
     @apply relative block py-1 pl-[20px] -ml-px text-(--muted) no-underline
            rounded-md transition-colors duration-200 cursor-pointer
            hover:text-(--primary) hover:bg-(--primary)/5;
   }
-  /* 轨道上的圆点 */
+  /* 轨道上的竖向小矩形指示器（替换原圆点） */
   .toc-body .toc-link::after {
     content: "";
-    @apply absolute left-[2px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full
+    @apply absolute left-[5px] top-1/2 -translate-y-1/2 w-[3px] h-3.5 rounded-full
            bg-(--border) transition-all duration-200;
-    border: 2px solid var(--bg);
     z-index: 1;
   }
   .toc-body .toc-link.node-name--H2 {
@@ -154,9 +146,7 @@ const toc = generateToc(headings);
     @apply text-(--primary) font-semibold bg-(--primary)/9;
   }
   .toc-body .toc-link.is-active::after {
-    @apply bg-(--primary) scale-125;
-    border-color: color-mix(in oklab, var(--primary) 35%, var(--bg));
-    box-shadow: 0 0 0 4px color-mix(in oklab, var(--primary) 20%, transparent);
+    @apply bg-(--primary) h-5;
   }
   /* 有子项的父标题可点击折叠 */
   .toc-body .is-collapsed > .toc-list {

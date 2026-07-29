@@ -39,11 +39,11 @@ const isPost = Boolean(postTitle);
       </div>
 
       <div class="actions">
-        <button id="search-open" class="icon-btn" type="button" title="搜索" aria-label="搜索">
+        <button id="search-open" class="icon-btn" type="button" title="搜索" aria-label="搜索" data-ripple>
           <Icon name="search" size={18} />
         </button>
         <ThemeToggle />
-        <button id="menu-open" class="icon-btn" type="button" title="菜单" aria-label="菜单">
+        <button id="menu-open" class="icon-btn" type="button" title="菜单" aria-label="菜单" data-ripple>
           <Icon name="menu" size={18} />
         </button>
       </div>
@@ -193,7 +193,7 @@ const isPost = Boolean(postTitle);
 
   .icon-btn {
     @apply flex items-center justify-center w-9 h-9 rounded
-           border border-(--border) text-(--text)
+           border border-(--border) text-(--text) cursor-pointer
            bg-(--card-bg)/50 transition active:scale-95
            hover:text-(--primary);
   }

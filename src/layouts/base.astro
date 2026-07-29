@@ -1,5 +1,6 @@
 ---
 import { siteConfig, profileConfig } from "@/config";
+import type { THEME_MODE } from "@/constants/constants";
 import SpaRouter from "@/components/spa-router.astro";
 import Seo from "@/components/seo.astro";
 import SearchModal from "@/components/search-modal.astro";
@@ -131,5 +132,29 @@ const fullTitle = title ? title + " - " + siteConfig.title : siteConfig.title;
         <BackToTop />
         <Tooltip />
         <Animations />
+
+        <script is:inline>
+          // 通用点击波纹扩散：为带 data-ripple 的元素在点击处生成扩散圆
+          (function () {
+            function spawnRipple(e) {
+              var host = e.target && e.target.closest
+                ? e.target.closest("[data-ripple]")
+                : null;
+              if (!host) return;
+              var rect = host.getBoundingClientRect();
+              var size = Math.max(rect.width, rect.height);
+              var ink = document.createElement("span");
+              ink.className = "ripple-ink";
+              ink.style.width = ink.style.height = size + "px";
+              ink.style.left = e.clientX - rect.left - size / 2 + "px";
+              ink.style.top = e.clientY - rect.top - size / 2 + "px";
+              host.appendChild(ink);
+              ink.addEventListener("animationend", function () {
+                ink.remove();
+              });
+            }
+            document.addEventListener("pointerdown", spawnRipple);
+          })();
+        </script>
     </body>
 </html>

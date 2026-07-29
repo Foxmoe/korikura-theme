@@ -5,10 +5,28 @@ import Comments from "@/components/comments.astro";
 import { profileConfig, siteConfig } from "@/config";
 import Icon from "@/components/icon.astro";
 
+const features = [
+  {
+    icon: "folder",
+    title: "技术栈",
+    desc: "基于 Astro 构建，Tailwind CSS 驱动，默认零 JS、极致轻量。",
+  },
+  {
+    icon: "star",
+    title: "设计语言",
+    desc: "樱花粉主题，支持亮色 / 暗色 / 跟随系统三种模式无缝切换。",
+  },
+  {
+    icon: "message",
+    title: "互动交流",
+    desc: "文章评论、朋友圈动态，欢迎随时来聊 ~(￣▽￣)~",
+  },
+];
+
 const stats = [
-  { label: "主题", value: "Astro + Tailwind" },
-  { label: "部署", value: "Cloudflare Pages" },
-  { label: "留言", value: "欢迎邮件" },
+  { icon: "sun", value: "3 种", label: "主题模式" },
+  { icon: "link", value: "Cloudflare", label: "边缘部署" },
+  { icon: "mail", value: "随时", label: "欢迎来信" },
 ];
 ---
 
@@ -16,15 +34,31 @@ const stats = [
   <div slot="sidebar">
     <Sidebar headings={[]} />
   </div>
+
   <section class="about">
-    <div class="about-hero">
-      <img src={profileConfig.avatar} alt={profileConfig.name} class="about-avatar" />
+    <!-- 个人信息 Hero -->
+    <div class="about-hero card">
+      <div class="about-banner"></div>
+      <img
+        src={profileConfig.avatar}
+        alt={profileConfig.name}
+        class="about-avatar"
+      />
       <h1 class="about-name">{profileConfig.name}</h1>
+      <p class="about-role">一个喜欢折腾与分享的小站长</p>
       <p class="about-bio">{profileConfig.bio}</p>
       <div class="about-socials">
         {
           profileConfig.social.map((s) => (
-            <a href={s.url} title={s.name} target="_blank" rel="noopener noreferrer" aria-label={s.name}>
+            <a
+              href={s.url}
+              title={s.name}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={s.name}
+              class="about-social"
+              data-ripple
+            >
               <Icon name={s.icon} size={18} />
             </a>
           ))
@@ -32,6 +66,7 @@ const stats = [
       </div>
     </div>
 
+    <!-- 关于这里 -->
     <div class="about-card prose">
       <h2>关于这里</h2>
       <p>
@@ -46,10 +81,29 @@ const stats = [
       </ul>
     </div>
 
+    <!-- 特性卡片 -->
+    <div class="about-features">
+      {
+        features.map((f) => (
+          <div class="feat card" data-ripple>
+            <div class="feat-icon">
+              <Icon name={f.icon} size={20} />
+            </div>
+            <div class="feat-title">{f.title}</div>
+            <p class="feat-desc">{f.desc}</p>
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- 统计 -->
     <div class="about-stats">
       {
         stats.map((s) => (
-          <div class="stat">
+          <div class="stat card">
+            <div class="stat-icon">
+              <Icon name={s.icon} size={18} />
+            </div>
             <div class="stat-value">{s.value}</div>
             <div class="stat-label">{s.label}</div>
           </div>
@@ -65,40 +119,85 @@ const stats = [
   .about {
     @apply max-w-2xl mx-auto px-1 py-6;
   }
+
+  /* Hero */
   .about-hero {
-    @apply text-center py-8;
+    @apply relative text-center pt-0 pb-6 px-6 mt-4 overflow-hidden;
+  }
+  .about-banner {
+    @apply absolute inset-x-0 top-0 h-28;
+    background: linear-gradient(
+      135deg,
+      color-mix(in oklab, var(--primary) 38%, var(--card-bg)),
+      color-mix(in oklab, var(--primary) 12%, var(--card-bg))
+    );
   }
   .about-avatar {
-    @apply w-24 h-24 rounded-full mx-auto mb-4 object-cover
+    @apply relative w-24 h-24 rounded-full mx-auto -mt-10 mb-3 object-cover
            border-4 border-(--card-bg) shadow-lg;
+    box-shadow: 0 8px 24px -10px color-mix(in oklab, var(--primary) 60%, transparent);
   }
   .about-name {
     @apply text-2xl font-bold text-(--text);
   }
+  .about-role {
+    @apply text-xs text-(--primary) font-medium mt-1;
+  }
   .about-bio {
-    @apply text-sm text-(--muted) mt-1;
+    @apply text-sm text-(--muted) mt-2 leading-relaxed;
   }
   .about-socials {
-    @apply flex items-center justify-center gap-4 mt-4 text-(--muted);
-    a {
-      @apply transition hover:text-(--primary) hover:-translate-y-0.5;
-    }
+    @apply flex items-center justify-center gap-2.5 mt-4;
   }
+  .about-social {
+    @apply w-9 h-9 rounded-full flex items-center justify-center
+           border border-(--border) text-(--muted)
+           transition hover:text-(--primary) hover:border-(--primary)
+           hover:-translate-y-0.5 active:scale-95;
+  }
+
+  /* 关于卡片 */
   .about-card {
     @apply rounded-xl border border-(--border) p-6 mt-4
            bg-(--card-bg)/50;
   }
+
+  /* 特性卡片 */
+  .about-features {
+    @apply grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4;
+  }
+  .feat {
+    @apply rounded-xl border border-(--border) p-4 text-left
+           bg-(--card-bg)/50 transition hover:-translate-y-0.5
+           hover:shadow-md hover:border-(--primary)/40;
+    .feat-icon {
+      @apply w-10 h-10 rounded-lg flex items-center justify-center mb-2
+             bg-(--primary)/12 text-(--primary);
+    }
+    .feat-title {
+      @apply text-sm font-semibold text-(--text);
+    }
+    .feat-desc {
+      @apply text-xs text-(--muted) mt-1 leading-relaxed;
+    }
+  }
+
+  /* 统计 */
   .about-stats {
     @apply grid grid-cols-3 gap-3 mt-4;
   }
   .stat {
     @apply rounded-lg border border-(--border) p-4 text-center
            bg-(--card-bg)/50;
+    .stat-icon {
+      @apply inline-flex items-center justify-center w-7 h-7 rounded-full
+             bg-(--primary)/12 text-(--primary) mb-1.5;
+    }
     .stat-value {
       @apply text-sm font-semibold text-(--text);
     }
     .stat-label {
-      @apply text-xs text-(--muted) mt-1;
+      @apply text-xs text-(--muted) mt-0.5;
     }
   }
 </style>

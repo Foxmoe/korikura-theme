@@ -21,3 +21,41 @@
 [2m22:01:08[22m [34m[watch][39m /src/components/home-carousel.astro?astro&type=style&index=0&lang.css
 [2m07:01:26[22m [34m[vite][39m [vite] program reload
 [2m07:01:55[22m [34m[watch][39m /src/styles/style.css?direct, /src/styles/sidebar.css
+[2m07:13:56[22m [34m[watch][39m /src/components/comments.astro?astro&type=style&index=0&lang.css
+[2m07:14:10[22m [34m[vite][39m [vite] program reload
+[2m07:14:36[22m [34m[vite][39m [vite] program reload
+[2m07:15:01[22m [34m[vite][39m [vite] program reload
+[2m07:15:18[22m [34m[watch][39m /src/styles/style.css?direct, /src/styles/sidebar.css
+[2m07:27:13[22m [34m[watch][39m src/components/home-carousel.astro
+[2m07:27:13[22m [34m[vite][39m [vite] program reload
+[2m07:27:32[22m [34m[watch][39m /src/components/home-carousel.astro?astro&type=style&index=0&lang.css
+[2m07:27:56[22m [34m[watch][39m src/components/home-carousel.astro
+[2m07:27:56[22m [34m[vite][39m [vite] program reload
+[2m07:28:09[22m [34m[watch][39m /src/components/home-carousel.astro?astro&type=style&index=0&lang.css
+[2m07:28:19[22m [34m[vite][39m [vite] program reload
+[2m07:28:39[22m [34m[vite][39m [vite] program reload
+[2m07:28:48[22m [34m[watch][39m /src/styles/style.css?direct, /src/styles/sidebar.css
+[2m07:30:05[22m [34m[watch][39m src/components/home-carousel.astro
+[2m07:30:05[22m [34m[vite][39m [vite] program reload
+[2m07:30:39[22m [34m[watch][39m /src/components/home-carousel.astro?astro&type=style&index=0&lang.css
+[2m07:30:50[22m [34m[vite][39m [vite] program reload
+[2m07:31:03[22m [34m[watch][39m /src/styles/style.css?direct, /src/styles/sidebar.css
+[2m07:37:59[22m [34m[watch][39m src/styles/style.css
+[2m07:38:05[22m [34m[watch][39m src/styles/style.css
+[2m07:38:11[22m [34m[watch][39m src/styles/style.css
+[2m07:38:16[22m [34m[watch][39m /src/styles/style.css?direct, /src/styles/sidebar.css
+[2m07:38:16[22m [34m[vite][39m [vite] program reload
+[2m07:38:28[22m [34m[watch][39m /src/components/navbar.astro?astro&type=style&index=0&lang.css
+[2m07:38:33[22m [34m[watch][39m /src/styles/style.css?direct, /src/styles/sidebar.css, /src/components/navbar.astro?astro&type=style&index=0&lang.css
+[2m07:38:33[22m [34m[vite][39m [vite] program reload
+[2m07:38:56[22m [34m[watch][39m /src/components/table-of-contents.astro?astro&type=style&index=0&lang.css
+[2m07:39:47[22m [34m[watch][39m /src/styles/style.css?direct, /src/styles/sidebar.css
+[2m07:40:44[22m [34m[watch][39m /src/styles/style.css?direct, /src/styles/sidebar.css, /src/components/post-card.astro?astro&type=style&index=0&lang.css
+[2m07:40:48[22m [34m[watch][39m /src/styles/style.css?direct, /src/styles/sidebar.css, /src/pages/index.astro?astro&type=style&index=0&lang.css
+[2m07:41:19[22m [34m[watch][39m /src/styles/style.css?direct, /src/styles/sidebar.css
+[2m07:41:19[22m [34m[vite][39m [vite] program reload
+[2m07:41:34[22m [34m[vite][39m [vite] program reload
+[2m07:42:01[22m [34m[watch][39m /src/styles/sidebar.css
+[2m08:14:22[22m [34m[watch][39m src/styles/style.css
+[2m08:14:35[22m [34m[watch][39m src/styles/style.css
+[ELIFECYCLE] Command failed with exit code 1.

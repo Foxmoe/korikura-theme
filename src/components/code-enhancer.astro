@@ -97,13 +97,18 @@
       if (el.dataset.githubEnhanced) return;
       const firstP = el.querySelector("p");
       if (!firstP) return;
-      const m = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*$/i.exec(
-        (firstP.textContent || "").trim()
-      );
+      // 允许 [!TYPE] 独占一段，或与正文挤在同一段（软换行）两种情况
+      const re = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*/i;
+      const m = re.exec((firstP.textContent || "").trim());
       if (!m) return;
       el.dataset.githubEnhanced = "true";
       const type = m[1].toLowerCase();
-      firstP.remove();
+      // 仅移除首段里的 [!TYPE] 标记，保留正文（可能和标记在同一段）
+      firstP.textContent = (firstP.textContent || "")
+        .replace(re, "")
+        .replace(/^\s*[\r\n]+/, "")
+        .trim();
+      if (!firstP.textContent.trim()) firstP.remove();
 
       const alert = document.createElement("div");
       alert.className = `github-alert alert-${type}`;

@@ -55,7 +55,7 @@ function toPlainText(md: string): string {
       <div class="home-dyn">
         <div class="section-header">
           <h2 class="section-title">最新动态</h2>
-          <a href="/dynamics" class="section-more">
+          <a href="/dynamics" class="section-more" data-ripple>
             更多
             <Icon name="arrow-right" size={14} />
           </a>
@@ -94,18 +94,18 @@ function toPlainText(md: string): string {
   <section class="posts-section">
     <div class="section-header cat-header">
       <div class="cat-filter" id="cat-filter">
-        <button type="button" class="filter-chip active" data-cat=""
+        <button type="button" class="filter-chip active" data-cat="" data-ripple
           >全部文章</button
         >
         {
           cats.map((c) => (
-            <button type="button" class="filter-chip" data-cat={c}>
+            <button type="button" class="filter-chip" data-cat={c} data-ripple>
               #{c}
             </button>
           ))
         }
       </div>
-      <a href="/posts" class="section-more">
+      <a href="/posts" class="section-more" data-ripple>
         查看全部
         <Icon name="arrow-right" size={14} />
       </a>
