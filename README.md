@@ -9,7 +9,7 @@
 - **内容形态**：
   - 文章（`/posts`）：Markdown / MDX，支持代码高亮（Shiki / rehype-pretty-code）、数学公式（KaTeX）、代码分组（tabbed code group）、过期提示。
   - 动态（`/dynamics`）：仿微信朋友圈的九宫格图片流，点击进灯箱。
-  - 友链、工具、归档、分类（标签与分类合并为同一页面）、关于等独立页面。
+  - 友链、工具、归档、分类（标签与分类合并为同一页面）、关于等独立页面。关于页包含重新设计的个人信息 Hero、技能栈进度条、站点足迹时间线与特性统计。
 - **交互组件**：返回顶部按钮（带顺时针阅读进度环）、目录树（tocbot，H1–H3 层级）、图片灯箱、站内搜索（Pagefind）、访客计数。
 - **评论系统**：Waline（`@waline/client` 前端 + 独立 Cloudflare Workers + D1 后端）。
 - **无障碍 / 性能**：静态生成 + 增量岛屿，按需加载 JS；构建产物经 `astro-compressor` 压缩。
@@ -63,6 +63,20 @@ pnpm preview
 - `friendLinks` / `tools` —— 友链与工具页数据。
 
 文章写在 `src/content/posts/`（`.md` / `.mdx`），动态写在 `src/content/dynamics/`。
+
+## 关于页结构（`src/pages/about.astro`）
+
+关于页为单文件自定义布局，区块自上而下：
+
+- **个人信息 Hero**：左右分栏（移动端堆叠），左侧大头像带 conic 渐变光环，右侧含问候语、姓名、角色、简介、快速标签与社交图标；背景两处柔光斑。
+- **关于这里 / 这个站点**：`prose` 文本卡片。
+- **特性卡片**：技术栈 / 设计语言 / 互动交流三列网格，含图标与 hover 上浮。
+- **技能栈**：带进度条动画（数据在组件内 `skills` 数组）。
+- **足迹时间线**：复用全局 `.timeline` 样式（数据在 `timeline` 数组）。
+- **统计卡片**：主题模式 / 部署 / 欢迎来信三列。
+- **评论**：`<Comments />`（Waline）。
+
+样式全部使用主题 CSS 变量（`--primary` / `--text` / `--muted` / `--border` / `--card-bg`）与 `card`、`data-ripple`、`reveal` 动画，配色用 `color-mix(in oklab, ...)` 与全局一致。
 
 ## 评论系统（Waline）
 

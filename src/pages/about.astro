@@ -12,7 +12,7 @@ const features = [
     desc: "基于 Astro 构建，Tailwind CSS 驱动，默认零 JS、极致轻量。",
   },
   {
-    icon: "star",
+    icon: "palette",
     title: "设计语言",
     desc: "樱花粉主题，支持亮色 / 暗色 / 跟随系统三种模式无缝切换。",
   },
@@ -28,6 +28,24 @@ const stats = [
   { icon: "link", value: "Cloudflare", label: "边缘部署" },
   { icon: "mail", value: "随时", label: "欢迎来信" },
 ];
+
+const timeline = [
+  { date: "2022", title: "站点诞生", desc: "在角落里悄悄搭起这个小窝，开始记录生活碎片。" },
+  { date: "2024", title: "拥抱 Astro", desc: "用 Astro 重构，享受极致轻量与零 JS 的清爽。" },
+  { date: "2025", title: "樱花粉主题", desc: "换上喜欢的樱花粉，亮色暗色随心切换。" },
+  { date: "至今", title: "持续折腾", desc: "写代码、写生活，也写写那些不务正业的小玩意。" },
+];
+
+const skills = [
+  { name: "Astro", level: 92 },
+  { name: "Tailwind CSS", level: 88 },
+  { name: "TypeScript", level: 80 },
+  { name: "Svelte", level: 70 },
+  { name: "React", level: 68 },
+];
+
+// 当前年份，用于页脚等
+const year = new Date().getFullYear();
 ---
 
 <Default title="关于我">
@@ -37,37 +55,55 @@ const stats = [
 
   <section class="about">
     <!-- 个人信息 Hero -->
-    <div class="about-hero card">
-      <div class="about-banner"></div>
-      <img
-        src={profileConfig.avatar}
-        alt={profileConfig.name}
-        class="about-avatar"
-      />
-      <h1 class="about-name">{profileConfig.name}</h1>
-      <p class="about-role">一个喜欢折腾与分享的小站长</p>
-      <p class="about-bio">{profileConfig.bio}</p>
-      <div class="about-socials">
-        {
-          profileConfig.social.map((s) => (
-            <a
-              href={s.url}
-              title={s.name}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={s.name}
-              class="about-social"
-              data-ripple
-            >
-              <Icon name={s.icon} size={18} />
-            </a>
-          ))
-        }
+    <div class="about-hero card reveal" data-ripple>
+      <span class="hero-glow hero-glow-a"></span>
+      <span class="hero-glow hero-glow-b"></span>
+      <div class="hero-avatar-wrap">
+        <div class="hero-ring"></div>
+        <img
+          src={profileConfig.avatar}
+          alt={profileConfig.name}
+          class="about-avatar"
+        />
+      </div>
+      <div class="hero-info">
+        <div class="hero-hello">
+          <span class="hero-wave">👋</span> 你好，我是
+        </div>
+        <h1 class="about-name">{profileConfig.name}</h1>
+        <p class="about-role">
+          <Icon name="star" size={13} />
+          一个喜欢折腾与分享的小站长
+        </p>
+        <p class="about-bio">{profileConfig.bio}</p>
+        <div class="hero-tags">
+          <span class="hero-tag">Astro</span>
+          <span class="hero-tag">Tailwind</span>
+          <span class="hero-tag">粉色控</span>
+          <span class="hero-tag">狐狸</span>
+        </div>
+        <div class="about-socials">
+          {
+            profileConfig.social.map((s) => (
+              <a
+                href={s.url}
+                title={s.name}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={s.name}
+                class="about-social"
+                data-ripple
+              >
+                <Icon name={s.icon} size={18} />
+              </a>
+            ))
+          }
+        </div>
       </div>
     </div>
 
     <!-- 关于这里 -->
-    <div class="about-card prose">
+    <div class="about-card prose reveal" data-ripple>
       <h2>关于这里</h2>
       <p>
         这里是一个藏在角落的小站，记录着关于代码、生活和美好事物的碎片。
@@ -84,8 +120,12 @@ const stats = [
     <!-- 特性卡片 -->
     <div class="about-features">
       {
-        features.map((f) => (
-          <div class="feat card" data-ripple>
+        features.map((f, i) => (
+          <div
+            class="feat card reveal"
+            data-ripple
+            style={`--reveal-delay:${i * 80}ms`}
+          >
             <div class="feat-icon">
               <Icon name={f.icon} size={20} />
             </div>
@@ -96,11 +136,54 @@ const stats = [
       }
     </div>
 
+    <!-- 技能栈 -->
+    <div class="about-block reveal">
+      <h2 class="about-block-title">技能栈</h2>
+      <div class="skills card" data-ripple>
+        {
+          skills.map((s) => (
+            <div class="skill">
+              <div class="skill-head">
+                <span class="skill-name">{s.name}</span>
+                <span class="skill-pct">{s.level}%</span>
+              </div>
+              <div class="skill-bar">
+                <div class="skill-fill" style={`--lv:${s.level}%`} />
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- 足迹 / 时间线 -->
+    <div class="about-block reveal">
+      <h2 class="about-block-title">足迹</h2>
+      <ul class="timeline about-timeline">
+        {
+          timeline.map((t) => (
+            <li class="tl-item">
+              <span class="tl-dot" />
+              <div class="tl-card">
+                <div class="tl-date">{t.date}</div>
+                <div class="tl-title">{t.title}</div>
+                <div class="tl-content">{t.desc}</div>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
     <!-- 统计 -->
     <div class="about-stats">
       {
-        stats.map((s) => (
-          <div class="stat card">
+        stats.map((s, i) => (
+          <div
+            class="stat card reveal"
+            data-ripple
+            style={`--reveal-delay:${i * 80}ms`}
+          >
             <div class="stat-icon">
               <Icon name={s.icon} size={18} />
             </div>
@@ -122,32 +205,83 @@ const stats = [
 
   /* Hero */
   .about-hero {
-    @apply relative text-center pt-0 pb-6 px-6 mt-4 overflow-hidden;
+    @apply relative flex items-center gap-6 mt-4 p-6 overflow-hidden;
   }
-  .about-banner {
-    @apply absolute inset-x-0 top-0 h-28;
-    background: linear-gradient(
-      135deg,
-      color-mix(in oklab, var(--primary) 38%, var(--card-bg)),
-      color-mix(in oklab, var(--primary) 12%, var(--card-bg))
+  /* 背景柔光斑 */
+  .hero-glow {
+    @apply absolute rounded-full pointer-events-none blur-2xl opacity-50;
+  }
+  .hero-glow-a {
+    width: 180px;
+    height: 180px;
+    top: -60px;
+    right: -40px;
+    background: radial-gradient(
+      circle,
+      color-mix(in oklab, var(--primary) 55%, transparent),
+      transparent 70%
+    );
+  }
+  .hero-glow-b {
+    width: 140px;
+    height: 140px;
+    bottom: -50px;
+    left: -30px;
+    background: radial-gradient(
+      circle,
+      color-mix(in oklab, var(--primary) 30%, transparent),
+      transparent 70%
+    );
+  }
+  /* 头像区 */
+  .hero-avatar-wrap {
+    @apply relative shrink-0;
+  }
+  .hero-ring {
+    @apply absolute -inset-1.5 rounded-full;
+    background: conic-gradient(
+      from 0deg,
+      color-mix(in oklab, var(--primary) 70%, transparent),
+      color-mix(in oklab, var(--primary) 15%, transparent),
+      color-mix(in oklab, var(--primary) 70%, transparent)
     );
   }
   .about-avatar {
-    @apply relative w-24 h-24 rounded-full mx-auto -mt-10 mb-3 object-cover
-           border-4 border-(--card-bg) shadow-lg;
-    box-shadow: 0 8px 24px -10px color-mix(in oklab, var(--primary) 60%, transparent);
+    @apply relative w-28 h-28 rounded-full object-cover border-4
+           border-(--card-bg);
+    box-shadow: 0 10px 30px -10px color-mix(in oklab, var(--primary) 65%, transparent);
+  }
+  /* 信息区 */
+  .hero-info {
+    @apply relative min-w-0 flex-1;
+  }
+  .hero-hello {
+    @apply text-sm text-(--muted) mb-0.5;
+    .hero-wave {
+      @apply inline-block;
+      animation: hero-wave 2.4s ease-in-out infinite;
+    }
   }
   .about-name {
-    @apply text-2xl font-bold text-(--text);
+    @apply text-3xl font-bold text-(--text) leading-tight;
   }
   .about-role {
-    @apply text-xs text-(--primary) font-medium mt-1;
+    @apply inline-flex items-center gap-1 text-sm text-(--primary)
+           font-medium mt-1.5;
   }
   .about-bio {
-    @apply text-sm text-(--muted) mt-2 leading-relaxed;
+    @apply text-sm text-(--muted) mt-3 leading-relaxed;
+  }
+  .hero-tags {
+    @apply flex flex-wrap gap-2 mt-3.5;
+  }
+  .hero-tag {
+    @apply text-xs px-2.5 py-1 rounded-full border border-(--border)
+           bg-(--card-bg)/50 text-(--muted) transition
+           hover:text-(--primary) hover:border-(--primary)/40;
   }
   .about-socials {
-    @apply flex items-center justify-center gap-2.5 mt-4;
+    @apply flex items-center gap-2.5 mt-4;
   }
   .about-social {
     @apply w-9 h-9 rounded-full flex items-center justify-center
@@ -156,10 +290,43 @@ const stats = [
            hover:-translate-y-0.5 active:scale-95;
   }
 
+  @keyframes hero-wave {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(16deg); }
+    50% { transform: rotate(0deg); }
+    75% { transform: rotate(-8deg); }
+  }
+
+  /* 移动端：上下堆叠 */
+  @media (max-width: 560px) {
+    .about-hero {
+      @apply flex-col text-center;
+    }
+    .hero-info {
+      @apply flex flex-col items-center;
+    }
+    .about-socials {
+      @apply justify-center;
+    }
+  }
+
   /* 关于卡片 */
   .about-card {
     @apply rounded-xl border border-(--border) p-6 mt-4
            bg-(--card-bg)/50;
+  }
+
+  /* 通用区块标题 */
+  .about-block {
+    @apply mt-8;
+  }
+  .about-block-title {
+    @apply text-lg font-bold text-(--text) mb-4 relative pl-3;
+    &::before {
+      content: "";
+      @apply absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 rounded-full
+             bg-(--primary);
+    }
   }
 
   /* 特性卡片 */
@@ -179,6 +346,45 @@ const stats = [
     }
     .feat-desc {
       @apply text-xs text-(--muted) mt-1 leading-relaxed;
+    }
+  }
+
+  /* 技能栈 */
+  .skills {
+    @apply rounded-xl border border-(--border) p-5 space-y-4
+           bg-(--card-bg)/50;
+  }
+  .skill-head {
+    @apply flex items-center justify-between mb-1.5;
+  }
+  .skill-name {
+    @apply text-sm font-medium text-(--text);
+  }
+  .skill-pct {
+    @apply text-xs text-(--muted) font-mono;
+  }
+  .skill-bar {
+    @apply h-2 rounded-full overflow-hidden bg-(--border)/50;
+  }
+  .skill-fill {
+    @apply h-full rounded-full;
+    width: var(--lv);
+    background: linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--primary) 70%, transparent),
+      var(--primary)
+    );
+    transition: width 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* 时间线 */
+  .about-timeline {
+    @apply mt-1;
+    .tl-card {
+      @apply transition hover:border-(--primary)/40;
+    }
+    .tl-title {
+      @apply text-sm font-semibold text-(--text) mt-0.5;
     }
   }
 
