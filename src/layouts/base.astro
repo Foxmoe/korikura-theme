@@ -14,36 +14,36 @@ import "katex/dist/katex.min.css";
 import styleUrl from "@/styles/style.css?url";
 
 export interface Props {
-    title?: string;
-    description?: string;
-    keywords?: string;
-    themeMode?: THEME_MODE;
-    ogType?: "website" | "article";
-    ogImage?: string;
-    publishedTime?: string;
-    modifiedTime?: string;
-    tags?: string[];
-    author?: string;
+  title?: string;
+  description?: string;
+  keywords?: string;
+  themeMode?: THEME_MODE;
+  ogType?: "website" | "article";
+  ogImage?: string;
+  publishedTime?: string;
+  modifiedTime?: string;
+  tags?: string[];
+  author?: string;
 }
 
 const walineHost = (() => {
-    try {
-        return new URL(siteConfig.comments.walineServer).host;
-    } catch {
-        return "";
-    }
+  try {
+    return new URL(siteConfig.comments.walineServer).host;
+  } catch {
+    return "";
+  }
 })();
 
 let {
-    title,
-    description = siteConfig.description,
-    keywords = siteConfig.keywords,
-    ogType = "website",
-    ogImage = siteConfig.defaultCover,
-    publishedTime,
-    modifiedTime,
-    tags,
-    author = profileConfig.name,
+  title,
+  description = siteConfig.description,
+  keywords = siteConfig.keywords,
+  ogType = "website",
+  ogImage = siteConfig.defaultCover,
+  publishedTime,
+  modifiedTime,
+  tags,
+  author = profileConfig.name,
 } = Astro.props;
 
 const fullTitle = title ? title + " - " + siteConfig.title : siteConfig.title;
@@ -51,64 +51,76 @@ const fullTitle = title ? title + " - " + siteConfig.title : siteConfig.title;
 
 <!doctype html>
 <html lang={siteConfig.lang}>
-    <head>
-        <script is:inline>
-            (function () {
-                try {
-                    var saved = localStorage.getItem("theme-mode") || "auto";
-                    var dark =
-                        saved === "dark" ||
-                        (saved === "auto" &&
-                            window.matchMedia("(prefers-color-scheme: dark)").matches);
-                    var root = document.documentElement;
-                    root.setAttribute("data-theme", dark ? "dark" : "light");
-                    root.setAttribute("data-mode", saved);
-                    root.classList.toggle("dark", dark);
-                } catch (e) {}
-            })();
-        </script>
+  <head>
+    <script is:inline>
+      (function () {
+        try {
+          var saved = localStorage.getItem("theme-mode") || "auto";
+          var dark =
+            saved === "dark" ||
+            (saved === "auto" &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches);
+          var root = document.documentElement;
+          root.setAttribute("data-theme", dark ? "dark" : "light");
+          root.setAttribute("data-mode", saved);
+          root.classList.toggle("dark", dark);
+        } catch (e) {}
+      })();
+    </script>
 
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="color-scheme" content="light dark" />
-        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
-        <link rel="preconnect" href="https://busuanzi.ibruce.info" crossorigin />
-        {walineHost && <link rel="preconnect" href={`https://${walineHost}`} crossorigin />}
+    <link rel="preconnect" href="https://busuanzi.ibruce.info" crossorigin />
+    {
+      walineHost && (
+        <link rel="preconnect" href={`https://${walineHost}`} crossorigin />
+      )
+    }
 
-        <meta name="description" content={description} />
-        <meta name="keywords" content={keywords} />
-        <meta name="author" content={author} />
-        <meta name="generator" content={Astro.generator} />
-        <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
-        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="description" content={description} />
+    <meta name="keywords" content={keywords} />
+    <meta name="author" content={author} />
+    <meta name="generator" content={Astro.generator} />
+    <meta
+      name="theme-color"
+      content="#0f172a"
+      media="(prefers-color-scheme: dark)"
+    />
+    <meta
+      name="theme-color"
+      content="#ffffff"
+      media="(prefers-color-scheme: light)"
+    />
 
-        <Seo
-            title={fullTitle}
-            description={description}
-            type={ogType}
-            image={ogImage}
-            url={Astro.url.pathname}
-            publishedTime={publishedTime}
-            modifiedTime={modifiedTime}
-            tags={tags}
-            author={author}
-        />
+    <Seo
+      title={fullTitle}
+      description={description}
+      type={ogType}
+      image={ogImage}
+      url={Astro.url.pathname}
+      publishedTime={publishedTime}
+      modifiedTime={modifiedTime}
+      tags={tags}
+      author={author}
+    />
 
-        <link rel="sitemap" href="/sitemap.xml" />
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap.xml" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-        <link
-            rel="alternate"
-            type="application/rss+xml"
-            title="RSS Feed"
-            href="/rss.xml"
-        />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="RSS Feed"
+      href="/rss.xml"
+    />
 
-        <title>{fullTitle}</title>
+    <title>{fullTitle}</title>
 
-        <link rel="stylesheet" href={styleUrl} data-permanent />
+    <link rel="stylesheet" href={styleUrl} data-permanent />
 
         <link
             rel="preload"
@@ -120,92 +132,103 @@ const fullTitle = title ? title + " - " + siteConfig.title : siteConfig.title;
             async
             fetchpriority="low"
             src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    </head>
+  </head>
 
-    <body>
-        <div id="global-motion-bg" aria-hidden="true"></div>
-        <a class="skip-link" href="#main-container">跳到主要内容</a>
-        <SpaRouter
-            contentSelector="#main-container"
-            heroSelector="#hero-slot"
-            scrollToTop={true}
-            prefetch={false}
-            ignoreHash={false}
-            scrollBehavior="smooth"
-        />
-        <SearchModal />
-        <RestoreStyle />
-        <CodeEnhancer />
-        <Lightbox />
-        <slot />
+  <body>
+    <div id="global-motion-bg" aria-hidden="true"></div>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-KVZ4499R"
+        height="0"
+        width="0"
+        style="display:none;visibility:hidden"></iframe></noscript
+    >
+    <!-- End Google Tag Manager (noscript) -->
 
-        <BackToTop />
-        <Tooltip />
-        <Animations />
+    <a class="skip-link" href="#main-container">跳到主要内容</a>
+    <SpaRouter
+      contentSelector="#main-container"
+      heroSelector="#hero-slot"
+      scrollToTop={true}
+      prefetch={false}
+      ignoreHash={false}
+      scrollBehavior="smooth"
+    />
+    <SearchModal />
+    <RestoreStyle />
+    <CodeEnhancer />
+    <Lightbox />
+    <slot />
 
-        <style lang="scss">
-          #global-motion-bg {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            overflow: hidden;
-            pointer-events: none;
-            --ps-tile-size: 160px;
-            --ps-scroll-speed: 30s;
+    <BackToTop />
+    <Tooltip />
+    <Animations />
 
-            &::before {
-              content: "";
-              position: absolute;
-              inset: 0;
-              opacity: 0.2;
-              background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke='%23222222' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='40' cy='40' r='22'/%3E%3Cpath d='M120 20 L140 56 L100 56 Z'/%3E%3Cpath d='M28 112 L52 136 M52 112 L28 136'/%3E%3Crect x='100' y='104' width='36' height='36' rx='5' ry='5'/%3E%3C/g%3E%3C/svg%3E");
-              background-size: var(--ps-tile-size) var(--ps-tile-size);
-              background-repeat: repeat;
-              background-position: 0 0;
-              animation: ps-bg-pan var(--ps-scroll-speed) linear infinite;
-              will-change: background-position;
-            }
-          }
+    <style lang="scss">
+      #global-motion-bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        overflow: hidden;
+        pointer-events: none;
+        --ps-tile-size: 160px;
+        --ps-scroll-speed: 30s;
 
-          :global([data-theme="dark"]) #global-motion-bg::before {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke='%23cfcfcf' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='40' cy='40' r='22'/%3E%3Cpath d='M120 20 L140 56 L100 56 Z'/%3E%3Cpath d='M28 112 L52 136 M52 112 L28 136'/%3E%3Crect x='100' y='104' width='36' height='36' rx='5' ry='5'/%3E%3C/g%3E%3C/svg%3E");
-            opacity: 0.14;
-          }
+        &::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          opacity: 0.2;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke='%23222222' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='40' cy='40' r='22'/%3E%3Cpath d='M120 20 L140 56 L100 56 Z'/%3E%3Cpath d='M28 112 L52 136 M52 112 L28 136'/%3E%3Crect x='100' y='104' width='36' height='36' rx='5' ry='5'/%3E%3C/g%3E%3C/svg%3E");
+          background-size: var(--ps-tile-size) var(--ps-tile-size);
+          background-repeat: repeat;
+          background-position: 0 0;
+          animation: ps-bg-pan var(--ps-scroll-speed) linear infinite;
+          will-change: background-position;
+        }
+      }
 
-          @keyframes ps-bg-pan {
-            0%   { background-position: 0 0; }
-            100% { background-position: calc(-1 * var(--ps-tile-size)) calc(-1 * var(--ps-tile-size)); }
-          }
+      :global([data-theme="dark"]) #global-motion-bg::before {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke='%23cfcfcf' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='40' cy='40' r='22'/%3E%3Cpath d='M120 20 L140 56 L100 56 Z'/%3E%3Cpath d='M28 112 L52 136 M52 112 L28 136'/%3E%3Crect x='100' y='104' width='36' height='36' rx='5' ry='5'/%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.14;
+      }
 
-          @media (prefers-reduced-motion: reduce) {
-            #global-motion-bg::before {
-              animation: none;
-              will-change: auto;
-            }
-          }
-        </style>
+      @keyframes ps-bg-pan {
+        0%   { background-position: 0 0; }
+        100% { background-position: calc(-1 * var(--ps-tile-size)) calc(-1 * var(--ps-tile-size)); }
+      }
 
-        <script is:inline>
-          (function () {
-            function spawnRipple(e) {
-              var host = e.target && e.target.closest
-                ? e.target.closest("[data-ripple]")
-                : null;
-              if (!host) return;
-              var rect = host.getBoundingClientRect();
-              var size = Math.max(rect.width, rect.height);
-              var ink = document.createElement("span");
-              ink.className = "ripple-ink";
-              ink.style.width = ink.style.height = size + "px";
-              ink.style.left = e.clientX - rect.left - size / 2 + "px";
-              ink.style.top = e.clientY - rect.top - size / 2 + "px";
-              host.appendChild(ink);
-              ink.addEventListener("animationend", function () {
-                ink.remove();
-              });
-            }
-            document.addEventListener("pointerdown", spawnRipple);
-          })();
-        </script>
-    </body>
+      @media (prefers-reduced-motion: reduce) {
+        #global-motion-bg::before {
+          animation: none;
+          will-change: auto;
+        }
+      }
+    </style>
+
+    <script is:inline>
+      (function () {
+        function spawnRipple(e) {
+          var host =
+            e.target && e.target.closest
+              ? e.target.closest("[data-ripple]")
+              : null;
+          if (!host) return;
+          var rect = host.getBoundingClientRect();
+          var size = Math.max(rect.width, rect.height);
+          var ink = document.createElement("span");
+          ink.className = "ripple-ink";
+          ink.style.width = ink.style.height = size + "px";
+          ink.style.left = e.clientX - rect.left - size / 2 + "px";
+          ink.style.top = e.clientY - rect.top - size / 2 + "px";
+          host.appendChild(ink);
+          ink.addEventListener("animationend", function () {
+            ink.remove();
+          });
+        }
+        document.addEventListener("pointerdown", spawnRipple);
+      })();
+    </script>
+  </body>
 </html>

@@ -23,9 +23,5 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
-# content
-src/content/dynamics/
-src/content/posts/
-
 # wrangler local state
 .wrangler/

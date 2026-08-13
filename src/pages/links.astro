@@ -1,6 +1,7 @@
 ---
 import Default from "@/layouts/default.astro";
 import Icon from "@/components/icon.astro";
+import Comments from "@/components/comments.astro";
 import { siteConfig } from "@/config";
 
 const links = siteConfig.friendLinks ?? [];
@@ -11,6 +12,7 @@ const links = siteConfig.friendLinks ?? [];
     <header class="page-head">
       <h1>友情链接</h1>
       <p>这里收集了一些我喜欢的站点，欢迎互相交换友链 ~(￣▽￣)~</p>
+      <p>邮箱:dream.qu@qq.com</p>
     </header>
     <div class="link-grid">
       {
@@ -32,4 +34,5 @@ const links = siteConfig.friendLinks ?? [];
       }
     </div>
   </section>
+  <Comments />
 </Default>

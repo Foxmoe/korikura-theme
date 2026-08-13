@@ -8,6 +8,7 @@ Disallow: /assets/
 Disallow: /console/
 Disallow: /.well-known/
 
+Sitemap: ${new URL("sitemap-0.xml", import.meta.env.SITE).href}
 Sitemap: ${new URL("sitemap.xml", import.meta.env.SITE).href}
 
 Crawl-delay: 5

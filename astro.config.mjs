@@ -44,7 +44,7 @@ import react from '@astrojs/react';
 import mdx from '@astrojs/mdx';
 
 import svelte from '@astrojs/svelte';
-import clarity from '@bitfresh/astro-clarity';
+import clarity from "@bitfresh/astro-clarity";
 import NebulaCMS from 'nebula-cms';
 import tailwindcss from '@tailwindcss/vite';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
@@ -70,7 +70,7 @@ export default defineConfig({
   trailingSlash: "never",
   compressHTML: true,
   build: {
-    format: 'file',
+    format: 'directory', 
     assets: 'assets',
     inlineStylesheets: 'never',
   },
@@ -78,14 +78,19 @@ export default defineConfig({
   adapter: cloudflare(),
 
   integrations: [clarity({
-      projectId: "YOUR_CLARITY_PROJECT_ID",
-      enabled: true,
+      projectId: "ss3a1su3uz",
+      enabled: true,  
     }),
     sitemap({
     changefreq: 'weekly',
     priority: 0.7,
     filenameBase: 'sitemap',
     entryLimit: 50000,
+     filter: (page) => {
+    if (page.includes('/tags/') || page.includes('/categories/')) return false;
+    if (page.includes('/console') || page.includes('/search') || page.includes('/assets/')) return false;
+    return true;
+  },
   }), react(), mdx(), svelte(), NebulaCMS({
     basePath: '/console',
   }), compressor({ gzip: true, brotli: true })],
@@ -130,7 +135,6 @@ export default defineConfig({
       },
     },
     build: {
-      cssCodeSplit: false
     }
   }
 });

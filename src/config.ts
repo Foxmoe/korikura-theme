@@ -1,7 +1,7 @@
 export const siteConfig = {
-    title: "狐言乱语",
+    title: "狐言碎语",
     description: "不写代码的Baka不是好狐狸。随便写写，别太当真。",
-    keywords: "小狐,Baka小狐,BakaXH,BakaXH日记,BakaXH的博客,BakaXH的博客网站,狐言乱语,狐言乱语博客,狐言乱语网站,狐言乱语BLOG,狐言乱语BLOG网站,狐言乱语BLOG网站",
+    keywords: "小狐,Baka小狐,BakaXH,BakaXH日记,BakaXH的博客,BakaXH的博客网站,狐言碎语,狐言碎语博客,狐言碎语网站,狐言碎语BLOG,狐言碎语BLOG网站,狐言碎语BLOG网站",
     lang: "zh-CN",
     url: "https://blog.foxmoe.top",
     entry: "/",
@@ -25,7 +25,7 @@ export const siteConfig = {
     ],
 
     friendLinks: [
-        { name: "Astro", url: "https://astro.build", avatar: "https://astro.build/favicon.svg", desc: "The web framework for content-driven websites" },
+        { name: "菱华博客", url: "https://blog.inlyra.cn", avatar: "https://bed.foxmoe.top/file/images/1785997326402_image.png", desc: "一个分享想法的小站点" },
         { name: "胡巴的博客", url: "https://hlydwz.com", avatar: "", desc: "胡巴的博客是一个自建的全栈个人博客系统，使用 Astro + React + PocketBase 构建，自 2025 年运行至今。" },
     ],
 
