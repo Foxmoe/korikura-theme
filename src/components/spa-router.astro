@@ -125,7 +125,6 @@ const {
             document.title = newTitle;
         }
 
-        // SPA 切换时同步 <head> 中的 SEO 元信息（description / canonical / OG / Twitter / JSON-LD）
         const META_SELECTORS = [
             'meta[name="description"]',
             'meta[property^="og:"]',
@@ -162,9 +161,8 @@ const {
             }
 
             try {
-                // 先拉取新内容，拿到后再一次性交换，避免“先清空”导致的空白闪烁
                 const newDoc = await fetchContent(url);
-                if (token !== navToken) return; // 已有更新的导航，放弃本次
+                if (token !== navToken) return;
 
                 const newContent = newDoc.querySelector(contentSelector);
                 if (!newContent) throw new Error("Missing content");
@@ -190,7 +188,6 @@ const {
                 const t = document.startViewTransition(swap);
                 await t.finished.catch(() => {});
 
-                // 跨页锚点（如动态详情 #评论）：新内容已就位后滚动到目标
                 if (hasHash) {
                     const target = document.getElementById(
                         decodeURIComponent(targetUrl.hash.slice(1)),
@@ -230,7 +227,6 @@ const {
             if (link.hasAttribute("download") || link.target === "_blank")
                 return;
 
-            // 同页锚点（目录/TOC 等）：直接平滑滚动，避免整页拉取导致的闪烁
             if (url.pathname === location.pathname && url.hash.length > 1) {
                 const target = document.getElementById(
                     decodeURIComponent(url.hash.slice(1)),

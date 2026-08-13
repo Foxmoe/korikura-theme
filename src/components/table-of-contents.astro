@@ -10,7 +10,6 @@ interface TocItem {
 
 const { headings = [] } = Astro.props as { headings?: any[] };
 
-// 把 Astro render() 返回的扁平 headings 转成嵌套树（参考 Axi-Theme 的 generateToc，做了容错）
 function generateToc(items: any[]): TocItem[] {
   const body = items.filter((h) => h.depth > 1);
   const toc: TocItem[] = [];
@@ -112,11 +111,9 @@ const toc = generateToc(headings);
   .toc-body {
     @apply text-sm relative;
   }
-  /* 竖向轨道（仅作为层级缩进容器，去掉长条装饰，指示器改用 toc-link 的 ::after 竖矩形） */
   .toc-body .toc-list {
     @apply list-none m-0 p-0 relative;
   }
-  /* 嵌套层级缩进 */
   .toc-body .toc-list .toc-list {
     @apply ml-3.5 mt-0.5;
   }
@@ -125,7 +122,6 @@ const toc = generateToc(headings);
            rounded-md transition-colors duration-200 cursor-pointer
            hover:text-(--primary) hover:bg-(--primary)/5;
   }
-  /* 轨道上的竖向小矩形指示器（替换原圆点） */
   .toc-body .toc-link::after {
     content: "";
     @apply absolute left-[5px] top-1/2 -translate-y-1/2 w-[3px] h-3.5 rounded-full
@@ -141,14 +137,12 @@ const toc = generateToc(headings);
   .toc-body .toc-link.node-name--H4 {
     @apply text-[0.8rem];
   }
-  /* 当前阅读位置高亮 */
   .toc-body .toc-link.is-active {
     @apply text-(--primary) font-semibold bg-(--primary)/9;
   }
   .toc-body .toc-link.is-active::after {
     @apply bg-(--primary) h-5;
   }
-  /* 有子项的父标题可点击折叠 */
   .toc-body .is-collapsed > .toc-list {
     @apply hidden;
   }
@@ -172,7 +166,6 @@ const toc = generateToc(headings);
       if (id) map[id] = l;
     });
 
-    // 折叠 / 展开整块目录
     toggle?.addEventListener("click", () => {
       if (!tocRoot) return;
       const collapsed = tocRoot.classList.toggle("is-collapsed");
@@ -180,7 +173,6 @@ const toc = generateToc(headings);
       toggle.setAttribute("aria-label", collapsed ? "展开目录" : "折叠目录");
     });
 
-    // 可折叠父项：初始化 aria-expanded，点击仅折叠/展开不跳转
     links.forEach((a) => {
       const li = a.parentElement;
       if (li && li.querySelector(":scope > .toc-list")) {
@@ -205,9 +197,8 @@ const toc = generateToc(headings);
       : [];
     if (!headingEls.length) return;
 
-    // 当前阅读位置：取最后一个“顶部已越过阈值线”的标题，双向滚动都正确
     let activeId: string | null = null;
-    const THRESHOLD = 130; // 顶栏下方一点的判定线
+    const THRESHOLD = 130;
 
     const onScroll = () => {
       let current: string | null = null;
@@ -225,7 +216,6 @@ const toc = generateToc(headings);
           if (on) l.setAttribute("aria-current", "location");
           else l.removeAttribute("aria-current");
         });
-        // 自动展开所有祖先节点，确保当前项可见
         const active = map[current];
         if (active) {
           let li = active.closest(".toc-item");
@@ -241,7 +231,6 @@ const toc = generateToc(headings);
         }
       }
 
-      // 阅读进度条
       if (progress && content) {
         const rect = content.getBoundingClientRect();
         const total = rect.height - window.innerHeight;
@@ -251,7 +240,6 @@ const toc = generateToc(headings);
       }
     };
 
-    // 防止 SPA 多次导航后叠加监听器
     const key = "__tocScrollHandler" as keyof Window;
     if (window[key]) window.removeEventListener("scroll", window[key] as any);
     (window as any)[key] = onScroll;
@@ -260,4 +248,21 @@ const toc = generateToc(headings);
   }
 
   initToc();
+
+  const container = document.getElementById("main-container");
+  if (container) {
+    let lastTocBody = document.getElementById("toc-body");
+    const mo = new MutationObserver(() => {
+      const cur = document.getElementById("toc-body");
+      if (cur && cur !== lastTocBody) {
+        lastTocBody = cur;
+        initToc();
+      } else if (!cur) {
+        lastTocBody = null;
+      }
+    });
+    mo.observe(container, { childList: true, subtree: true });
+  }
+
+  document.addEventListener("spa-navigate", initToc);
 </script>
