@@ -72,9 +72,7 @@ export default defineConfig({
   build: {
     format: 'file',
     assets: 'assets',
-  },
-  devToolbar: {
-    enabled: true
+    inlineStylesheets: 'never',
   },
 
   adapter: cloudflare(),
@@ -132,7 +130,7 @@ export default defineConfig({
       },
     },
     build: {
-      cssCodeSplit: true
+      cssCodeSplit: false
     }
   }
 });

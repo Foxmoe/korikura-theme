@@ -5,7 +5,7 @@
 	"name": "korikura",
 	"main": "./worker.js",
 	"assets": {
-		"directory": "./dist",
+		"directory": "./dist/client",
 		"binding": "ASSETS",
 		"not_found_handling": "404-page"
 	},

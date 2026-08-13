@@ -1,4 +1,4 @@
-# BakaXH 日记（Korikura Theme）
+# Korikura Theme
 
 一个基于 **Astro 7 + Tailwind CSS v4** 构建的轻量个人博客，部署于 **Cloudflare Pages**。支持文章 / 动态（仿朋友圈）/ 友链 / 工具 / 归档等模块，并内置 SPA 式页面过渡、主题切换、访客统计、代码分组、目录树、灯箱、搜索与评论系统。
 

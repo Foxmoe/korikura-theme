@@ -26,3 +26,6 @@ pnpm-debug.log*
 # content
 src/content/dynamics/
 src/content/posts/
+
+# wrangler local state
+.wrangler/
