@@ -1,6 +1,4 @@
 ---
-// 增强灯箱：分组画廊、缩放、上一张/下一张、复制图片、分享图片。
-// 对文章 .prose 与动态 .moments-grid 内的图片统一生效，SPA 切换后依旧可用。
 ---
 
 <style is:global>
@@ -231,7 +229,6 @@
     };
 
     const applyZoom = () => {
-      // 先平移（屏幕像素）再缩放，放大后可通过拖拽查看整张图而非局部
       lbImg.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
       lbImg.classList.toggle("zoomed", scale > 1);
       lbImg.style.cursor = scale > 1 ? "grab" : "zoom-in";
@@ -291,7 +288,6 @@
           return;
         }
       } catch {
-        /* 跨域或环境不支持，回退到复制链接 */
       }
       try {
         await navigator.clipboard.writeText(item.src);
@@ -310,7 +306,6 @@
           await navigator.share(shareData);
           return;
         } catch {
-          /* 用户取消则忽略 */
         }
       }
       try {
@@ -336,7 +331,6 @@
 
     lbImg.addEventListener("click", () => { scale = scale > 1 ? 1 : 2; applyZoom(); });
 
-    // 放大后拖拽平移，查看整张图片（点击与拖拽区分：拖动超过阈值不算点击）
     let dragging = false;
     let moved = 0;
     let sx = 0;
@@ -367,7 +361,6 @@
       try {
         lbImg.releasePointerCapture(e.pointerId);
       } catch {
-        /* 指针已释放 */
       }
       lbImg.style.cursor = scale > 1 ? "grab" : "zoom-in";
     };
@@ -388,8 +381,6 @@
       else if (e.key === "-" || e.key === "_") zoomBy(-0.25);
     });
 
-    // 点击文章 .prose、动态 .moments-grid / .feed-item 内的图片打开灯箱
-    // 使用捕获阶段：先于 SPA 路由执行，避免触发外层链接（如动态详情）的跳转
     document.addEventListener(
       "click",
       (e) => {

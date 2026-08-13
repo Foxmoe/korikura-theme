@@ -2,7 +2,6 @@
 import { getPublishedPosts, getDynamics } from "@/utils/posts";
 import Icon from "./icon.astro";
 
-// 贡献日历：统计文章与动态的按日活跃度
 const posts = await getPublishedPosts();
 const dyns = await getDynamics();
 const counts = new Map<string, number>();
@@ -17,7 +16,7 @@ const WEEKS = 26;
 const today = new Date();
 const startOfWeek = (date: Date) => {
   const d = new Date(date);
-  const day = (d.getDay() + 6) % 7; // 周一=0
+  const day = (d.getDay() + 6) % 7;
   d.setDate(d.getDate() - day);
   d.setHours(0, 0, 0, 0);
   return d;
@@ -53,14 +52,12 @@ const siteMessages = [
 
 <div class="hc" id="home-carousel">
   <div class="hc-panels">
-    <!-- 天气（整块 M3 卡片，背景随天气变化） -->
     <div class="hc-panel hc-weather-panel" data-panel="weather">
       <div class="hc-weather" id="hc-weather">
         <div class="hc-w-loading">加载中…</div>
       </div>
     </div>
 
-    <!-- 一言 -->
     <div class="hc-panel" data-panel="hitokoto">
       <div class="hc-panel-head">
         <Icon name="message" size={18} /> 一言
@@ -71,7 +68,6 @@ const siteMessages = [
       <div class="hc-hitokoto-from" id="hc-hitokoto-from"></div>
     </div>
 
-    <!-- 更新日历（满铺卡片） -->
     <div class="hc-panel hc-cal-panel" data-panel="calendar">
       <div class="hc-cal">
         <div class="hc-cal-top">
@@ -102,7 +98,6 @@ const siteMessages = [
       </div>
     </div>
 
-    <!-- 全站消息 -->
     <div class="hc-panel" data-panel="messages">
       <div class="hc-panel-head">
         <Icon name="info" size={18} /> 全站消息
@@ -131,7 +126,7 @@ const siteMessages = [
 <style lang="scss">
   .hc {
     @apply relative rounded-xl border border-(--border)
-           bg-(--card-bg)/50 overflow-hidden min-h-[260px];
+           bg-(--card-bg) overflow-hidden min-h-[260px];
     box-shadow: 0 2px 10px -8px rgba(0, 0, 0, 0.22);
   }
   .hc-panels {
@@ -145,7 +140,6 @@ const siteMessages = [
       @apply opacity-100 pointer-events-auto;
     }
   }
-  /* 与首页其他区块标题统一：左侧主色竖条 + 文字主色 + 同字号/字重 */
   .hc-panel-head {
     @apply flex items-center gap-1.5 text-xl font-bold text-(--text) relative pl-3 mb-2;
     &::before {
@@ -153,7 +147,6 @@ const siteMessages = [
       @apply absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-full bg-(--primary);
     }
   }
-  /* 天气面板：整块 M3 卡片，去除内边距让渐变 hero 满铺 */
   .hc-weather-panel {
     @apply p-0;
   }
@@ -163,7 +156,6 @@ const siteMessages = [
   .hc-w-loading {
     @apply text-sm text-(--muted) flex items-center justify-center h-full;
   }
-  /* 天气 hero 由客户端脚本 innerHTML 注入，元素不带组件 scoped 属性，故用 :global 命中 */
   :global(.hc-w-hero) {
     @apply relative w-full h-full overflow-hidden flex flex-col
            text-white px-5 pt-4 pb-9 justify-between;
@@ -175,7 +167,6 @@ const siteMessages = [
     from { opacity: 0; transform: scale(0.98); }
     to { opacity: 1; transform: scale(1); }
   }
-  /* M3 柔光点缀 */
   :global(.hc-w-glow) {
     @apply absolute w-56 h-56 rounded-full pointer-events-none;
     top: -22%;
@@ -214,7 +205,6 @@ const siteMessages = [
     @apply opacity-85;
   }
 
-  /* ===== 按天气类型切换的背景渐变（AccuWeather 风格） ===== */
   :global(.hc-w-hero[data-w="clear"]) {
     background: linear-gradient(150deg, #2193b0 0%, #6dd5ed 100%);
   }
@@ -243,7 +233,6 @@ const siteMessages = [
   .hc-hitokoto-from {
     @apply text-sm text-(--muted) text-right;
   }
-  /* 更新日历满铺卡片：整块填充面板，轻微主色渐变呼应天气卡 */
   .hc-cal-panel {
     @apply p-0;
   }
@@ -348,7 +337,6 @@ const siteMessages = [
     root.addEventListener("mouseenter", stop);
     root.addEventListener("mouseleave", start);
 
-    // 天气（open-meteo，默认北京；失败有兜底）
     const wBox = document.getElementById("hc-weather");
     const drawWeather = (
       theme: string,
@@ -381,7 +369,6 @@ const siteMessages = [
       81: ["🌦️", "阵雨"], 82: ["⛈️", "强阵雨"], 85: ["🌨️", "阵雪"], 86: ["🌨️", "阵雪"],
       95: ["⛈️", "雷阵雨"], 96: ["⛈️", "雷阵雨伴雹"], 99: ["⛈️", "强雷暴"],
     };
-    // 天气代码 -> 背景主题
     const themeOf = (code: number): string => {
       if (code === 0) return "clear";
       if (code === 1 || code === 2) return "partly";
@@ -414,7 +401,6 @@ const siteMessages = [
       })
       .catch(() => drawFrom({ weathercode: 2, temperature: 23, windspeed: 8 }));
 
-    // 一言（hitokoto）
     const hk = document.getElementById("hc-hitokoto");
     const hkFrom = document.getElementById("hc-hitokoto-from");
     fetch("https://v1.hitokoto.cn/?c=f&encode=json")

@@ -13,7 +13,6 @@ const all = await getPublishedPosts();
 const cur = all.find((p) => p.id === current);
 const others = all.filter((p) => p.id !== current);
 
-// 优先同标签，不足则随机补足
 const related = others.filter((p) =>
   cur ? p.data.tags.some((t) => cur.data.tags.includes(t)) : false,
 );

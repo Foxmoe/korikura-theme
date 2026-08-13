@@ -73,7 +73,7 @@ const isPost = Boolean(postTitle);
     max-width: 100%;
     margin-inline: auto;
     @apply relative flex items-center justify-between gap-3 px-4 py-3;
-    background-color: color-mix(in oklab, var(--bg) 28%, transparent);
+    background-color: color-mix(in oklab, var(--bg) 82%, transparent);
     border: 1px solid transparent;
     border-radius: 0;
     box-shadow: none;
@@ -86,13 +86,13 @@ const isPost = Boolean(postTitle);
 
   .nav-wrapper[data-nav="down"] .nav-card,
   .nav-wrapper[data-nav="up"] .nav-card {
-    max-width: var(--container);
-    @apply px-5 py-2.5 rounded-xl border shadow-md mt-1.5;
+    max-width: min(94vw, var(--container));
+    @apply px-5 py-2.5 rounded-xl border mt-1.5;
     border-color: color-mix(in oklab, var(--border) 70%, transparent);
     background-color: color-mix(in oklab, var(--card-bg) 82%, transparent);
     -webkit-backdrop-filter: blur(16px);
     backdrop-filter: blur(16px);
-    box-shadow: 0 12px 32px -16px color-mix(in oklab, var(--text) 10%, transparent);
+    box-shadow: 0 8px 28px -18px color-mix(in oklab, var(--primary) 22%, transparent);
   }
 
   .logo {
@@ -198,7 +198,6 @@ const isPost = Boolean(postTitle);
            hover:text-(--primary);
   }
 
-  /* 桌面端（sm: 及以上）导航链接已常驻，隐藏冗余的汉堡按钮，仅移动端出现 */
   @media (min-width: 640px) {
     #menu-open {
       @apply hidden;
@@ -213,7 +212,7 @@ const isPost = Boolean(postTitle);
     @apply rounded-md border border-(--border) p-2
            flex flex-col gap-1 overflow-hidden
            opacity-0 invisible -translate-y-2 transition-all duration-200;
-    background-color: color-mix(in oklab, var(--card-bg) 96%, transparent);
+    background-color: var(--card-bg);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     box-shadow: 0 12px 30px -16px color-mix(in oklab, var(--text) 35%, transparent);
@@ -297,7 +296,6 @@ const isPost = Boolean(postTitle);
   setPostState(window.location.pathname);
   updateNav();
 
-  // 点击导航链接时立即高亮，避免等待 SPA 导航完成才显示选中态
   document.addEventListener("click", (e) => {
     const link = e.target?.closest?.(".nav-link, .mobile-link");
     if (link?.dataset.link) setActive(link.dataset.link);

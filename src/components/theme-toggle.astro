@@ -18,7 +18,7 @@ import Icon from "./icon.astro";
   .icon-btn {
     @apply flex items-center justify-center w-9 h-9 rounded
            border border-(--border) text-(--text)
-           bg-(--card-bg)/50 transition active:scale-95
+           bg-(--card-bg) transition active:scale-95
            hover:text-(--primary);
   }
   .theme-icon {
@@ -45,7 +45,6 @@ import Icon from "./icon.astro";
   const btn = document.getElementById("theme-toggle");
   const order: ("light" | "dark" | "auto")[] = ["dark", "light", "auto"];
 
-  // 初始化：读取已保存模式（无闪烁脚本可能在更早时设置过 data-mode）
   if (!document.documentElement.getAttribute("data-mode")) {
     const saved = (localStorage.getItem("theme-mode") as "light" | "dark" | "auto") || "auto";
     applyTheme(saved);
@@ -56,7 +55,6 @@ import Icon from "./icon.astro";
       (document.documentElement.getAttribute("data-mode") as "light" | "dark" | "auto") || "auto";
     const next = order[(order.indexOf(current) + 1) % order.length];
 
-    // 全局圆圈涟漪：从点击位置扩散
     const rect = (btn as HTMLButtonElement).getBoundingClientRect();
     const x = e.clientX || rect.left + rect.width / 2;
     const y = e.clientY || rect.top + rect.height / 2;
@@ -67,7 +65,6 @@ import Icon from "./icon.astro";
     document.body.appendChild(ripple);
     ripple.addEventListener("animationend", () => ripple.remove());
 
-    // 用 View Transitions 做平滑的主题切换（GPU 合成，无逐元素过渡卡顿）
     const swap = () => applyTheme(next);
     if (typeof document.startViewTransition === "function") {
       document.startViewTransition(swap);
@@ -81,7 +78,6 @@ import Icon from "./icon.astro";
     }
   });
 
-  // 跟随系统变化（仅 auto 模式）
   window
     .matchMedia("(prefers-color-scheme: dark)")
     .addEventListener("change", () => {
@@ -89,7 +85,6 @@ import Icon from "./icon.astro";
       if (mode === "auto") applyTheme("auto");
     });
 
-  // SPA 导航后保持主题
   window.addEventListener("spa-navigate", () => {
     const mode = (document.documentElement.getAttribute("data-mode") as
       | "light"

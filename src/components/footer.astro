@@ -104,8 +104,8 @@ const totalWords = await getTotalWords();
 
 <style lang="scss">
   .site-footer {
-    @apply mt-auto w-full border-t border-(--border);
-    background-color: color-mix(in oklab, var(--card-bg) 88%, transparent);
+    @apply mt-auto relative z-0 w-full border-t border-(--border);
+    background-color: var(--card-bg);
   }
   .footer-container {
     @apply max-w-6xl mx-auto px-4 py-8 flex flex-col gap-4;

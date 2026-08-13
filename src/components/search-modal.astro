@@ -221,7 +221,6 @@ import Icon from "./icon.astro";
     }, 120);
   });
 
-  // 点击结果后关闭（SPA 路由会接管跳转）
   results.addEventListener("click", (e) => {
     if ((e.target as HTMLElement).closest("a")) closeModal();
   });

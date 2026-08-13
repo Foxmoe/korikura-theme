@@ -15,7 +15,7 @@ import Icon from "./icon.astro";
     @apply fixed right-5 bottom-5 z-[90000] w-11 h-11 rounded-full
            flex items-center justify-center
            border border-transparent text-(--text)
-           bg-(--card-bg) shadow-lg
+           bg-(--card-bg) shadow-lg cursor-pointer
            opacity-0 translate-y-3 pointer-events-none
            transition hover:text-(--primary) active:scale-90;
     &.show {
@@ -54,11 +54,10 @@ import Icon from "./icon.astro";
     ring.style.strokeDashoffset = String(C * (1 - p));
     btn.classList.toggle("show", window.scrollY > 400);
 
-    // 滚到底部时让按钮停在 footer 顶部之上，不与 footer 叠加
     const footer = document.querySelector(".site-footer");
     if (footer) {
       const fr = footer.getBoundingClientRect();
-      const gap = 20; // 与 footer 顶部的间距(px)
+      const gap = 20;
       const offset = Math.max(20, window.innerHeight - fr.top + gap);
       btn.style.bottom = offset + "px";
     }

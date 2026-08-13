@@ -1,6 +1,4 @@
 ---
-// 全局浮动 tooltip：为带 data-tooltip / title / aria-label 的元素在 hover 时
-// 显示美化提示，并抑制浏览器原生 title。事件委托，SPA 切换后依然生效。
 ---
 
 <div id="app-tooltip" class="app-tooltip" role="tooltip" aria-hidden="true"></div>
@@ -98,7 +96,6 @@
       const label = getLabel(el);
       if (!label) return;
       current = el;
-      // 抑制原生 title 气泡
       if (el.hasAttribute("title")) {
         el.setAttribute("data-title", el.getAttribute("title") || "");
         el.removeAttribute("title");

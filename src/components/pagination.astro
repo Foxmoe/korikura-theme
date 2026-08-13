@@ -9,7 +9,6 @@ function pageUrl(p: number) {
   return p <= 1 ? "/posts" : `/posts/page/${p}`;
 }
 
-// 生成带省略号的页码序列
 function pageItems(): (number | "...")[] {
   if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
   const items: (number | "...")[] = [1];
@@ -64,7 +63,7 @@ function pageItems(): (number | "...")[] {
   .page-btn {
     @apply px-4 py-2 rounded-lg text-sm font-medium
            text-(--text) border border-(--border)
-           bg-(--card-bg)/60 transition hover:border-(--primary) hover:text-(--primary);
+           bg-(--card-bg) transition hover:border-(--primary) hover:text-(--primary);
   }
   .page-numbers {
     @apply flex items-center gap-1.5;
