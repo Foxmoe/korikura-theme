@@ -110,10 +110,20 @@ const fullTitle = title ? title + " - " + siteConfig.title : siteConfig.title;
 
         <link rel="stylesheet" href={styleUrl} data-permanent />
 
-        <script is:inline defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <link
+            rel="preload"
+            as="script"
+            href="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"
+        />
+        <script
+            is:inline
+            async
+            fetchpriority="low"
+            src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
     </head>
 
     <body>
+        <div id="global-motion-bg" aria-hidden="true"></div>
         <a class="skip-link" href="#main-container">跳到主要内容</a>
         <SpaRouter
             contentSelector="#main-container"
@@ -133,8 +143,49 @@ const fullTitle = title ? title + " - " + siteConfig.title : siteConfig.title;
         <Tooltip />
         <Animations />
 
+        <style lang="scss">
+          #global-motion-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+            --ps-tile-size: 160px;
+            --ps-scroll-speed: 30s;
+
+            &::before {
+              content: "";
+              position: absolute;
+              inset: 0;
+              opacity: 0.2;
+              background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke='%23222222' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='40' cy='40' r='22'/%3E%3Cpath d='M120 20 L140 56 L100 56 Z'/%3E%3Cpath d='M28 112 L52 136 M52 112 L28 136'/%3E%3Crect x='100' y='104' width='36' height='36' rx='5' ry='5'/%3E%3C/g%3E%3C/svg%3E");
+              background-size: var(--ps-tile-size) var(--ps-tile-size);
+              background-repeat: repeat;
+              background-position: 0 0;
+              animation: ps-bg-pan var(--ps-scroll-speed) linear infinite;
+              will-change: background-position;
+            }
+          }
+
+          :global([data-theme="dark"]) #global-motion-bg::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke='%23cfcfcf' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='40' cy='40' r='22'/%3E%3Cpath d='M120 20 L140 56 L100 56 Z'/%3E%3Cpath d='M28 112 L52 136 M52 112 L28 136'/%3E%3Crect x='100' y='104' width='36' height='36' rx='5' ry='5'/%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.14;
+          }
+
+          @keyframes ps-bg-pan {
+            0%   { background-position: 0 0; }
+            100% { background-position: calc(-1 * var(--ps-tile-size)) calc(-1 * var(--ps-tile-size)); }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            #global-motion-bg::before {
+              animation: none;
+              will-change: auto;
+            }
+          }
+        </style>
+
         <script is:inline>
-          // 通用点击波纹扩散：为带 data-ripple 的元素在点击处生成扩散圆
           (function () {
             function spawnRipple(e) {
               var host = e.target && e.target.closest

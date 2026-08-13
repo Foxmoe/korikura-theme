@@ -19,18 +19,16 @@
 
 :root {
   --hue: 350;
-  --primary: oklch(0.80 0.10 var(--hue));
-  --primary-hover: oklch(0.72 0.12 var(--hue));
+  --primary: oklch(0.58 0.17 var(--hue));
+  --primary-hover: oklch(0.50 0.18 var(--hue));
   --bg: oklch(0.99 0 0);
   --card-bg: oklch(1 0 0);
   --text: oklch(0.27 0 0);
-  --muted: oklch(0.55 0 0);
-  --border: oklch(0.92 0 0);
+  --muted: oklch(0.46 0.005 var(--hue));
+  --border: oklch(0.88 0.006 var(--hue));
   --nav-h: 60px;
   --container: min(1360px, 97vw);
   --hero-tint: var(--bg);
-  /* 定义在“无层”的 :root 上，优先级高于 Tailwind @layer theme 里的默认 --font-sans，
-     否则会被 ui-sans-serif 默认栈覆盖，导致自定义字体不生效 */
   --font-sans: "LemiHuiYuanTi", system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, "Noto Sans CJK SC", "PingFang SC",
     "Microsoft YaHei", sans-serif;
@@ -71,11 +69,10 @@ body {
   font-family: var(--font-sans);
   font-synthesis: weight style;
   color: var(--text);
-  background-color: var(--bg);
+  background-color: transparent;
   min-height: 100vh;
 }
 
-/* 壁纸放在固定伪元素上，避免 background-attachment:fixed 在滚动时反复重绘导致卡顿 */
 body::after {
   content: "";
   position: fixed;
@@ -113,17 +110,27 @@ html {
   font-size: 15px;
   scroll-behavior: smooth;
   scrollbar-gutter: stable;
-  /* 锚点 / TOC 跳转时为固定导航栏留出空间，避免标题被遮住 */
   scroll-padding-top: calc(var(--nav-h) + 16px);
 }
 
-/* 键盘导航时的可见焦点轮廓（鼠标点击不显示） */
 :where(a, button, input, textarea, select, [tabindex]):focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 
-/* 跳到主要内容：默认移出视口，键盘聚焦时滑入 */
+[data-theme="light"] {
+  cursor: url("/cursor/dark_arrow.cur"), auto !important;
+  :where(a, button, input, textarea, select, label, [role="button"], [onclick], summary) {
+    cursor: url("/cursor/dark_hand.cur"), pointer !important;
+  }
+}
+[data-theme="dark"] {
+  cursor: url("/cursor/light_arrow.cur"), auto !important;
+  :where(a, button, input, textarea, select, label, [role="button"], [onclick], summary) {
+    cursor: url("/cursor/light_hand.cur"), pointer !important;
+  }
+}
+
 .skip-link {
   position: fixed;
   top: -100px;
@@ -267,7 +274,7 @@ button,
 }
 .code-group .code-tabs {
   @apply flex flex-wrap items-center gap-1 px-2 py-1.5
-         border-b border-(--border) bg-(--card-bg)/60;
+         border-b border-(--border) bg-(--card-bg);
 }
 .code-group .code-tab {
   @apply px-3 py-1 rounded text-xs font-medium no-underline cursor-pointer
@@ -368,7 +375,6 @@ button,
   @apply rounded-md;
   border: 0;
 }
-/* 内联代码：品牌浅粉圆角胶囊，弱化默认背景的厚重感 */
 .prose :where(code):not(pre code) {
   @apply rounded bg-(--primary)/10 px-1.5 py-0.5 text-[0.85em] font-medium text-(--primary);
   &::before,
@@ -419,7 +425,6 @@ button,
   @apply my-5 rounded-md border-l-4 px-4 py-3 text-sm;
   background: color-mix(in oklab, var(--alert) 7%, var(--card-bg));
 }
-/* .prose blockquote 特异性高于 .github-alert，用 .prose 前缀提权以彻底覆盖引用样式 */
 .prose .github-alert {
   margin: 1.25rem 0;
   border: 0;
@@ -536,26 +541,26 @@ button,
   }
 }
 
-/* 可复用的点击波纹扩散：给任意元素加 data-ripple 即可，自动裁剪溢出 */
 [data-ripple] {
   position: relative;
   overflow: hidden;
 }
+[data-ripple] { position: relative; }
 .ripple-ink {
   position: absolute;
   border-radius: 9999px;
-  background: color-mix(in oklab, var(--primary) 38%, transparent);
+  background: color-mix(in oklab, var(--primary) 30%, transparent);
   transform: scale(0);
-  opacity: 0.6;
+  opacity: 0.5;
   pointer-events: none;
   z-index: 1;
-  animation: ripple-ink 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+  animation: ripple-ink 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 @keyframes ripple-ink {
-  to {
-    transform: scale(2.8);
-    opacity: 0;
-  }
+  0%   { transform: scale(0);    opacity: 0.5; }
+  60%  { opacity: 0.28; }
+  100% { transform: scale(2.6);  opacity: 0; }
 }
 
 html.theme-transition,
@@ -657,19 +662,19 @@ html.theme-transition * {
   transform: translateX(-50%) translateY(0);
 }
 
-.page { @apply max-w-3xl mx-auto py-4; }
+.page { @apply max-w-4xl mx-auto px-5 py-6 bg-(--card-bg) rounded-xl shadow-sm; }
 .page-head { @apply mb-6; }
 .page-head h1 { @apply text-2xl font-bold; }
 .page-head p { @apply text-sm text-(--muted) mt-1; }
 .link-grid { @apply grid gap-3 sm:grid-cols-2; }
-.link-card { @apply flex items-center gap-3 p-3 rounded-lg border border-(--border) no-underline bg-(--card-bg)/50 transition hover:-translate-y-0.5; }
+.link-card { @apply flex items-center gap-3 p-3 rounded-lg border border-(--border) no-underline bg-(--card-bg) transition hover:-translate-y-0.5; }
 .link-avatar { @apply w-10 h-10 rounded-full object-cover border border-(--border); }
 .link-meta { @apply min-w-0 flex-1; }
 .link-name { @apply text-sm font-semibold text-(--text); }
 .link-desc { @apply text-xs text-(--muted) truncate; }
 .link-go { @apply text-(--muted) shrink-0 self-center; }
 .tool-grid { @apply grid gap-3 sm:grid-cols-2 lg:grid-cols-3; }
-.tool-card { @apply flex flex-col gap-1 p-4 rounded-lg border border-(--border) no-underline bg-(--card-bg)/50 transition hover:-translate-y-0.5; }
+.tool-card { @apply flex flex-col gap-1 p-4 rounded-lg border border-(--border) no-underline bg-(--card-bg) transition hover:-translate-y-0.5; }
 .tool-icon { @apply text-(--primary); }
 .tool-name { @apply text-sm font-semibold text-(--text); }
 .tool-desc { @apply text-xs text-(--muted); }
@@ -677,7 +682,7 @@ html.theme-transition * {
 .tl-item { @apply relative pl-6 pb-5 border-l-2 border-(--border); }
 .tl-item:last-child { @apply border-l-transparent pb-0; }
 .tl-dot { @apply absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-(--primary); }
-.tl-card { @apply rounded-lg border border-(--border) p-3 bg-(--card-bg)/50; }
+.tl-card { @apply rounded-lg border border-(--border) p-3 bg-(--card-bg); }
 .tl-date { @apply text-xs text-(--muted); }
 .tl-content { @apply text-sm text-(--text) mt-1 leading-relaxed; }
 
@@ -692,7 +697,6 @@ html.theme-transition * {
   }
 }
 
-/* 入场 / 滚动揭示动画：元素先隐藏，进入视口后淡入上移，缓解“生硬”感 */
 @keyframes fade-in-up {
   from {
     opacity: 0;
@@ -725,7 +729,6 @@ html.theme-transition * {
     transition: none;
   }
 
-  /* 关闭页面 / 英雄区的视图过渡与主题切换动画，尊重用户的减弱动态偏好 */
   ::view-transition-old(root),
   ::view-transition-new(root),
   ::view-transition-old(main),

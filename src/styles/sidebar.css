@@ -2,8 +2,6 @@
 
 .sidebar {
     @apply w-72 shrink-0 hidden xl:block;
-    /* 父 wrapper 被 flex stretch 出具体高度 2577px，100% 可正确解析，
-       从而给内部 sticky 元素提供吸顶所需的滚动空间 */
     height: 100%;
 }
 
@@ -43,7 +41,7 @@
 
 .card {
     @apply border border-(--border) p-4 rounded-lg;
-    background-color: color-mix(in oklab, var(--card-bg) 92%, transparent);
+    background-color: var(--card-bg);
     box-shadow: 0 2px 16px -12px rgba(0, 0, 0, 0.18);
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
     &:hover {
