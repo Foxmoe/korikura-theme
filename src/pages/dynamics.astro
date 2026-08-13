@@ -170,7 +170,7 @@ const months = [...monthMap.entries()]
   }
 
   .feed {
-    @apply rounded-xl border border-(--border) bg-(--card-bg)/50 overflow-hidden;
+    @apply rounded-xl border border-(--border) bg-(--card-bg) overflow-hidden px-4 py-3;
   }
   .feed-item {
     @apply flex flex-col gap-1 px-4 py-4 border-b border-(--border) transition-colors;
@@ -326,7 +326,6 @@ const months = [...monthMap.entries()]
             await navigator.share(data);
             return;
           } catch {
-            /* 用户取消则忽略 */
           }
         }
         try {

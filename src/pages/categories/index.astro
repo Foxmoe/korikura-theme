@@ -123,7 +123,6 @@ function tagSize(count: number) {
           p.hidden = p.getAttribute("data-panel") !== key;
         });
       }
-      // 仅绑定一次：点击事件委托到 document，SPA 切换后无需重新绑定
       if (!window.__taxTabsBound) {
         document.addEventListener("click", onTaxClick);
         window.__taxTabsBound = true;
@@ -149,10 +148,9 @@ function tagSize(count: number) {
     @apply text-(--muted);
   }
 
-  /* 选项卡 */
   .tax-tabs {
     @apply flex items-center gap-1 p-1 mb-6 rounded-xl
-           bg-(--card-bg)/60 border border-(--border) w-fit;
+           bg-(--card-bg) border border-(--border) w-fit;
   }
   .tax-tab {
     @apply inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm
@@ -166,13 +164,12 @@ function tagSize(count: number) {
     }
   }
 
-  /* 分类列表 */
   .cat-list {
     @apply flex flex-col gap-2;
   }
   .cat-item {
     @apply flex items-center gap-2 px-4 py-3 rounded-lg no-underline
-           border border-(--border) bg-(--card-bg)/50
+           border border-(--border) bg-(--card-bg)
            text-(--text) transition;
     &:hover {
       @apply border-(--primary) text-(--primary) -translate-y-0.5;
@@ -185,7 +182,6 @@ function tagSize(count: number) {
     @apply text-xs px-2 py-0.5 rounded-full bg-(--primary)/10 text-(--primary);
   }
 
-  /* 标签云 */
   .cloud {
     @apply flex flex-wrap gap-3;
   }

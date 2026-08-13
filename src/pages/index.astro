@@ -19,7 +19,6 @@ const cats = (await getCategoryCounts()).map((c) => c.name);
 
 const dynamics = (await getDynamics()).slice(0, 3);
 
-// 动态摘要：去掉 markdown 标记（图片 / 链接 / 符号），避免首页直接显示 md 源码
 function toPlainText(md: string): string {
   return (md || "")
     .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
@@ -47,7 +46,6 @@ function toPlainText(md: string): string {
     </div>
   </div>
 
-  <!-- 顶部：左轮播卡片 + 右最新动态 -->
   <section class="posts-section home-top reveal">
     <div class="home-top-grid">
       <HomeCarousel />
@@ -151,7 +149,6 @@ function toPlainText(md: string): string {
           card.style.display = show ? "" : "none";
         });
       }
-      // 仅绑定一次：委托到 document，SPA 切换后无需重新绑定
       if (!window.__catFilterBound) {
         document.addEventListener("click", onFilterClick);
         window.__catFilterBound = true;
@@ -163,18 +160,17 @@ function toPlainText(md: string): string {
 <style lang="scss">
   .hero-banner {
     @apply relative w-full overflow-hidden;
+    background-color: var(--bg);
+    z-index: 0;
     margin-top: calc(-1 * (var(--nav-h) + 8px));
-    /* 小屏用最小高度，避免 21:7 比例把 banner 压得过矮、文字被挤到屏幕外 */
-    min-height: 46vh;
+    min-height: 40vh;
     @media (min-width: 768px) {
-      aspect-ratio: 21 / 7;
-      min-height: 0;
+      min-height: 42vh;
     }
   }
   .hero-banner-img {
-    @apply w-full h-full object-cover;
+    @apply absolute inset-0 w-full h-full object-cover;
   }
-  /* 底部取色渐变：用 hero 主色淡出到页面背景，使 banner 与下方内容的分界柔和模糊 */
   .hero-banner::after {
     content: "";
     @apply absolute inset-x-0 bottom-0 h-2/5 pointer-events-none z-0;
@@ -243,7 +239,7 @@ function toPlainText(md: string): string {
     @apply pt-2;
   }
   .home-dyn {
-    @apply rounded-xl border border-(--border) bg-(--card-bg)/50 p-4;
+    @apply rounded-xl border border-(--border) bg-(--card-bg) p-4;
   }
   .home-dyn .section-header {
     @apply mb-3;
@@ -257,7 +253,7 @@ function toPlainText(md: string): string {
   }
   .filter-chip {
     @apply px-3 py-1.5 rounded-full text-xs font-medium no-underline cursor-pointer
-           border border-(--border) bg-(--card-bg)/60
+           border border-(--border) bg-(--card-bg)
            text-(--muted) transition;
     &:hover {
       @apply text-(--primary) border-(--primary);

@@ -96,7 +96,6 @@ const monthDay = (d: Date) => `${d.getMonth() + 1}月${d.getDate()}日`;
     @apply text-lg text-(--muted);
   }
 
-  /* 时间轴 */
   .tl {
     @apply relative;
   }
@@ -129,7 +128,7 @@ const monthDay = (d: Date) => `${d.getMonth() + 1}月${d.getDate()}日`;
     @apply bg-(--primary) scale-110;
   }
   .tl-card {
-    @apply block rounded-lg border border-(--border) bg-(--card-bg)/50
+    @apply block rounded-lg border border-(--border) bg-(--card-bg)
            px-4 py-2.5 transition
            hover:border-(--primary) hover:-translate-y-0.5 hover:shadow-md;
   }

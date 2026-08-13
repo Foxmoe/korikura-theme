@@ -38,6 +38,5 @@ import Icon from "@/components/icon.astro";
 <script>
   const open = () => document.dispatchEvent(new CustomEvent("open-search"));
   document.getElementById("sp-open")?.addEventListener("click", open);
-  // 直接进入 /search 时自动弹出搜索框
   open();
 </script>

@@ -84,7 +84,7 @@ const handle =
     @apply text-xs text-(--muted);
   }
   .detail-card {
-    @apply rounded-xl border border-(--border) bg-(--card-bg)/60 p-5;
+    @apply rounded-xl border border-(--border) bg-(--card-bg) p-5;
   }
   .detail-head {
     @apply flex items-center gap-3 mb-3;
@@ -148,7 +148,6 @@ const handle =
         document.body.appendChild(t);
         window.setTimeout(() => t.remove(), 1600);
       } catch {
-        /* 复制失败忽略 */
       }
     });
   }
