@@ -1,10 +1,4 @@
 ---
-// 增强文章内代码块：
-//  - 把连续、且带相同 `group=xxx` 的 <pre> 组合为可切换选项卡的 .code-group
-//  - 为普通代码块添加语言标签 + 复制按钮
-//  - 超过阈值可手动折叠，>100 行自动折叠
-//  - 将 `> [!NOTE]` 等 GitHub 提示框转换为彩色卡片
-// 随 SPA 导航在文章页重新执行。
 ---
 
 <script>
@@ -47,7 +41,6 @@
     wrap.insertBefore(head, wrap.firstChild);
   }
 
-  // 为代码块添加折叠按钮（行数足够时）；>100 行默认折叠
   function addCollapse(wrap: HTMLElement, pre: HTMLElement) {
     if (wrap.querySelector(".code-toggle")) return;
     const code = pre.querySelector("code");
@@ -75,7 +68,6 @@
     return wrap;
   }
 
-  // GitHub 提示框：把 `> [!NOTE]` 等引用转换为彩色卡片
   const GITHUB_ALERT_ICONS: Record<string, string> = {
     note: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>',
     tip: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg>',
@@ -97,13 +89,11 @@
       if (el.dataset.githubEnhanced) return;
       const firstP = el.querySelector("p");
       if (!firstP) return;
-      // 允许 [!TYPE] 独占一段，或与正文挤在同一段（软换行）两种情况
       const re = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*/i;
       const m = re.exec((firstP.textContent || "").trim());
       if (!m) return;
       el.dataset.githubEnhanced = "true";
       const type = m[1].toLowerCase();
-      // 仅移除首段里的 [!TYPE] 标记，保留正文（可能和标记在同一段）
       firstP.textContent = (firstP.textContent || "")
         .replace(re, "")
         .replace(/^\s*[\r\n]+/, "")
@@ -128,7 +118,6 @@
     });
   }
 
-  // 把连续同组的 <pre> 包进 .code-group，便于生成选项卡
   function groupCodeBlocks() {
     const pres = Array.from(
       document.querySelectorAll("pre.astro-code[data-group]")
@@ -167,7 +156,6 @@
   function initCodeBlocks() {
     groupCodeBlocks();
 
-    // 1) 分组代码块：构建选项卡
     document.querySelectorAll(".code-group").forEach((group) => {
       const g = group as HTMLElement;
       const pres = Array.from(
@@ -206,14 +194,12 @@
       });
     });
 
-    // 2) 普通代码块
     document.querySelectorAll("pre.astro-code").forEach((pre) => {
       const p = pre as HTMLElement;
       if (p.closest(".code-group")) return;
       wrapPre(p);
     });
 
-    // 3) GitHub 提示框
     enhanceGithubAlerts();
   }
 

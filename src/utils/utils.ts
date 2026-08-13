@@ -1,4 +1,3 @@
-// 简单日期格式化
 export function formatDate(date: Date) {
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
@@ -6,7 +5,6 @@ export function formatDate(date: Date) {
   return `${year}-${month}-${day}`;
 }
 
-// 中文日期：2022年1月1日
 export function formatDateToChinese(date: Date) {
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
@@ -14,12 +12,10 @@ export function formatDateToChinese(date: Date) {
   return `${year}年${month}月${day}日`;
 }
 
-// ISO 8601（用于 RSS / JSON-LD）
 export function formatDateToISO(date: Date) {
   return date.toISOString();
 }
 
-// 相对时间：3 天前 / 2 个月前
 export function formatRelativeTime(date: Date) {
   const diff = Date.now() - date.getTime();
   const day = 24 * 60 * 60 * 1000;
@@ -32,8 +28,6 @@ export function formatRelativeTime(date: Date) {
 }
 
 /**
- * 估算阅读时长与字数。
- * 中文按字符计、英文/数字按词计，混合文本更贴近真实阅读量。
  */
 export function getReadingTime(content: string, speed = 320) {
   const text = content || "";
@@ -48,7 +42,6 @@ export function getReadingTime(content: string, speed = 320) {
   return { words, minutes };
 }
 
-// 标签/分类 URL 安全化（保留大小写，仅做编码）
 export function tagToSlug(tag: string) {
   return encodeURIComponent(tag.trim());
 }

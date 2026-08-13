@@ -1,5 +1,4 @@
 ---
-// 评论区组件，使用 @waline/client，后端为独立部署的 Waline Worker。
 import { siteConfig } from "../config";
 
 const walineServer = siteConfig.comments?.walineServer ?? "https://waline.foxmoe.top";
@@ -11,7 +10,6 @@ const walineServer = siteConfig.comments?.walineServer ?? "https://waline.foxmoe
 </section>
 
 <style lang="scss" is:global>
-  /* 评论区全面主题化：覆盖 Waline 默认白底蓝字，与站点暗色/亮色主题统一 */
   .comments {
     --waline-theme-color: var(--primary);
     --waline-active-color: var(--primary-hover);
@@ -24,7 +22,6 @@ const walineServer = siteConfig.comments?.walineServer ?? "https://waline.foxmoe
     --waline-disable-color: var(--muted);
     --waline-code-bgcolor: color-mix(in oklab, var(--primary) 12%, var(--card-bg));
 
-    /* ====== 主面板：强制覆盖 waline.css 的白色默认 ====== */
     .wl-panel {
       font-family: var(--font-sans);
       background: var(--card-bg) !important;
@@ -33,7 +30,6 @@ const walineServer = siteConfig.comments?.walineServer ?? "https://waline.foxmoe
       box-shadow: 0 2px 12px color-mix(in oklab, #000 10%, transparent);
     }
 
-    /* 头部（昵称/邮箱/链接输入行） */
     .wl-header {
       border-bottom-color: var(--border) !important;
     }
@@ -49,7 +45,6 @@ const walineServer = siteConfig.comments?.walineServer ?? "https://waline.foxmoe
       }
     }
 
-    /* 编辑器（多行文本框） */
     .wl-editor {
       background: color-mix(in oklab, var(--card-bg) 80%, var(--bg)) !important;
       color: var(--text) !important;
@@ -63,20 +58,17 @@ const walineServer = siteConfig.comments?.walineServer ?? "https://waline.foxmoe
       &::placeholder { color: var(--muted) !important; }
     }
 
-    /* 底部操作栏（字数 + 提交按钮） */
     .wl-action {
       background: transparent !important;
       border-top-color: var(--border) !important;
     }
     .wl-word-count { color: var(--muted) !important; }
 
-    /* 按钮 */
     .wl-btn {
       border-radius: 0.6rem;
       transition: background-color 0.2s, border-color 0.2s, color 0.2s;
     }
     .wl-btn-primary {
-      /* 加深主色保证白字可读 */
       background: color-mix(in oklab, var(--primary) 68%, #000) !important;
       border-color: color-mix(in oklab, var(--primary) 68%, #000) !important;
       color: #fff !important;
@@ -86,7 +78,6 @@ const walineServer = siteConfig.comments?.walineServer ?? "https://waline.foxmoe
       }
     }
 
-    /* ====== 评论列表 ====== */
     .wl-list {
       padding-top: 0.25rem;
     }
@@ -121,10 +112,8 @@ const walineServer = siteConfig.comments?.walineServer ?? "https://waline.foxmoe
     .wl-quote { color: var(--muted) !important; }
     .wl-quote .wl-nick { color: var(--primary-hover) !important; }
 
-    /* 头像 */
     .wl-avatar { border-radius: 9999px; }
 
-    /* 点赞 */
     .wl-like {
       border-color: var(--border) !important;
       color: var(--muted) !important;
@@ -135,7 +124,6 @@ const walineServer = siteConfig.comments?.walineServer ?? "https://waline.foxmoe
       }
     }
 
-    /* 回复输入框 */
     .wl-reply-form .wl-editor,
     .wl-reply-form .wl-input {
       background: var(--card-bg) !important;
@@ -144,21 +132,17 @@ const walineServer = siteConfig.comments?.walineServer ?? "https://waline.foxmoe
       border-radius: 0.5rem;
     }
 
-    /* 分页 / 加载更多 */
     .wl-more { color: var(--muted) !important; }
     .wl-more:hover { color: var(--primary) !important; }
 
-    /* 信息栏（Powered by / 按正序等） */
     .wl-info { color: var(--muted) !important; }
     .wl-info a { color: var(--primary) !important; }
 
-    /* 管理员标签 */
     .wl-admin-badge {
       background: var(--primary) !important;
       color: #fff !important;
     }
 
-    /* 表情/图片工具栏图标 */
     .wl-gif-popup,
     .wl-image-popup {
       background: var(--card-bg) !important;
@@ -179,16 +163,13 @@ const walineServer = siteConfig.comments?.walineServer ?? "https://waline.foxmoe
     let walineInstance = null;
 
     function initWaline() {
-      // Waline 脚本可能尚未加载完成，稍后重试
       if (typeof Waline === "undefined") {
         return setTimeout(initWaline, 50);
       }
-      // 销毁旧实例，避免 SPA 切换时重复渲染
       if (walineInstance) {
         try {
           walineInstance.destroy();
         } catch (e) {
-          /* 忽略已脱离 DOM 的实例销毁错误 */
         }
         walineInstance = null;
       }
@@ -199,15 +180,12 @@ const walineServer = siteConfig.comments?.walineServer ?? "https://waline.foxmoe
         el: "#waline",
         serverURL: walineServer,
         lang: "zh-CN",
-        // 评论数统计等可按需开启
         visitor: false,
       });
     }
 
-    // 首次加载
     initWaline();
 
-    // SPA 页面切换后重跑
     window.addEventListener("spa-navigate", () => setTimeout(initWaline, 60));
   })();
 </script>

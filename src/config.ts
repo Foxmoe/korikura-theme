@@ -7,16 +7,12 @@ export const siteConfig = {
     entry: "/",
     themeMode: "auto",
 
-    /* 默认头图 */
     defaultCover: "/images/wallhaven-qr3j1r.jpg",
 
-    /* 阅读速度 */
     readingSpeed: 320,
 
-    /* 文章超过该天数未更新则提示“内容可能已过期” */
     outdatedDays: 180,
 
-    /* 导航链接 */
     navLinks: [
         { href: "/", label: "首页" },
         { href: "/posts", label: "文章" },
@@ -28,25 +24,21 @@ export const siteConfig = {
         { href: "/about", label: "关于" },
     ],
 
-    /* 友链 */
     friendLinks: [
         { name: "Astro", url: "https://astro.build", avatar: "https://astro.build/favicon.svg", desc: "The web framework for content-driven websites" },
         { name: "胡巴的博客", url: "https://hlydwz.com", avatar: "", desc: "胡巴的博客是一个自建的全栈个人博客系统，使用 Astro + React + PocketBase 构建，自 2025 年运行至今。" },
     ],
 
-    /* 工具 */
     tools: [
         { name: "示例工具", url: "https://example.com", desc: "在这里替换为你的小工具链接", icon: "link" },
         { name: "Astro 文档", url: "https://docs.astro.build", desc: "Astro 官方文档", icon: "github" },
     ],
 
-    /* 社交 */
     socialLinks: [
         { name: "GitHub", url: "https://github.com/Foxmoe", icon: "github" },
         { name: "RSS", url: "/rss.xml", icon: "rss" },
     ],
 
-    /* 页脚信息 */
     footer: {
         since: "2022-06-01",
         icp: "",
@@ -54,15 +46,12 @@ export const siteConfig = {
         poweredBy: true,
     },
 
-    /* 文章许可 */
     license: {
         name: "CC BY-NC-SA 4.0",
         url: "https://creativecommons.org/licenses/by-nc-sa/4.0/",
     },
 
-    /* 评论系统（Waline） */
     comments: {
-        // Waline 后端地址，即你的独立 Worker 域名
         walineServer: "https://waline.foxmoe.top",
     },
 
